@@ -1,6 +1,36 @@
+# Maven          #
+##################
 target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
+
+# Eclipse         #
+###################
+.project
+.metadata
+*.tmp
+local.properties
+.classpath
+.settings/
+.loadpath
+.cache
+target/**
+*/*/target
+
+# Logs and databases #
+######################
+*.log
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.d
