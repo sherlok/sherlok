@@ -1,0 +1,131 @@
+#hits_cnt{
+    padding-bottom: 15px;
+    font-size: 0.9em;
+}
+
+a.prop_class{
+    padding: 4px;
+}
+
+#default_search{
+    padding-left: 10px;
+}
+
+.inline-a {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: transparent transparent #bbb;
+    border-image: none;
+    border-radius: 3px;
+    border-style: solid solid dotted;
+    border-width: 1px;
+    display: inline-block;
+    line-height: 14px;
+    padding: 2px;
+    vertical-align: baseline;
+    white-space: nowrap;
+}
+
+.inline_shadow {
+    background-color: #fcfbed !important;
+    box-shadow: 0 1px 3px rgba(15, 15, 15, 0.27);
+}
+.inline-a:hover {
+    /*cursor: pointer;*/
+    background-color: #fcfbed !important;
+    box-shadow: 0 1px 3px rgba(15, 15, 15, 0.27);
+}
+
+.np_neuron { /*black*/
+    background-color: #dcdcdc;
+    border: 1px solid #999999;
+    color: #666666;
+}
+.np_morphology { /* blue */
+    background-color: #d3e9f4;
+    border: 1px solid #98c3cd;
+    color: #3a87ad;
+}
+.np_layer { /*violet*/
+    background-color: rgb(227, 215, 255);
+    border: 1px solid rgb(207, 195, 236);
+    color: rgb(61, 24, 142);
+}
+.np_brainregion { /*lightred*/
+    background-color: rgb(242, 222, 222);
+    border: 1px solid rgb(229, 211, 211);
+    color: rgb(185, 74, 72);
+}
+.np_electrophysiology { /*yellow*/
+    background-color: #fafdb6;
+    border: 1px solid #d9d598;
+    color: #cda12a;
+}
+.np_function { /*orange*/
+    background-color: rgb(254, 228, 189);
+    border: 1px solid rgb(252, 205, 127);
+    color: rgb(89, 32, 3);
+}
+.np_layer { /*green*/
+    background-color: #dff0d8;
+    border: 1px solid #9bc08c;
+    color: #468847;
+}
+.np_orientation { /*lightgreen*/
+    background-color: rgb(238, 255, 236);
+    border: 1px solid rgb(225, 246, 209);
+    color: rgb(82, 157, 84);
+}
+.np_size { /*darkgreen*/
+    background-color: rgb(186, 221, 188);
+    border: 1px solid #9bc08c;
+    color: rgb(80, 104, 82);
+}
+.np_neurotransmitter { /*forest*/
+    background-color: rgb(206, 212, 180);
+    border: 1px solid rgb(175, 180, 153);
+    color: rgb(67, 70, 56);
+}
+.np_protein { /*darkblue*/
+    background-color: rgb(187, 211, 230);
+    border: 1px solid rgb(170, 197, 238);
+    color: rgb(13, 77, 124);
+}
+.np_developmental { /*lightyellow*/
+    background-color: rgb(252, 248, 227);
+    border: 1px solid rgb(251, 238, 213);
+    color: rgb(144, 118, 49);
+}
+.np_species { /*red*/
+    background-color: #f3c2c2;
+    border: 1px solid #c99797;
+    color: #c14240;
+}
+
+
+
+/*FOOTER */
+/* Sticky footer styles http://getbootstrap.com/examples/sticky-footer/sticky-footer.css
+-------------------------------------------------- */
+.myfooter {
+  text-align: center;
+  padding: 10px;
+}
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}

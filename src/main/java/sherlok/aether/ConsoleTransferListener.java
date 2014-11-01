@@ -8,7 +8,7 @@
  * Contributors:
  *    Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.aether.examples.util;
+package sherlok.aether;
 
 import java.io.PrintStream;
 import java.text.DecimalFormat;

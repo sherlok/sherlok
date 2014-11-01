@@ -8,27 +8,24 @@
  * Contributors:
  *    Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package enelpy_core;
+package sherlok;
 
-import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
-import static org.apache.uima.fit.factory.CollectionReaderFactory.createReaderDescription;
-import static org.apache.uima.fit.pipeline.SimplePipeline.runPipeline;
-import static org.apache.uima.fit.util.JCasUtil.selectAll;
+import static ch.epfl.bbp.collections.Create.list;
+import static ch.epfl.bbp.collections.Create.map;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_component.AnalysisComponent;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
-import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.collection.CollectionReaderDescription;
-import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
+import org.apache.uima.collection.metadata.CpeDescriptorException;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
-import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -37,18 +34,21 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.collection.DependencyCollectionException;
-import org.eclipse.aether.examples.util.Booter;
-import org.eclipse.aether.examples.util.ConsoleDependencyGraphDumper;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.xml.sax.SAXException;
+
+import sherlok.aether.Booter;
+import sherlok.aether.ConsoleDependencyGraphDumper;
+import ch.epfl.bbp.collections.Create;
 
 /**
  * Collects the transitive dependencies of an artifact.
  */
-public class GetDependencyTreeMine3 {
+public class Resolver {
 
     /** reflection to bypass encapsulation */
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -82,17 +82,14 @@ public class GetDependencyTreeMine3 {
         }
     }
 
-    private static void solveDeps() throws ArtifactResolutionException,
+    private void solveDeps(String fakePom) throws ArtifactResolutionException,
             DependencyCollectionException, IOException {
 
         RepositorySystem system = Booter.newRepositorySystem();
         RepositorySystemSession session = Booter
                 .newRepositorySystemSession(system);
 
-        Artifact rootArtifact = new DefaultArtifact(
-        // "org.apache.maven:maven-aether-provider:3.1.0");
-        // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-asl:1.6.2");
-                "enelpy:enelpy:pom:1");
+        Artifact rootArtifact = new DefaultArtifact(fakePom);
 
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(new Dependency(rootArtifact, ""));
@@ -126,26 +123,6 @@ public class GetDependencyTreeMine3 {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-
-        // well-behaved Java packages work relative to the
-        // context classloader. Others don't (like commons-logging)
-        solveDeps();
-
-        AnalysisEngineDescription seg = createEngine("de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter");
-        AnalysisEngineDescription pos = createEngine("de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger");
-
-        // AnalysisEngineDescription parser = createEngineDescription(
-        // MaltParser.class, PARAM_LANGUAGE, "en", PARAM_VARIANT, "linear");
-
-        AnalysisEngineDescription printDeps = createEngineDescription(PrintDeps.class);
-
-        // JCas jCas = UimaUtils.getCas("The cat sits on the mat.");
-        // runPipeline(jCas.getCas(), seg, pos, parser, printDeps);
-        CollectionReaderDescription cr = createReaderDescription(SingleAbstractReader.class);
-        runPipeline(cr, seg, pos, printDeps);// , parser);
-    }
-
     @SuppressWarnings("unchecked")
     static AnalysisEngineDescription createEngine(String cName,
             Object... params) throws ClassNotFoundException,
@@ -161,21 +138,81 @@ public class GetDependencyTreeMine3 {
         return aed;
     }
 
-    public static class PrintDeps extends JCasAnnotator_ImplBase {
+    public static class AED {
+        String componentClass;
+        Object[] params;
 
-        @Override
-        public void process(JCas jCas) throws AnalysisEngineProcessException {
+        public AED(String componentClass) {
+            this.componentClass = componentClass;
+            this.params = new Object[0];
+        }
 
-            for (TOP a : selectAll(jCas)) {
-                System.out.println(a);
+        public AED(String componentClass, Object... params) {
+            this.componentClass = componentClass;
+            this.params = params;
+        }
+
+        // AED add(Object param) {
+        // params.add(param);
+        // return this;
+        // }
+
+        public Object[] getParams() {
+            // return params.toArray(new Object[params.size()]);
+            return params;
+        }
+    }
+
+    private static final String SEP = ":::";
+    private Map<String, Pipeline> pipelineCache = map();
+
+    public Pipeline resolve(String pipelineName, String version)
+            throws UIMAException, ArtifactResolutionException,
+            DependencyCollectionException, IOException, ClassNotFoundException,
+            SAXException, CpeDescriptorException {
+
+        // 1. get pipeline from cache of components
+        if (pipelineCache.containsKey(pipelineName + SEP + version)) {
+            return pipelineCache.get(pipelineName + SEP + version);
+
+        } else {
+            // 2. else, create it
+            // 2.1 read pipeline def
+            // 2.2 resolve engines
+            List<AED> aeds = Create.list();
+            aeds.add(new AED(
+                    "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter"));
+            aeds.add(new AED(
+                    "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger"));
+            aeds.add(new AED(
+                    "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder",
+                    "modelVariant", "person"));
+            aeds.add(new AED(
+                    "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder",
+                    "modelVariant", "location"));
+
+            // 2.3 resolve bundles
+
+            // 2.4 create fake POM from bundles and copy it
+            String fakePom = "sherlok:sherlok:pom:1";
+            // 2.4 solve dependecies
+            solveDeps(fakePom);
+
+            // 3 create pipeline and add components
+            Pipeline p = new Pipeline(pipelineName, version);
+            for (AED aed : aeds) {
+                p.add(createEngine(aed.componentClass, aed.getParams()));
             }
+            // AnalysisEngineDescription seg =
+            // createEngine("de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter");
+            // AnalysisEngineDescription pos =
+            // createEngine("de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger");
+            // AnalysisEngineDescription parser = createEngineDescription(
+            // MaltParser.class, PARAM_LANGUAGE, "en", PARAM_VARIANT, "linear");
 
-            // for (Dependency dep : select(jCas, Dependency.class)) {
-            // System.out.println("dep: [" + dep.getDependencyType()
-            // + "] \t gov: [" + dep.getGovernor().getCoveredText()
-            // + "] \t dep: [" + dep.getDependent().getCoveredText()
-            // + "]");
-            // }
+            p.initializeEngines();
+            pipelineCache.put(pipelineName + SEP + version, p);
+            return p;
         }
     }
 
