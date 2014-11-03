@@ -20,7 +20,7 @@ public class ResolverTest {
         
         File dir = new File("local_repo/sherlok/sherlok/1");
         dir.mkdirs();
-        FileUtils.copyFile(new File("sherlok-default-1.pom"), new File("local_repo/sherlok/sherlok/1/sherlok-1.pom"));
+        FileUtils.copyFile(new File("sherlok-1.pom"), new File("local_repo/sherlok/sherlok/1/sherlok-1.pom"));
         
 
         Pipeline pipeline = new Resolver().resolve("default", "1");

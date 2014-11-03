@@ -101,14 +101,14 @@ public class Resolver {
 
             ArtifactResult artifactResult = system.resolveArtifact(session,
                     artifactRequest);
-           // System.out.println("RESOLVED:: " + artifactResult.isResolved());
+            // System.out.println("RESOLVED:: " + artifactResult.isResolved());
 
             artifact = artifactResult.getArtifact();
 
             ClassPathHack.addFile(artifact.getFile());
 
-//            System.out
-//                    .println("FILE:: " + artifact.getFile().getAbsolutePath());
+            // System.out
+            // .println("FILE:: " + artifact.getFile().getAbsolutePath());
         }
     }
 
@@ -194,7 +194,9 @@ public class Resolver {
             }
 
             // 3.2 set annotations to output
-            p.addOutputAnnotation("de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity", "value");
+            p.addOutputAnnotation(
+                    "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity",
+                    "value");
 
             // 3.3 initialize pipeline and cache it
             p.initialize();
