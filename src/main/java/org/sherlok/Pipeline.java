@@ -1,4 +1,4 @@
-package sherlok;
+package org.sherlok;
 
 import static ch.epfl.bbp.collections.Create.list;
 
@@ -18,6 +18,19 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.util.InvalidXMLException;
 import org.xml.sax.SAXException;
 
+/**
+ * Lifecycle:<br>
+ * <ol>
+ * <li>create Pipeline</li>
+ * <li>add engines</li>
+ * <li>add output fields</li>
+ * <li>initialize</li>
+ * <li>annotate text</li>
+ * <li>close</li>
+ * </ol>
+ * 
+ * @author renaud@apache.org
+ */
 public class Pipeline {
 
     private String pipelineName;
@@ -34,10 +47,6 @@ public class Pipeline {
         this.version = version;
     }
 
-    public void addOutputAnnotation(String typeName) {
-        filter.includeType(typeName);
-    }
-
     public void add(AnalysisEngineDescription aDesc) throws IOException,
             SAXException, CpeDescriptorException, InvalidXMLException {
         if (engines != null)
@@ -46,13 +55,17 @@ public class Pipeline {
         aeds.add(aDesc);
     }
 
+    public void addOutputAnnotation(String typeName, String... properties) {
+        filter.includeType(typeName, properties);
+    }
+
     public void initialize() throws UIMAException {
         // initialize Engines
         if (engines == null) {
             engines = createEngines(aeds
                     .toArray(new AnalysisEngineDescription[aeds.size()]));
         }
-        // initialize outputter
+        // initialize JSON writer (incl. filter)
         if (xcs == null) {
             xcs = new XmiCasSerializer(filter);
             xcs.setPrettyPrint(true);
@@ -94,5 +107,4 @@ public class Pipeline {
     public String toString() {
         return pipelineName + ":" + version;
     }
-
 }

@@ -1,6 +1,6 @@
-package org.apache.uima.cas.impl;
+package org.apache.uima.cas.impl; // needed because of methods visibility
 
-import sherlok.Pipeline;
+import org.sherlok.Pipeline;
 
 /**
  * Used to filter JSON writer, see {@link Pipeline}
@@ -10,11 +10,18 @@ import sherlok.Pipeline;
  */
 public class FilteringTypeSystem extends TypeSystemImpl {
 
-    /***/
-    public void includeType(String typeName) {
-        super.addType(typeName, annotBaseTypeCode);
+    /**
+     * @param typeName
+     *            the type to include in the JSON output
+     * @param properties
+     *            the name of properties to include in the JSON output
+     */
+    public void includeType(String typeName, String... properties) {
+        int type = super.addType(typeName, annotBaseTypeCode);
+        for (String property : properties) {
+            super.addFeature(property, type, annotBaseTypeCode);
+        }
     }
-
     /*-
 
     public Type getType(String typeName) {

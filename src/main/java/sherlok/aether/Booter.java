@@ -10,8 +10,7 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
-
-import sherlok.Sherlok;
+import org.sherlok.Sherlok;
 
 /**
  * A helper to boot the repository system and a repository system session.

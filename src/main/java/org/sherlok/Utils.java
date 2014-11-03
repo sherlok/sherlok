@@ -1,4 +1,4 @@
-package sherlok;
+package org.sherlok;
 
 import org.apache.uima.UIMAException;
 import org.apache.uima.fit.factory.JCasFactory;

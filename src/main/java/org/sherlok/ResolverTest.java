@@ -1,4 +1,4 @@
-package sherlok;
+package org.sherlok;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 

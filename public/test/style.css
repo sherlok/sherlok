@@ -1,14 +1,6 @@
-#hits_cnt{
-    padding-bottom: 15px;
-    font-size: 0.9em;
-}
 
-a.prop_class{
-    padding: 4px;
-}
-
-#default_search{
-    padding-left: 10px;
+#annotated{
+    height: auto;
 }
 
 .inline-a {
@@ -37,6 +29,8 @@ a.prop_class{
     background-color: #fcfbed !important;
     box-shadow: 0 1px 3px rgba(15, 15, 15, 0.27);
 }
+
+/* ANNOTATIONS */
 
 .np_neuron { /*black*/
     background-color: #dcdcdc;
@@ -104,6 +98,17 @@ a.prop_class{
     color: #c14240;
 }
 
+
+.np_location { /*forest*/
+    background-color: rgb(206, 212, 180);
+    border: 1px solid rgb(175, 180, 153);
+    color: rgb(67, 70, 56);
+}
+.np_person { /*red*/
+    background-color: #f3c2c2;
+    border: 1px solid #c99797;
+    color: #c14240;
+}
 
 
 /*FOOTER */

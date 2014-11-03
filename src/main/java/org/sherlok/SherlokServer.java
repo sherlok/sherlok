@@ -1,4 +1,4 @@
-package sherlok;
+package org.sherlok;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static spark.Spark.*;
@@ -7,6 +7,11 @@ import org.slf4j.Logger;
 
 import spark.*;
 
+/**
+ * Main Sherlok server
+ * 
+ * @author renaud@apache.org
+ */
 public class SherlokServer {
     private static Logger LOG = getLogger(SherlokServer.class);
 
@@ -27,6 +32,8 @@ public class SherlokServer {
     }
 
     static void init() {
+        
+        
 
         setPort(9600);
 

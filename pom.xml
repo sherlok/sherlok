@@ -88,6 +88,18 @@
       <version>0.1</version>
     </dependency>
 
+    <!-- JSON and YAML ser/deser -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-json-org</artifactId>
+      <version>2.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>2.4.2</version>
+    </dependency>
+
     <!-- SPARK web framework -->
     <dependency>
       <groupId>com.sparkjava</groupId>

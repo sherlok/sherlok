@@ -8,7 +8,7 @@
  * Contributors:
  *    Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package sherlok;
+package org.sherlok;
 
 import static ch.epfl.bbp.collections.Create.map;
 
@@ -204,7 +204,7 @@ public class Resolver {
             }
 
             // 3.2 set annotations to output
-            p.addOutputAnnotation("de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity");
+            p.addOutputAnnotation("de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity", "value");
 
             // 3.3 initialize pipeline and cache it
             p.initialize();
