@@ -30,8 +30,8 @@
     <!-- latest (unreleased), for Json writer -->
     <dependency>
       <groupId>org.apache.uima</groupId>
-      <artifactId>uimaj-examples</artifactId>
-      <version>2.6.1-SNAPSHOT</version>
+      <artifactId>uimaj-core</artifactId>
+      <version>2.6.1-json</version>
     </dependency>
 
     <dependency>
@@ -140,14 +140,13 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>appassembler-maven-plugin</artifactId>
-        <version>1.3</version>
+        <version>1.8.1</version>
         <configuration>
-          <extraJvmArguments>-Xms512M -Xmx800M
-            -Dbabylon_home=@BASEDIR@/resources -Dfile.encoding=UTF8</extraJvmArguments>
+          <extraJvmArguments> -Dfile.encoding=UTF8</extraJvmArguments>
           <programs>
             <program>
-              <mainClass>TODO</mainClass>
-              <name>recommandation_server</name>
+              <mainClass>org.sherlok.SherlokServer</mainClass>
+              <name>sherlok</name>
             </program>
           </programs>
         </configuration>

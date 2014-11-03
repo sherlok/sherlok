@@ -7,6 +7,9 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+import org.sherlok.Pipeline;
+import org.sherlok.Resolver;
+import org.sherlok.Sherlok;
 
 public class ResolverTest {
 
