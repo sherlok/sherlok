@@ -10,7 +10,6 @@
  *******************************************************************************/
 package sherlok;
 
-import static ch.epfl.bbp.collections.Create.list;
 import static ch.epfl.bbp.collections.Create.map;
 
 import java.io.File;
@@ -203,17 +202,14 @@ public class Resolver {
             for (AED aed : aeds) {
                 p.add(createEngine(aed.componentClass, aed.getParams()));
             }
-            // AnalysisEngineDescription seg =
-            // createEngine("de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter");
-            // AnalysisEngineDescription pos =
-            // createEngine("de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger");
-            // AnalysisEngineDescription parser = createEngineDescription(
-            // MaltParser.class, PARAM_LANGUAGE, "en", PARAM_VARIANT, "linear");
 
-            p.initializeEngines();
+            // 3.2 set annotations to output
+            p.addOutputAnnotation("de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity");
+
+            // 3.3 initialize pipeline and cache it
+            p.initialize();
             pipelineCache.put(pipelineName + SEP + version, p);
             return p;
         }
     }
-
 }

@@ -1,13 +1,15 @@
 package sherlok;
 
+import static ch.epfl.bbp.collections.Create.list;
+
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.cas.impl.FilteringTypeSystem;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.collection.metadata.CpeDescriptorException;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
@@ -21,14 +23,19 @@ public class Pipeline {
     private String pipelineName;
     private String version;
 
-    private List<AnalysisEngineDescription> aeds = new ArrayList<AnalysisEngineDescription>();
+    private List<AnalysisEngineDescription> aeds = list();
     private AnalysisEngine[] engines = null;
+    private FilteringTypeSystem filter = new FilteringTypeSystem();
 
-    private XmiCasSerializer xcs = new XmiCasSerializer(null);
+    private XmiCasSerializer xcs;
 
     public Pipeline(String pipelineName, String version) {
         this.pipelineName = pipelineName;
         this.version = version;
+    }
+
+    public void addOutputAnnotation(String typeName) {
+        filter.includeType(typeName);
     }
 
     public void add(AnalysisEngineDescription aDesc) throws IOException,
@@ -39,10 +46,16 @@ public class Pipeline {
         aeds.add(aDesc);
     }
 
-    public void initializeEngines() throws UIMAException {
+    public void initialize() throws UIMAException {
+        // initialize Engines
         if (engines == null) {
             engines = createEngines(aeds
                     .toArray(new AnalysisEngineDescription[aeds.size()]));
+        }
+        // initialize outputter
+        if (xcs == null) {
+            xcs = new XmiCasSerializer(filter);
+            xcs.setPrettyPrint(true);
         }
     }
 
@@ -62,8 +75,7 @@ public class Pipeline {
     public String annotate(String text) throws UIMAException, SAXException {
 
         JCas jCas = Utils.getCas(text);
-        System.out.println("annotating:: "+text);
-        
+        System.out.println("annotating:: " + text);
 
         SimplePipeline.runPipeline(jCas, engines);
 

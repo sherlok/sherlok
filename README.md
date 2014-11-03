@@ -10,3 +10,7 @@ http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases
 http://www.taywils.me/2013/11/05/javasparkframeworktutorial.html
 
 mvn clean package appassembler:assemble -Dmaven.test.skip=true
+
+
+cp sherlok-1.pom local_repo/sherlok/sherlok/1/
+
