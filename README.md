@@ -14,11 +14,13 @@ Sherlok is a flexible and powerful open source, distributed, real-time text-mini
 
 ## Getting Started
 
-* [Download](TODO) and unzip the latest Sherlok distribution
+* Download and unzip the latest Sherlok [release](https://github.com/renaud/sherlok/releases)
 * Run `bin/sherlok` (Unix), or `bin/sherlok.bat` (Windows)
 * Start annotating [http://localhost:9600/annotate/opennlp_ners?text=Jack Burton...](http://localhost:9600/annotate/opennlp_ners?text=Jack Burton %28born April 29, 1954 in El Paso%29, also known as Jake Burton, is an American snowboarder and founder of Burton Snowboards.)
 * Check the demo at http://localhost:9600/_demo/
 
+
+## WARNING: some features below are not yet implemented!
 
 ## Pipelines
 
