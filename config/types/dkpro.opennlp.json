@@ -1,0 +1,9 @@
+{
+  "types" : [ {
+    "classz" : "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity",
+    "shortName" : "dkpro.NamedEntity",
+    "color" : null,
+    "description" : null,
+    "properties" : [ "value" ]
+  } ]
+}

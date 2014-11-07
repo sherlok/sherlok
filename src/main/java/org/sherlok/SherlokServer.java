@@ -15,7 +15,7 @@ import spark.*;
 public class SherlokServer {
     private static Logger LOG = getLogger(SherlokServer.class);
 
-    private final static Resolver resolver = new Resolver();
+    private final static Resolver2 resolver = new Resolver2();
 
     protected static Object annotate_pipeline(Request request, Response response) {
         String pipeline = request.params(":pipeline");
@@ -32,8 +32,6 @@ public class SherlokServer {
     }
 
     static void init() {
-        
-        
 
         setPort(9600);
 

@@ -47,6 +47,13 @@ public class Pipeline {
         this.version = version;
     }
 
+    public Pipeline(String pipelineId) {
+        CheckThat.isValidId(pipelineId);
+        String[] split = pipelineId.split(Sherlok.SEPARATOR);
+        this.pipelineName = split[0];
+        this.version = split[1];
+    }
+
     public void add(AnalysisEngineDescription aDesc) throws IOException,
             SAXException, CpeDescriptorException, InvalidXMLException {
         if (engines != null)

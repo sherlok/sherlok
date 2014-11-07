@@ -1,6 +1,7 @@
 package org.sherlok.mappings;
 
 import static ch.epfl.bbp.collections.Create.list;
+import static org.sherlok.Sherlok.SEPARATOR;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +23,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * 
  * @author renaud@apache.org
  */
-public class Pipeline {
+public class PipelineDef {
 
     /** A unique name for this pipeline. Letters, numbers and underscore only */
     private String name,
@@ -53,21 +54,34 @@ public class Pipeline {
 
     /** An engine definition */
     public static class PipelineEngine {
-        String name;
+        private String id, script;
 
         public PipelineEngine() {
         }
 
-        public PipelineEngine(String name) {
-            this.name = name;
+        public PipelineEngine(String id) {
+            this.id = id;
         }
 
-        public String getName() {
-            return name;
+        public String getId() {
+            return id;
         }
 
-        public void setName(String name) {
-            this.name = name;
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getScript() {
+            return script;
+        }
+
+        public void setScript(String script) {
+            this.script = script;
+        }
+
+        @Override
+        public String toString() {
+            return id;// TODO
         }
     }
 
@@ -108,9 +122,9 @@ public class Pipeline {
         mapper.writeValue(f, this);
     }
 
-    public static Pipeline load(File f) throws JsonParseException,
+    public static PipelineDef load(File f) throws JsonParseException,
             JsonMappingException, FileNotFoundException, IOException {
-        return mapper.readValue(new FileInputStream(f), Pipeline.class);
+        return mapper.readValue(new FileInputStream(f), PipelineDef.class);
     }
 
     // get/set
@@ -119,7 +133,7 @@ public class Pipeline {
         return name;
     }
 
-    public Pipeline setName(String name) {
+    public PipelineDef setName(String name) {
         this.name = name;
         return this;
     }
@@ -128,7 +142,7 @@ public class Pipeline {
         return version;
     }
 
-    public Pipeline setVersion(String version) {
+    public PipelineDef setVersion(String version) {
         this.version = version;
         return this;
     }
@@ -137,7 +151,7 @@ public class Pipeline {
         return language;
     }
 
-    public Pipeline setLanguage(String language) {
+    public PipelineDef setLanguage(String language) {
         this.language = language;
         return this;
     }
@@ -146,7 +160,7 @@ public class Pipeline {
         return domain;
     }
 
-    public Pipeline setDomain(String domain) {
+    public PipelineDef setDomain(String domain) {
         this.domain = domain;
         return this;
     }
@@ -155,7 +169,7 @@ public class Pipeline {
         return description;
     }
 
-    public Pipeline setDescription(String description) {
+    public PipelineDef setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -164,7 +178,7 @@ public class Pipeline {
         return loadOnStartup;
     }
 
-    public Pipeline setLoadOnStartup(boolean loadOnStartup) {
+    public PipelineDef setLoadOnStartup(boolean loadOnStartup) {
         this.loadOnStartup = loadOnStartup;
         return this;
     }
@@ -173,12 +187,12 @@ public class Pipeline {
         return engines;
     }
 
-    public Pipeline setEngines(List<PipelineEngine> engines) {
+    public PipelineDef setEngines(List<PipelineEngine> engines) {
         this.engines = engines;
         return this;
     }
 
-    public Pipeline addEngine(PipelineEngine engine) {
+    public PipelineDef addEngine(PipelineEngine engine) {
         this.engines.add(engine);
         return this;
     }
@@ -187,23 +201,38 @@ public class Pipeline {
         return output;
     }
 
-    public Pipeline setOutput(PipelineOutput output) {
+    public PipelineDef setOutput(PipelineOutput output) {
         this.output = output;
         return this;
     }
 
-    public Pipeline addOutputAnnotation(String annotation) {
+    public PipelineDef addOutputAnnotation(String annotation) {
         this.output.annotations.add(annotation);
         return this;
     }
 
-    public Pipeline addOutputPayload(String payload) {
+    public PipelineDef addOutputPayload(String payload) {
         this.output.payloads.add(payload);
         return this;
     }
 
+    // utils
+
+    public boolean validate() {
+        // FIXME
+        return true;
+    }
+
+    public static String createId(String pipelineName, String version) {
+        return pipelineName + SEPARATOR + version;
+    }
+
+    public String createId() {
+        return name + SEPARATOR + version;
+    }
+
     @Override
     public String toString() {
-        return name + ":" + version;
+        return createId();
     }
 }

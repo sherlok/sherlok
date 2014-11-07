@@ -2,17 +2,17 @@ package org.sherlok.mappings;
 
 import static java.lang.System.currentTimeMillis;
 import static org.junit.Assert.assertEquals;
-import static org.sherlok.mappings.Bundle.BundleDependency.DependencyType.mvn;
+import static org.sherlok.mappings.BundleDef.BundleDependency.DependencyType.mvn;
 
 import java.io.File;
 
 import org.junit.Test;
-import org.sherlok.mappings.Bundle.BundleDependency;
+import org.sherlok.mappings.BundleDef.BundleDependency;
 
 public class BundleTest {
 
-    public static Bundle getDkproOpennlpEn() {
-        Bundle b = new Bundle()
+    public static BundleDef getDkproOpennlpEn() {
+        BundleDef b = new BundleDef()
                 .setName("dkpro_opennlp_en")
                 .setVersion("1.6.2")
                 .setDescription("all opennlp engines and models for English")
@@ -48,9 +48,9 @@ public class BundleTest {
     public void testWriteRead() throws Exception {
 
         File bf = new File("target/bundleTest_" + currentTimeMillis() + ".json");
-        Bundle b = getDkproOpennlpEn();
+        BundleDef b = getDkproOpennlpEn();
         b.write(bf);
-        Bundle b2 = Bundle.load(bf);
+        BundleDef b2 = BundleDef.load(bf);
         assertEquals(b.getName(), b2.getName());
         assertEquals(b.getVersion(), b2.getVersion());
         assertEquals(b.getDependencies().size(), b2.getDependencies().size());

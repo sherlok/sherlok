@@ -1,0 +1,13 @@
+{
+  "name" : "OpenNlpEnLocationNer",
+  "version" : "1.6.2",
+  "domain" : "dkpro",
+  "description" : null,
+  "bundle_id" : "dkpro_opennlp_en:1.6.2",
+  "parameters" : {
+    "language" : "en",
+    "modelVariant": "location"
+  },
+  "script" : null,
+  "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder"
+}

@@ -2,6 +2,7 @@ package org.sherlok.mappings;
 
 import static ch.epfl.bbp.collections.Create.list;
 import static ch.epfl.bbp.collections.Create.map;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +10,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import org.sherlok.CheckThat;
+import org.sherlok.Sherlok;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -22,7 +26,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * 
  * @author renaud@apache.org
  */
-public class Bundle {
+public class BundleDef {
 
     /** a unique name for this bundle. Letters, numbers and underscore only */
     private String name,
@@ -76,6 +80,18 @@ public class Bundle {
         public void setValue(String value) {
             this.value = value;
         }
+
+        public String getGroupId() {
+            return value.split(Sherlok.SEPARATOR)[0];
+        }
+
+        public String getArtifactId() {
+            return value.split(Sherlok.SEPARATOR)[1];
+        }
+
+        public String getVersion() {
+            return value.split(Sherlok.SEPARATOR)[2];
+        }
     }
 
     // read/write
@@ -90,9 +106,9 @@ public class Bundle {
         mapper.writeValue(f, this);
     }
 
-    public static Bundle load(File f) throws JsonParseException,
+    public static BundleDef load(File f) throws JsonParseException,
             JsonMappingException, FileNotFoundException, IOException {
-        return mapper.readValue(new FileInputStream(f), Bundle.class);
+        return mapper.readValue(new FileInputStream(f), BundleDef.class);
     }
 
     // get/set
@@ -101,7 +117,7 @@ public class Bundle {
         return name;
     }
 
-    public Bundle setName(String name) {
+    public BundleDef setName(String name) {
         this.name = name;
         return this;
     }
@@ -110,7 +126,7 @@ public class Bundle {
         return version;
     }
 
-    public Bundle setVersion(String version) {
+    public BundleDef setVersion(String version) {
         this.version = version;
         return this;
     }
@@ -119,7 +135,7 @@ public class Bundle {
         return description;
     }
 
-    public Bundle setDescription(String description) {
+    public BundleDef setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -128,12 +144,12 @@ public class Bundle {
         return dependencies;
     }
 
-    public Bundle setDependencies(List<BundleDependency> dependencies) {
+    public BundleDef setDependencies(List<BundleDependency> dependencies) {
         this.dependencies = dependencies;
         return this;
     }
 
-    public Bundle addDependency(BundleDependency dependency) {
+    public BundleDef addDependency(BundleDependency dependency) {
         this.dependencies.add(dependency);
         return this;
     }
@@ -142,12 +158,12 @@ public class Bundle {
         return repositories;
     }
 
-    public Bundle setRepositories(Map<String, String> repositories) {
+    public BundleDef setRepositories(Map<String, String> repositories) {
         this.repositories = repositories;
         return this;
     }
 
-    public Bundle addRepository(String id, String url) {
+    public BundleDef addRepository(String id, String url) {
         this.repositories.put(id, url);
         return this;
     }
@@ -155,5 +171,18 @@ public class Bundle {
     @Override
     public String toString() {
         return name + ":" + version;
+    }
+
+    public boolean validate() {
+        try {
+            checkNotNull(name, "name should not be null");
+            CheckThat.isOnlyAlphanumUnderscore(name);
+            checkNotNull(version);
+            CheckThat.isOnlyAlphanumDotUnderscore(version);
+            // TODO more
+        } catch (Throwable e) {
+            throw new ValidationException(e.getMessage());
+        }
+        return true;
     }
 }

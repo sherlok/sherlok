@@ -1,0 +1,21 @@
+{
+  "name" : "opennlp_en_ners",
+  "version" : "1.6.2",
+  "language" : "en",
+  "domain" : "dkpro",
+  "description" : null,
+  "loadOnStartup" : true,
+  "engines" : [ {
+    "id" : "OpenNlpEnSegmenter:1.6.2"
+  }, {
+    "id" : "OpenNlpEnPosTagger:1.6.2"
+  }, {
+    "id" : "OpenNlpEnPersonNer:1.6.2"
+  }, {
+    "id" : "OpenNlpEnLocationNer:1.6.2"
+  } ],
+  "output" : {
+    "annotations" : [ "dkpro.NamedEntity" ],
+    "payloads" : [ ]
+  }
+}

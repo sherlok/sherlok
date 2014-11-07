@@ -1,12 +1,17 @@
 package org.sherlok.mappings;
 
+import static ch.epfl.bbp.collections.Create.list;
 import static ch.epfl.bbp.collections.Create.map;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -22,13 +27,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * @author renaud@apache.org
  *
  */
-public class Engine {
+public class EngineDef {
 
     /** A unique name for this engine. Letters, numbers and underscore only */
     private String name,
     /**
-     * A unique version id for this engine. Letters, numbers, dots and underscore
-     * only
+     * A unique version id for this engine. Letters, numbers, dots and
+     * underscore only
      */
     version,
     /**
@@ -41,11 +46,13 @@ public class Engine {
     /** the Java UIMA class name of this engine */
     @JsonProperty("class")
     String classz;
-    /** which {@link Bundle}this engine comes from */
-    String bundle;
+    /** which {@link BundleDef}this engine comes from */
+    @JsonProperty("bundle_id")
+    String bundleId;
     /** UIMA parameters. Overwrites default parameters */
     private Map<String, Object> parameters = map();
-
+    /** Or you can just specify a Ruta script */
+    String script;
     // read/write
 
     static final ObjectMapper mapper = new ObjectMapper(new JsonFactory());
@@ -58,9 +65,9 @@ public class Engine {
         mapper.writeValue(f, this);
     }
 
-    public static Engine load(File f) throws JsonParseException,
+    public static EngineDef load(File f) throws JsonParseException,
             JsonMappingException, FileNotFoundException, IOException {
-        return mapper.readValue(new FileInputStream(f), Engine.class);
+        return mapper.readValue(new FileInputStream(f), EngineDef.class);
     }
 
     // get/set
@@ -69,7 +76,7 @@ public class Engine {
         return name;
     }
 
-    public Engine setName(String name) {
+    public EngineDef setName(String name) {
         this.name = name;
         return this;
     }
@@ -78,7 +85,7 @@ public class Engine {
         return version;
     }
 
-    public Engine setVersion(String version) {
+    public EngineDef setVersion(String version) {
         this.version = version;
         return this;
     }
@@ -87,7 +94,7 @@ public class Engine {
         return domain;
     }
 
-    public Engine setDomain(String domain) {
+    public EngineDef setDomain(String domain) {
         this.domain = domain;
         return this;
     }
@@ -96,7 +103,7 @@ public class Engine {
         return description;
     }
 
-    public Engine setDescription(String description) {
+    public EngineDef setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -105,17 +112,17 @@ public class Engine {
         return classz;
     }
 
-    public Engine setClassz(String classz) {
+    public EngineDef setClassz(String classz) {
         this.classz = classz;
         return this;
     }
 
-    public String getBundle() {
-        return bundle;
+    public String getBundleId() {
+        return bundleId;
     }
 
-    public Engine setBundle(String bundle) {
-        this.bundle = bundle;
+    public EngineDef setBundleId(String bundleId) {
+        this.bundleId = bundleId;
         return this;
     }
 
@@ -123,18 +130,46 @@ public class Engine {
         return parameters;
     }
 
-    public Engine setParameters(Map<String, Object> parameters) {
+    public EngineDef setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
         return this;
     }
 
-    public Engine addParameter(String key, Object value) {
+    public EngineDef addParameter(String key, Object value) {
         this.parameters.put(key, value);
+        return this;
+    }
+
+    public Object getParameter(String key) {
+        return this.parameters.get(key);
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public EngineDef setScript(String script) {
+        this.script = script;
         return this;
     }
 
     @Override
     public String toString() {
         return name + ":" + version;
+    }
+
+    public boolean validate() {
+        // FIXME
+        return true;
+    }
+
+    /** Flatten the params to be used by the {@link AnalysisEngineFactory} */
+    public Object[] getFlatParams() {
+        List<Object> flatParams = list();
+        for (Entry<String, Object> en : getParameters().entrySet()) {
+            flatParams.add(en.getKey());
+            flatParams.add(en.getValue());
+        }
+        return flatParams.toArray(new Object[flatParams.size()]);
     }
 }

@@ -7,6 +7,7 @@ Sentiment:
 * AlchemyAPI: http://grepcode.com/file/repo1.maven.org/maven2/org.apache.uima/AlchemyAPIAnnotator/2.3.1/org/apache/uima/alchemy/digester/sentiment/SentimentAnalysisDigesterProvider.java
 * GATE: https://gate.ac.uk/sentiment/
 
+Medex: https://code.google.com/p/medex-uima/
 
 
 DkPro
