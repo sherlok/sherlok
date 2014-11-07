@@ -1,0 +1,250 @@
+
+div.section.brieflink.window div.DiscoveryDbLinks{
+    margin-top: 0;
+    *margin-top: 0.75em; 
+    padding-top: 0;
+    border-top: none;
+}
+div.brieflink.window ul li.item{
+    height: auto;
+}
+.adv_youtube{float:right;background:url('//static.pubmed.gov/portal/portal3rc.fcgi/4015231/img/2317562') no-repeat left;padding-left:55px;margin:2.125em auto auto auto;text-decoration: none;}
+.adv_youtube_title h2{float:left;}
+.adv_youtube a {color: #14376C;font-weight: normal;text-decoration: none;}
+.mpsrchbldr {overflow: hidden;}
+div.brieflinkpop span.invert {
+    display:none;
+}
+span.termHighlight{
+    font-weight:bold;
+}
+span.invert span.termHighlight{
+    font-weight:normal;
+}
+#pm_commons_ad_st{color:#333;}
+#pm_commons_ad .comm_f_name{font-weight:bold;}
+div.port li.item em.linklist.error{
+    color:#CC0000;
+    font-size: 1.2em;
+    background-color:#EAEBC8;
+}
+div.port.norender {
+    font-family: Arial,Lucida Sans,Trebuchet,Sans-Serif;
+}
+.portlet .ui-ncbitoggler-slave,
+.portlet .ui-ncbitoggler-slave-open {
+    margin: 0;
+}
+.portlet.blueStyle {
+    border: 2px solid #f2eee5;
+    box-shadow: 1px 1px 2px #ede7da;
+    background: #fffbee;
+    margin-top: 1.85em;
+    margin-right: 2px;
+    border-radius: 9px;  
+}
+.portlet.blueStyle>div {
+    margin: 1em;    
+}
+.portlet.blueStyle .portlet_head {
+    background: #5f8ece;
+    padding: 0.6em 1em;
+    margin: -1.65em 0.4em 0em 0.4em;
+    border-radius: 7px;
+}
+.portlet.blueStyle .portlet_title h3 {
+    color: #fff;
+}
+.portlet.blueStyle .portlet_shutter {
+    top: 0.65em;
+    right: 0.8em;
+}
+.portlet.whiteStyle {
+    border: 1px solid #f2eee5;
+    box-shadow: 1px 1px 2px #ede7da;
+    background: #fff;
+    margin-right: 2px;
+    border-radius: 9px;  
+}
+.portlet.whiteStyle>div {
+    margin: 1em;    
+}
+.portlet.whiteStyle .portlet_head {
+    background: #fff;
+    padding: 0 1em 0em 0;
+    
+    margin-top: 0.5em;
+    margin-bottom: 0em;
+    
+    
+    
+}
+.portlet.whiteStyle .portlet_title h3 {
+    color: #003366;
+}
+.portlet.whiteStyle .portlet_shutter {
+    top: 0.1em;
+}
+.inline_sensor {
+    width: 30%;
+    float: left;
+    border: 1px solid #f2eee5;
+    box-shadow: 1px 1px 1px #ede7da;
+    
+    margin-right: 2.8%;
+    margin-bottom: 2em;
+    border-radius: 9px;  
+}
+.inline_sensor .image {
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+}
+.inline_sensor.right {
+    float: right;
+    margin-left: 2.8%;
+    margin-right: 2px;
+}
+.inline_sensor h3 {
+    background: url(//static.pubmed.gov/portal/portal3rc.fcgi/4015231/img/3593075) repeat-x;
+    margin: 0;
+    padding: 0.5em;
+    color: #fff;
+    display: block;
+    font-size: 1.2em;
+}
+.inline_sensor .sensor_content
+{
+    margin: 0.5em 0.9em;
+}
+.portlet .pcommonsad ul li { border-bottom: none; margin-top: 0; }
+.portlet .pcommonsad img { margin-bottom: 0;}
+#content ul.DiscoverySection, .content ul.DiscoverySectionc{
+}
+#content li.DiscoverySectionTitle, .content li.DiscoverySectionTitle{
+    color:#1356D8;;
+    font-weight:bold;
+    border-bottom:1px solid #CCCCCC;
+    padding-top: 1em;
+    padding-bottom: 0.2em;
+}
+#content li.DiscoveryItem, .content li.DiscoveryItem {
+   background: url(/portal:img/ra_red) no-repeat top left;
+   padding-left: 1.2em;
+   padding-bottom: 0.3em; 
+   font-size:0.9em;
+}
+#content li.DiscoveryItem a, .content li.DiscoveryItem a {
+    color:#232323;
+    border-bottom: none;
+}
+#content li.DiscoveryItem a: hover, .content li.DiscoveryItem a: hover {
+    text-decoration: underline;
+}
+#content li.DiscoveryAllLinks, .content li.DiscoveryAllLinks {
+    text-align:right;
+    font-size:0.9em;
+    border-bottom:1px solid #CCCCCC;
+    padding-bottom: 0.3em; 
+}
+#content li.DiscoveryAllLinks a, .content li.DiscoveryAllLinks a {
+    color: #CC0000;
+    text-decoration: underline;
+}
+div.brieflinkpop em.cit{
+    
+    display:block;
+    margin-top: 0.5em;
+}
+div.brieflinkpop em.author{ 
+   
+    display:block;
+    margin-top: 0.5em;
+    margin-bottom: -0.3em;
+}
+div.brieflinkpop span.invert {
+    display:none;
+}
+.Discovery_Structure_Style ul li a {
+    display:block;
+    max-height: 3.6em;
+    overflow: hidden;
+}
+.Discovery_Structure_Style ul li a.img_link {
+    max-height: none;  
+}
+.Discovery_Structure_Style ul li.image div.desc {
+   font-size: 1.1em;
+   padding-top: 3px;
+}
+div.pubmed_favoritesad div.colloading {position:absolute; left:130px; top: 5px; width:15px; 
+background: url(//static.pubmed.gov/portal/portal3rc.fcgi/4015231/img/26219) no-repeat top left;overflow: hidden;text-indent: -100px; display:none;}
+#favList {width: 9.1em;}
+.ui-ncbisetswitch > a.jig-ncbisetswitch:hover, .ui-ncbisetswitch > a.ui-ncbisetswitch-button:hover 
+ {
+    background: #e8e8e8;
+    background: -moz-linear-gradient(top,#e8e8e8 0%,#e0e0e0 100%);
+    background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#e8e8e8),color-stop(100%,#e0e0e0));
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e8e8e8',endColorstr='#e0e0e0',GradientType=0 ); }
+.querymatch{
+    font-weight:bold;
+}
+span.titlematch {
+    font-weight:bold;
+}
+div#HTDisplay ul li a.hidden {
+    display:none;
+}
+div#HTDisplay div.action {    
+    overflow:hidden;  
+    width: 100%; 
+}
+div#HTDisplay div.action a {
+    margin: 0em .5em .25em .5em;
+    float: right;    
+    color:#14376C;
+    font-size:0.846em;
+}
+div#HTDisplay p {
+    clear: both;
+    color:#14376C;
+    margin: 1.2em 0em 0.6em 0.5em;
+}
+div#HTDisplay p a {   
+    color:#14376C;
+}
+div#HTDisplay p, div#HTDisplay .action a.HTOff, div#HTDisplay.HTOff .action a.HTOn {
+    display:none;
+}
+div#HTDisplay.HTOff p.HTOff, div#HTDisplay.HTOn p.HTOn {
+    display:block;
+}
+div#HTDisplay.HTOff .action a.HTOff, div#HTDisplay.HTOn .action a.HTOn {
+    display:block;
+}
+div#HTDisplay ul.hide {
+    display:none;
+}
+div#HTDisplay p.Err {
+    display:block;
+}
+div#HTDisplay.HTOff a.seemore, div#HTDisplay.HTOn a.seemore {
+    display:none;
+}
+body .popper {font-size: 1.2em;} 
+div.popper p {
+margin: 0 0 0.25em 0;
+}
+p#htbpcit,
+p.pmid {
+font-size: 85%;
+display: block;
+}
+p#htbpcit {
+font-style: italic;
+}
+#htbpopper.hidden {
+display: none;
+}
+div#HTDisplay .ralinkpop { width: 350px; }
+.relevancesortad { color: #14376C; }
+#relevancead_sort { display: block; white-space: nowrap; font-weight: bold; margin-bottom: 0.5em;}

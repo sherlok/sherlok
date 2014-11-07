@@ -1,0 +1,50 @@
+.universal_header,.footer,#portaldata,#portal-debug-console,.tabPopper,.send_to,.searchlinks,.search_form button,.res_logo,.clipboard_active,.pagination,.port,.supplemental .portlet{display:none}
+.supplemental,.app_msg{background-color:transparent;border:0}
+.header{background:none}
+.search{margin-left:1.6em}
+.search_form input{border:1px solid #ccc}
+.container{font-size:1.1em;line-height:1.5em}
+.content{margin:0}
+.supplemental{position:absolute;top:4.2em;right:1em;width:54%}
+.highlight{font-weight:bold}
+.results_settings h4 a{color:#000;text-decoration:none}
+.results_settings.bottom{display:none}
+.app_msg{margin:0}
+.app_msg .portlet_settings{display:none;padding:0}
+.no_filters  { display: none; }
+.limits_active p{background-image:none;padding-left:0;padding-right:0;text-align:right}
+.limits_active p strong{background-image:none}
+.filters{text-align:right}
+.filters p{display:inline;margin-right:.2em}
+.filters p:after{content:" ";}
+.filters .portlet_list { display: inline; }
+.filters .portlet_list li { display: none; }
+.filters .portlet_list li.filter_selected { display: inline; background-image: none; }
+.filters .portlet_list li.filter_selected a { display: inline; background-color: transparent; margin:0; padding:0;}
+.filters .portlet_list li.filter_selected a.no_back { display: none; }
+.grid { max-width: none; min-width: 0; overflow: visible; }
+.col{ margin-right:0; float:none; width: 100% !important}
+.shadow { box-shadow: none; }
+.search_form .jig-ncbiclearbutton-wrap input { border: 0 !important; }
+.search_form button.button_search { display: none; }
+.search, #maincontent .content { margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
+#faceted_search { display: none; }
+.rprtnum input, .links { display: none; } 
+.morecit h2 a.jig-ncbitoggler { background: none; padding-left:0; color: #000; }
+.morecit h2 a.jig-ncbitoggler .ui-icon { display: none; }
+p.auth_list a, .abstract h1.title a { border-bottom: 0;}
+.content { margin: 0; padding-right: 7em;}
+.content { font-size: 1.2em; }
+.abstract h1.title { font-family: baskerville, "palatino linotype", times, "times new roman", serif; font-size: 1.8em; }
+.abstract p.citation, .abstract p.pmid, .abstract p.aff, .abstract p.pmcid { font-size: 1em; }
+.abstract p.citation { line-height: inherit; }
+.abstract_text { margin: 1.2em auto; }
+.abstract p.aff { line-height: inherit; }
+.abstract .icons { display: block; }
+.supplemental .icons { display: block; margin-top: 0.5em; text-align: right;}
+.excerpt {margin-top:0em;}
+.excerpt p{margin:0em;}
+.supplemental .bookIcons { text-align: left;}
+.abstract .print-log { position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden; }
+.abstract .print-log li { list-style-image: url("/portal/portal3rc.fcgi/rlib/img/b_gif"); }
+#NCBIFooter_dynamic{display:none}
