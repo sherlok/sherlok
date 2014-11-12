@@ -1,13 +1,14 @@
 package org.sherlok.mappings;
 
-import static ch.epfl.bbp.collections.Create.list;
-import static ch.epfl.bbp.collections.Create.map;
+import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author renaud@apache.org
  *
  */
-public class EngineDef extends Def<EngineDef> {
+public class EngineDef extends Def {
 
     /**
      * Useful to group engines together. Letters, numbers, slashes and
@@ -92,12 +93,13 @@ public class EngineDef extends Def<EngineDef> {
         return this;
     }
 
-    public boolean validate() {
-        super.validate();
+    public boolean validate(String engineObject) {
+        super.validate(engineObject);
         try {
             // TODO more
         } catch (Throwable e) {
-            throw new ValidationException(e.getMessage());
+            throw new ValidationException("" + engineObject + ": "
+                    + e.getMessage());
         }
         return true;
     }

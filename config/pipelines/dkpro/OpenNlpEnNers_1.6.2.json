@@ -3,7 +3,7 @@
   "version" : "1.6.2",
   "language" : "en",
   "domain" : "dkpro",
-  "description" : null,
+  "description" : "Annotates persons and locations",
   "loadOnStartup" : true,
   "engines" : [ {
     "id" : "OpenNlpEnSegmenter:1.6.2"

@@ -1,6 +1,6 @@
 package sherlok.aether;
 
-import static ch.epfl.bbp.collections.Create.list;
+import static org.sherlok.utils.Create.list;
 
 import java.util.List;
 import java.util.Map;

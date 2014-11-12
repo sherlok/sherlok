@@ -7,10 +7,7 @@
       <!-- http://logback.qos.ch/manual/layouts.html#ClassicPatternLayout -->
       <Pattern>%-5level %msg [%logger{16} %d{HH:mm:ss}]%n
       </Pattern>
-      <!--
-        <Pattern>%d{HH:mm:ss}%-5level %logger{36} - %msg%n
-        </Pattern>
-      -->
+      <!-- <Pattern>%d{HH:mm:ss}%-5level %logger{36} - %msg%n </Pattern> -->
     </encoder>
   </appender>
 
@@ -22,36 +19,14 @@
   <!-- custom log levels for other libs -->
   <logger name="org.apache.commons" level="WARN" />
   <logger name="ch.qos.logback" level="ERROR" />
-  <logger name="edu.umass.cs.mallet" level="ERROR" />
   <logger name="org.apache" level="WARN" />
-  <logger name="org.apache.axis2" level="WARN" />
-  <logger name="org.apache.axiom" level="WARN" />
   <logger name="httpclient.wire" level="WARN" />
   <logger name="httpclient.wire.content" level="WARN" />
-  <logger name="abner" level="INFO" />
-  <logger name="org.openrdf.http" level="INFO" />
-  <logger name="org.openrdf.rio" level="INFO" />
   <logger name="org.xml.sax" level="INFO" />
-  <logger name="com.wcohen.ss" level="INFO" />
   <logger name="org.springframework" level="INFO" />
-  <logger name="org.elasticsearch.threadpool" level="INFO" />
   <logger name="org.eclipse.jetty" level="INFO" />
   <logger name="org.eclipse.jetty.server" level="WARN" />
   <logger name="spark" level="INFO" />
 
-  <!-- custom log levels for bbp -->
-  <logger name="ch.epfl.bbp.uima.ae.AbnerAnnotator" level="INFO" />
-  <logger name="ch.epfl.bbp.uima.validation" level="WARN" />
-  <logger name="ch.epfl.bbp.uima.banner" level="WARN" />
-  <logger name="ch.epfl.bbp.uima.ae.AbnerAnnotator" level="ERROR" />
-  <logger name="ch.epfl.bbp.uima.cleartk.ner.protein.AnnotationEvaluator"
-    level="INFO" />
-  <logger name="ch.epfl.bbp.uima.pdf" level="INFO" />
-  <logger name="ch.epfl.bbp.uima.fusion.ViterbiFilterAnnotator"
-    level="INFO" />
-  <logger name="ch.epfl.bbp.uima.ae.WordnetAnnotator" level="INFO" />
-  <logger name="ch.epfl.bbp.uima.ae.AbbreviationsAnnotator" level="INFO" />
-  <logger name="org.itc.irst.tcc" level="WARN" />
-  <logger name="ch.epfl.bbp.uima.jsre" level="WARN" />
 
 </configuration>

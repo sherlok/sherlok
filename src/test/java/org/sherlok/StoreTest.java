@@ -1,8 +1,12 @@
-package org.sherlok.mappings;
+package org.sherlok;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.sherlok.Store;
+import org.sherlok.mappings.EngineDef;
+import org.sherlok.mappings.PipelineDef;
+import org.sherlok.mappings.TypesDef;
 import org.sherlok.mappings.TypesDef.TypeDef;
 
 public class StoreTest {

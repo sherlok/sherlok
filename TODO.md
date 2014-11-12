@@ -21,5 +21,9 @@ Spark framework
 * http://www.taywils.me/2013/11/05/javasparkframeworktutorial.html
 * https://github.com/perwendel/spark-template-engines/tree/master/spark-template-freemarker
 
-cp sherlok-1.pom local_repo/sherlok/sherlok/1/
+    cp sherlok-1.pom local_repo/sherlok/sherlok/1/
 
+Integration testing:
+
+* https://code.google.com/p/rest-assured/
+* http://rest-assured.googlecode.com/svn/tags/2.3.4/apidocs/com/jayway/restassured/path/json/JsonPath.html

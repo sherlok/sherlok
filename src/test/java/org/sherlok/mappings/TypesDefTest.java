@@ -1,11 +1,12 @@
 package org.sherlok.mappings;
 
 import static java.lang.System.currentTimeMillis;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
 import org.junit.Test;
+import org.sherlok.FileBased;
 import org.sherlok.mappings.TypesDef.TypeDef;
 
 public class TypesDefTest {
@@ -25,11 +26,10 @@ public class TypesDefTest {
 
         File tf = new File("target/typesTest_" + currentTimeMillis() + ".json");
         TypesDef t = getOpennlpTypes();
-        FileBased.write(tf, t);
+        FileBased.MAPPER.writeValue(tf, t);
         TypesDef t2 = FileBased.loadTypes(tf);
+        t2.validate();
         assertEquals(t.getTypes().size(), t2.getTypes().size());
         // TODO more
     }
-
-    // TODO test parsing
 }

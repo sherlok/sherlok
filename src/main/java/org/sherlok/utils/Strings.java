@@ -21,7 +21,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.sherlok;
+package org.sherlok.utils;
 
 import java.text.Collator;
 import java.util.Comparator;

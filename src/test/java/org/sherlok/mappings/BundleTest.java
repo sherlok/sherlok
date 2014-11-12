@@ -7,6 +7,7 @@ import static org.sherlok.mappings.BundleDef.BundleDependency.DependencyType.mvn
 import java.io.File;
 
 import org.junit.Test;
+import org.sherlok.FileBased;
 import org.sherlok.mappings.BundleDef.BundleDependency;
 
 public class BundleTest {
@@ -37,9 +38,10 @@ public class BundleTest {
                                 "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-location:20100907.0"))
                 .addRepository(
                         "dkpro",
-                        "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/")
-                .setName("dkpro_opennlp_en").setVersion("1.6.2")
-                .setDescription("all opennlp engines and models for English");
+                        "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/");
+        b.setName("dkpro_opennlp_en");
+        b.setVersion("1.6.2");
+        b.setDescription("all opennlp engines and models for English");
         return b;
     }
 
@@ -50,10 +52,9 @@ public class BundleTest {
         BundleDef b = getDkproOpennlpEn();
         FileBased.write(bf, b);
         BundleDef b2 = FileBased.loadBundle(bf);
+        b2.validate("");
         assertEquals(b.getName(), b2.getName());
         assertEquals(b.getVersion(), b2.getVersion());
         assertEquals(b.getDependencies().size(), b2.getDependencies().size());
     }
-
-    // TODO test parsing
 }

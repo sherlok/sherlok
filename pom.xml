@@ -6,9 +6,36 @@
   <artifactId>sherlok_core</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
+  <organization>
+    <name>Sherlok</name>
+    <url>https://github.com/renaud/sherlok</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <name>Renaud Richardet</name>
+      <email>renaud.richardet@gmail.com</email>
+    </developer>
+  </developers>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
   <properties>
     <aetherVersion>1.0.0.v20140518</aetherVersion>
     <mavenVersion>3.1.0</mavenVersion>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+    <slf4j.version>1.6.5</slf4j.version>
   </properties>
 
   <dependencyManagement>
@@ -82,12 +109,6 @@
       <version>${mavenVersion}</version>
     </dependency>
 
-    <dependency>
-      <groupId>ch.epfl.bbp.nlp</groupId>
-      <artifactId>blue_commons</artifactId>
-      <version>0.1</version>
-    </dependency>
-
     <!-- JSON and YAML ser/deser -->
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -126,6 +147,12 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.jayway.restassured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <version>2.3.4</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <repositories>
@@ -137,6 +164,64 @@
 
   <build>
     <plugins>
+      <!-- compile with java 1.7 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+          <encoding>UTF-8</encoding>
+          <systemProperties>
+            <property>
+              <name>bluima_home</name>
+              <value>${bluima_home}</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>
+      <!-- attach sources to jars -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- LICENSE 
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+          <properties>
+            <owner>Renaud Richardet</owner>
+            <email>renaud@apache.org</email>
+          </properties>
+          <excludes>
+            <exclude>**/README</exclude>
+            <exclude>src/test/resources/**</exclude>
+            <exclude>src/main/resources/**</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>-->
+      <!-- APPASEMBLER to create one portable application -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>appassembler-maven-plugin</artifactId>

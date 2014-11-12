@@ -1,30 +1,33 @@
-
 # Sherlok
 
 _Distributed restful text mining._
 
-Sherlok is a flexible and powerful open source, distributed, real-time text-mining engine. Sherlok works as a RESTful annotation server based on Apache UIMA. Sherlok can:
+Sherlok is a flexible and powerful open source, distributed, real-time text-mining engine. Sherlok works as a RESTful annotation server based on [Apache UIMA](http://uima.apache.org/). For example, Sherlok can:
 
-* Highlight persons and locations in text (using [DKPro OpenNLP](https://www.ukp.tu-darmstadt.de/research/current-projects/dkpro/)),
-* Sentiment analysis using deep learning (using [Stanford Sentiment](http://nlp.stanford.edu/sentiment/)),
-* Syntactic analysis of tweets (using [TweetNLP](http://www.ark.cs.cmu.edu/TweetNLP/)),
-* Identify proteins and chemicals in biomedical texts (using [Bluima](https://github.com/BlueBrain/bluima)),
-* Clinical text analysis and knowledge extraction (using [Apache cTAKES](http://ctakes.apache.org/index.html))
+* highlight persons and locations in text (using [DKPro OpenNLP](https://www.ukp.tu-darmstadt.de/research/current-projects/dkpro/)),
+* perform sentiment analysis using deep learning (using [Stanford Sentiment](http://nlp.stanford.edu/sentiment/)),
+* analyse the syntax of tweets (using [TweetNLP](http://www.ark.cs.cmu.edu/TweetNLP/)),
+* identify proteins and chemicals in biomedical texts (using [Bluima](https://github.com/BlueBrain/bluima)),
+* analyze clinical text and perform knowledge extraction (using [Apache cTAKES](http://ctakes.apache.org/index.html))
 
 
-## Getting Started
+### Getting Started
 
 * Download and unzip the latest Sherlok [release](https://github.com/renaud/sherlok/releases)
 * Run `bin/sherlok` (Unix), or `bin/sherlok.bat` (Windows)
-* Start annotating [http://localhost:9600/annotate/opennlp_ners?text=Jack Burton...](http://localhost:9600/annotate/opennlp_en_ners?version=1.6.2&text=Jack Burton %28born April 29, 1954 in El Paso%29, also known as Jake Burton, is an American snowboarder and founder of Burton Snowboards.)
+* Start annotating [http://localhost:9600/annotate/opennlp_ners?text=Jack Burton...](http://localhost:9600/annotate/opennlp_en_ners?text=Jack Burton %28born April 29, 1954 in El Paso%29, also known as Jake Burton, is an American snowboarder and founder of Burton Snowboards.)
 * Check the demo at http://localhost:9600/_demo/index.html
 
 
-## WARNING: some features below are not yet implemented!
 
-## Pipelines
 
-A pipeline describes the steps to perform a text mining analysis. This analysis consists of a list of steps to be performed on text (e.g. split words, remove determinants, annotate locations, ...).
+# Formats
+
+WARNING: some features below are not yet implemented!
+
+### Pipelines
+
+A pipeline describes the steps to perform a text mining analysis (e.g. split words, remove determinants, annotate locations, ...). For example, the pipeline below first performs some preprocessing: segmenting raw text in sentences and tokens (words), then tagging words with their corresponding [part-of-speech](http://en.wikipedia.org/wiki/Part-of-speech_tagging). This preprocessing is then used by two [named entity recognizers](http://en.wikipedia.org/wiki/Named-entity_recognition) (NERs) that identify persons and location.
 
     {   
         "name": "opennlp_ners",
@@ -55,11 +58,14 @@ A pipeline describes the steps to perform a text mining analysis. This analysis 
 * Domain: useful to group pipelines together. Letters, numbers, slashes and underscore only
 * Description (optional):
 * Load_on_startup (optional): whether this pipeline should be loaded on server startup. Defaults to `false`
-* Engines : a list of engines (see Engines chapter below)
 * Annotations: which annotations to include in the output JSON
 * Payloads (optional): which payloads to include in the output JSON (see Payload chapter below)
 
-## Engines
+Engines can have the following formats: 
+    { "name": "engineId (see chapter below)"}
+    { "script": "Ruta script (see chapter below)"}
+
+### Engines
 
 An engine performs a single text analysis step in a pipeline. Engines can be reused across different pipelines. This is how we can define its configuration settings:
 
@@ -82,7 +88,7 @@ An engine performs a single text analysis step in a pipeline. Engines can be reu
 * Bundle: which bundle this engine comes from (see Bundle chapter below)
 * Parameters: provides (or overwrites) the engine parameters. Some parameters are optionals, other are required (this is defined in the UIMA engine).
 
-## Bundles
+### Bundles
 
 A Bundle helps group together a set of library dependencies.
 

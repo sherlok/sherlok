@@ -1,25 +1,37 @@
 package org.sherlok.mappings;
 
-import static ch.epfl.bbp.collections.Create.list;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sherlok.utils.Create.list;
 
 import java.util.List;
 
 import org.apache.uima.cas.Type;
+import org.sherlok.utils.ValidationException;
 
 /**
- * UIMA Types
+ * Description of UIMA Types
  * 
  * @author renaud@apache.org
  */
 public class TypesDef {
+
+    /** a unique name for this bundle. Letters, numbers and underscore only */
+    protected String name;
 
     /** all types */
     private List<TypeDef> types = list();
 
     /** Represents a UIMA {@link Type}. */
     public static class TypeDef {
-        private String classz, shortName, color, description;
+        /** The {@link Type} class name */
+        private String classz,
+        /** Short name to be used in output. Should be unique. */
+        shortName,
+        /** CSS color, for client (optional) */
+        color,
+        /** Description of this type (optional) */
+        description;
+        /** Properties to be outputed(optional) */
         private List<String> properties = list();
 
         public String getClassz() {
@@ -76,6 +88,15 @@ public class TypesDef {
         public String toString() {
             return shortName + "[" + classz + "]";
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public TypesDef setName(String name) {
+        this.name = name;
+        return this;
     }
 
     public List<TypeDef> getTypes() {

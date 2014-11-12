@@ -1,6 +1,6 @@
 package org.sherlok;
 
-import static ch.epfl.bbp.collections.Create.list;
+import static org.sherlok.utils.Create.list;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -13,9 +13,11 @@ import org.apache.uima.cas.impl.FilteringTypeSystem;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.collection.metadata.CpeDescriptorException;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.util.InvalidXMLException;
+import org.sherlok.utils.CheckThat;
 import org.xml.sax.SAXException;
 
 /**
@@ -48,7 +50,7 @@ public class Pipeline {
     }
 
     public Pipeline(String pipelineId) {
-        CheckThat.isValidId(pipelineId);
+        CheckThat.checkValidId(pipelineId);
         String[] split = pipelineId.split(Sherlok.SEPARATOR);
         this.pipelineName = split[0];
         this.version = split[1];
@@ -94,8 +96,9 @@ public class Pipeline {
 
     public String annotate(String text) throws UIMAException, SAXException {
 
-        JCas jCas = Utils.getCas(text);
-        System.out.println("annotating:: " + text);
+        JCas jCas = JCasFactory.createJCas();
+        jCas.setDocumentText(text);
+        jCas.setDocumentLanguage("en"); // important for DK pro components TODO
 
         SimplePipeline.runPipeline(jCas, engines);
 

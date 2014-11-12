@@ -5,10 +5,11 @@ import static org.junit.Assert.assertTrue;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.junit.Test;
+import org.sherlok.utils.Strings;
 import org.slf4j.Logger;
 
-public class ResolverTest {
-    private static Logger LOG = getLogger(ResolverTest.class);
+public class ResolverIntegrationTest {
+    private static Logger LOG = getLogger(ResolverIntegrationTest.class);
 
     @Test
     public void testNaturalOrdering() {

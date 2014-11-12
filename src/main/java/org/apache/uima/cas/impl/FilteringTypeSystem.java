@@ -4,9 +4,9 @@ import org.sherlok.Pipeline;
 
 /**
  * Used to filter JSON writer, see {@link Pipeline}
- * {@link XmiCasSerializer#setFilterTypes(TypeSystemImpl)}
+ * {@link XmiCasSerializer#setFilterTypes(TypeSystemImpl)}. Requires to be in this package because of package visibility
  * 
- * @author richarde
+ * @author renaud@apache.org
  */
 public class FilteringTypeSystem extends TypeSystemImpl {
 

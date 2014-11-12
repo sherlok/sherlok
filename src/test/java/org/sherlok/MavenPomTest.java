@@ -1,11 +1,11 @@
-package org.sherlok.mappings;
+package org.sherlok;
 
-import static ch.epfl.bbp.collections.Create.set;
-import static org.junit.Assert.*;
+import static org.sherlok.utils.Create.set;
 
 import org.junit.Test;
-
-import ch.epfl.bbp.collections.Create;
+import org.sherlok.Store;
+import org.sherlok.mappings.BundleDef;
+import org.sherlok.mappings.MavenPom;
 
 public class MavenPomTest {
 
@@ -15,5 +15,6 @@ public class MavenPomTest {
         BundleDef bundle = new Store().load().getBundleDef(
                 "dkpro_opennlp_en:1.6.2");
         MavenPom.writePom(set(bundle), "test", "1");
+        // TODO assertions
     }
 }

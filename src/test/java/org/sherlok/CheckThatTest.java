@@ -1,28 +1,31 @@
 package org.sherlok;
 
+import static org.sherlok.utils.CheckThat.checkValidId;
+
 import org.junit.Test;
-import org.sherlok.mappings.ValidationException;
+import org.sherlok.utils.CheckThat;
+import org.sherlok.utils.ValidationException;
 
 public class CheckThatTest {
 
     @Test(expected = ValidationException.class)
     public void testStar() {
-        CheckThat.isOnlyAlphanumDotUnderscore("*_");
+        CheckThat.checkOnlyAlphanumDotUnderscore("*_");
     }
 
     @Test(expected = ValidationException.class)
-    public void testParenth() {
-        CheckThat.isOnlyAlphanumDotUnderscore("(asd)");
+    public void testParenthesis() {
+        CheckThat.checkOnlyAlphanumDotUnderscore("(asd)");
     }
 
     @Test(expected = ValidationException.class)
-    public void testParenth2() {
+    public void testParenthesis2() {
         CheckThat.checkOnlyAlphanumUnderscore("(asd)");
     }
 
     @Test
     public void test() {
-        CheckThat.isOnlyAlphanumDotUnderscore("abAC09.32no__in23");
+        CheckThat.checkOnlyAlphanumDotUnderscore("abAC09.32no__in23");
     }
 
     @Test(expected = ValidationException.class)
@@ -37,21 +40,21 @@ public class CheckThatTest {
 
     @Test
     public void testValidId() {
-        CheckThat.isValidId("ab:cd");
+        checkValidId("ab:cd");
     }
 
     @Test
-    public void testValidId2() {
-        CheckThat.isValidId("a_b:c_d");
+    public void testValidIdWithUnderscores() {
+        checkValidId("a_b:c_d");
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidId3() {
-        CheckThat.isValidId("a:_b:c_d");
+    public void testValidIdTwoColumns() {
+        checkValidId("a:_b:c_d");
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidId4() {
-        CheckThat.isValidId("a_bc_d");
+    public void testValidIdMissingColumn() {
+        checkValidId("a_bc_d");
     }
 }

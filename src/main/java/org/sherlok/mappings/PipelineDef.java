@@ -1,11 +1,12 @@
 package org.sherlok.mappings;
 
-import static ch.epfl.bbp.collections.Create.list;
-import static org.sherlok.Sherlok.SEPARATOR;
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.sherlok.utils.CheckThat.checkValidId;
+import static org.sherlok.utils.Create.list;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.sherlok.utils.ValidationException;
 
 /**
  * A pipeline describes the steps to perform a text mining analysis. This
@@ -14,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 
  * @author renaud@apache.org
  */
-public class PipelineDef extends Def<PipelineDef> {
+public class PipelineDef extends Def {
 
     /** which language this pipeline works for (ISO code, or "all") */
     private String language,
@@ -22,7 +23,7 @@ public class PipelineDef extends Def<PipelineDef> {
      * Useful to group pipelines together. Letters, numbers, slashes and
      * underscore only
      */
-    domain;
+    domain = "";
     /**
      * Whether this pipeline should be loaded on server startup. Defaults to
      * false
@@ -156,36 +157,24 @@ public class PipelineDef extends Def<PipelineDef> {
 
     // utils
 
-    public boolean validate() {
-        super.validate();
+    public boolean validate(String pipelineObject) {
+        super.validate(pipelineObject);
         try {
+            checkArgument(domain.indexOf("..") == -1,
+                    "'domain' can not contain double dots");
+            for (PipelineEngine engine : engines) {
+                checkArgument(engine.id != null || engine.script != null,
+                        "Either id or script should be provided for engine '"
+                                + engine + "'.");
+                if (engine.id != null) {
+                    checkValidId(engine.id);
+                }
+            }
             // TODO more
         } catch (Throwable e) {
-            throw new ValidationException(e.getMessage());
+            throw new ValidationException("" + pipelineObject + ": "
+                    + e.getMessage());
         }
         return true;
-    }
-
-    /** Creates an id for this pipeline, composed of 'name:version' */
-    public static String createId(String pipelineName, String version) {
-        return pipelineName + SEPARATOR + (version == null ? "null" : version);
-    }
-
-    public static String getName(String pipelineId) {
-        return pipelineId.split(SEPARATOR)[0];
-    }
-
-    public static String getVersion(String pipelineId) {
-        return pipelineId.split(SEPARATOR)[1];
-    }
-
-    @JsonIgnore
-    public String getId() {
-        return name + SEPARATOR + version;
-    }
-
-    @Override
-    public String toString() {
-        return getId();
     }
 }

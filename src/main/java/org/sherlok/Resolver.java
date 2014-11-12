@@ -1,12 +1,12 @@
 package org.sherlok;
 
-import static ch.epfl.bbp.collections.Create.list;
-import static ch.epfl.bbp.collections.Create.map;
-import static ch.epfl.bbp.collections.Create.set;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sherlok.mappings.PipelineDef.createId;
 import static org.sherlok.mappings.PipelineDef.getName;
 import static org.sherlok.mappings.PipelineDef.getVersion;
+import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
+import static org.sherlok.utils.Create.set;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +42,7 @@ import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.MavenPom;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineEngine;
-import org.sherlok.mappings.Store;
+import org.sherlok.utils.Strings;
 import org.xml.sax.SAXException;
 
 import sherlok.aether.Booter;
@@ -143,41 +143,41 @@ public class Resolver {
     private void solveDeps(String fakePom, Map<String, String> repositoriesDefs)
             throws ArtifactResolutionException, DependencyCollectionException,
             IOException {
-    
+
         RepositorySystem system = Booter.newRepositorySystem();
         RepositorySystemSession session = Booter
                 .newRepositorySystemSession(system);
-    
+
         Artifact rootArtifact = new DefaultArtifact(fakePom);
-    
+
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(new Dependency(rootArtifact, ""));
         collectRequest.setRepositories(Booter.newRepositories(system, session,
                 new HashMap<String, String>()));
-    
+
         CollectResult collectResult = system.collectDependencies(session,
                 collectRequest);
-    
+
         collectResult.getRoot().accept(new ConsoleDependencyGraphDumper());
-    
+
         PreorderNodeListGenerator p = new PreorderNodeListGenerator();
         collectResult.getRoot().accept(p);
         for (Dependency dependency : p.getDependencies(true)) {
-    
+
             Artifact artifact = dependency.getArtifact();
             ArtifactRequest artifactRequest = new ArtifactRequest();
             artifactRequest.setArtifact(artifact);
             artifactRequest.setRepositories(Booter.newRepositories(system,
                     session, repositoriesDefs));
-    
+
             ArtifactResult artifactResult = system.resolveArtifact(session,
                     artifactRequest);
             // System.out.println("RESOLVED:: " + artifactResult.isResolved());
-    
+
             artifact = artifactResult.getArtifact();
-    
+
             ClassPathHack.addFile(artifact.getFile());
-    
+
             // System.out
             // .println("FILE:: " + artifact.getFile().getAbsolutePath());
         }
@@ -187,14 +187,14 @@ public class Resolver {
     static AnalysisEngineDescription createEngine(String cName,
             Object... params) throws ClassNotFoundException,
             ResourceInitializationException {
-    
+
         // instantiate class
         Class<? extends AnalysisComponent> classz = (Class<? extends AnalysisComponent>) Class
                 .forName(cName);
         // create ae
         AnalysisEngineDescription aed = AnalysisEngineFactory
                 .createEngineDescription(classz, params);
-    
+
         return aed;
     }
 
@@ -228,5 +228,13 @@ public class Resolver {
                         "Error, could not add URL to system classloader");
             }
         }
+    }
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void removeFromCache(String pipelineId) {
+        pipelineCache.remove(pipelineId);
     }
 }

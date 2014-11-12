@@ -1,33 +1,22 @@
 package org.sherlok.mappings;
 
-import static ch.epfl.bbp.collections.Create.list;
-import static ch.epfl.bbp.collections.Create.map;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.sherlok.CheckThat;
 import org.sherlok.Sherlok;
+import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Bundles group together a set of library dependencies.
  * 
  * @author renaud@apache.org
  */
-public class BundleDef extends Def<BundleDef> {
+public class BundleDef extends Def {
 
     /** a list of all the dependencies of this bundle */
     private List<BundleDependency> dependencies = list();
@@ -119,12 +108,13 @@ public class BundleDef extends Def<BundleDef> {
         return this;
     }
 
-    public boolean validate() {
-        super.validate();
+    public boolean validate(String bundleObject) {
+        super.validate(bundleObject);
         try {
             // TODO more
         } catch (Throwable e) {
-            throw new ValidationException(e.getMessage());
+            throw new ValidationException("" + bundleObject + ": "
+                    + e.getMessage());
         }
         return true;
     }

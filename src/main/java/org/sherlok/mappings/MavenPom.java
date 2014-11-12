@@ -1,6 +1,6 @@
 package org.sherlok.mappings;
 
-import static ch.epfl.bbp.collections.Create.list;
+import static org.sherlok.utils.Create.list;
 
 import java.io.File;
 import java.io.FileWriter;

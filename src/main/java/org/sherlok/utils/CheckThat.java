@@ -1,10 +1,8 @@
-package org.sherlok;
+package org.sherlok.utils;
 
 import static org.sherlok.Sherlok.SEPARATOR;
 
 import java.util.regex.Pattern;
-
-import org.sherlok.mappings.ValidationException;
 
 public class CheckThat {
 
@@ -25,7 +23,7 @@ public class CheckThat {
         }
     }
 
-    public static void isOnlyAlphanumDotUnderscore(String test)
+    public static void checkOnlyAlphanumDotUnderscore(String test)
             throws ValidationException {
         if (alphanumDotUnderscore.matcher(test).find()) {
             throw new ValidationException("'" + test
@@ -34,7 +32,7 @@ public class CheckThat {
         }
     }
 
-    public static void isValidId(String id) throws ValidationException {
+    public static void checkValidId(String id) throws ValidationException {
         if (id.indexOf(SEPARATOR) == -1) {
             throw new ValidationException(id + " must contain a column (':')");
 
