@@ -3,7 +3,7 @@ var Sherlok = {
     annotate: function (element_id) {
 
         var to_annotate = $("#to_annotate").val();
-        $.post("/annotate/opennlp_en_ners", {"text": to_annotate, "version": "1.6.2"}, function(annotated_json) {
+        $.post("/annotate/opennlp_en_ners", {"text": to_annotate}, function(annotated_json) {
             console.log(annotated_json);
 
             var blacklist = ["Sofa", "DocumentAnnotation"];

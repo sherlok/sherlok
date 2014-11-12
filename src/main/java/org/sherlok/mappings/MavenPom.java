@@ -12,9 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.sherlok.Sherlok;
 import org.sherlok.mappings.BundleDef.BundleDependency;
 
@@ -23,19 +20,6 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 public class MavenPom {
-
-    void create(String pipelineName, String pipelineVersion, BundleDef bundle)
-            throws IOException {
-
-        Model model = new Model();
-        model.setGroupId("some.group.id");
-        Dependency dependency = new Dependency();
-        model.addDependency(dependency);
-
-        FileWriter writer = new FileWriter(new File(Sherlok.LOCAL_REPO_PATH
-                + ""));
-        new MavenXpp3Writer().write(writer, model);
-    }
 
     public static class RepoDef {
         public String id, url;

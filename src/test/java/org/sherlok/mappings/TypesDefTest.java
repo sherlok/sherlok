@@ -25,8 +25,8 @@ public class TypesDefTest {
 
         File tf = new File("target/typesTest_" + currentTimeMillis() + ".json");
         TypesDef t = getOpennlpTypes();
-        t.write(tf);
-        TypesDef t2 = TypesDef.load(tf);
+        FileBased.write(tf, t);
+        TypesDef t2 = FileBased.loadTypes(tf);
         assertEquals(t.getTypes().size(), t2.getTypes().size());
         // TODO more
     }

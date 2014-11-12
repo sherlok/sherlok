@@ -1,21 +1,11 @@
 package org.sherlok.mappings;
 
 import static ch.epfl.bbp.collections.Create.list;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.uima.cas.Type;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * UIMA Types
@@ -102,23 +92,6 @@ public class TypesDef {
         return this;
     }
 
-    // read/write
-
-    static final ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-    static {
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-    }
-
-    public void write(File f) throws JsonGenerationException,
-            JsonMappingException, IOException {
-        mapper.writeValue(f, this);
-    }
-
-    public static TypesDef load(File f) throws JsonParseException,
-            JsonMappingException, FileNotFoundException, IOException {
-        return mapper.readValue(new FileInputStream(f), TypesDef.class);
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -129,7 +102,47 @@ public class TypesDef {
     }
 
     public boolean validate() {
-        // FIXME
+        for (TypeDef typeDef : types) {
+            if (!isUimaAnnotation(typeDef.getClassz())) {
+                throw new ValidationException("'" + typeDef + "' of '"
+                        + typeDef + "'is not a valid UIMA Annotation class");
+            }
+            try {
+                checkNotNull(typeDef.shortName, "'shortName' of '" + typeDef
+                        + "' should not be null");
+            } catch (Exception e) {
+                new ValidationException(e.getMessage());
+            }
+        }
         return true;
+    }
+
+    @SuppressWarnings("unused")
+    private static boolean isUimaAnnotation(String value) {
+        // try to load the class
+        Class<?> clasz = null;
+        try {
+
+            clasz = Class.forName(value);
+            // System.out.println("testing" + clasz.getName());
+        } catch (Exception e) {
+            return false;
+        }
+
+        while (true) {
+            Class<?> superclass = clasz.getSuperclass();
+            // System.out
+            // .println("  |-superclass " + superclass.getName());
+            if (superclass.getName().equals(
+                    "org.apache.uima.jcas.cas.AnnotationBase")) {
+                return true; // free, otherwise loop
+            } else if (superclass == null) {
+                return false;
+                // fail(value
+                // +
+                // " should be an instance of AnnotationBase (I could not find it, but it is defined in TypeSystem.java)");
+            }
+            clasz = superclass;
+        }
     }
 }

@@ -1,6 +1,12 @@
 package org.sherlok;
 
+import static ch.epfl.bbp.collections.Create.list;
 import static ch.epfl.bbp.collections.Create.map;
+import static ch.epfl.bbp.collections.Create.set;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sherlok.mappings.PipelineDef.createId;
+import static org.sherlok.mappings.PipelineDef.getName;
+import static org.sherlok.mappings.PipelineDef.getVersion;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +16,8 @@ import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_component.AnalysisComponent;
@@ -29,16 +37,166 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.sherlok.mappings.BundleDef;
+import org.sherlok.mappings.EngineDef;
+import org.sherlok.mappings.MavenPom;
+import org.sherlok.mappings.PipelineDef;
+import org.sherlok.mappings.PipelineDef.PipelineEngine;
+import org.sherlok.mappings.Store;
 import org.xml.sax.SAXException;
 
 import sherlok.aether.Booter;
 import sherlok.aether.ConsoleDependencyGraphDumper;
-import ch.epfl.bbp.collections.Create;
+import freemarker.template.TemplateException;
 
 /**
  * Resolves the transitive dependencies of an artifact.
  */
 public class Resolver {
+
+    private Store store;
+
+    public Resolver() {
+        this.store = new Store().load();
+    }
+
+    private Map<String, Pipeline> pipelineCache = map();
+
+    public Pipeline resolve(String pipelineName, String version)
+            throws UIMAException, ArtifactResolutionException,
+            DependencyCollectionException, IOException, ClassNotFoundException,
+            SAXException, CpeDescriptorException, TemplateException {
+
+        // 0. resolve version=null
+        if (version == null || version.equals("null")) {
+            String highestVersion = "0000000000000000000000000000000";
+            for (String pId : store.getPipelineDefNames()) {
+                if (getName(pId).equals(pipelineName)) {
+                    String pVersion = getVersion(pId);
+                    if (Strings.compareNatural(pVersion, highestVersion) > 0) {
+                        highestVersion = pVersion;
+                    }
+                }
+            }
+            version = highestVersion;
+        }
+
+        // 1. get pipeline from cache of components
+        String pipelineId = createId(pipelineName, version);
+
+        if (pipelineCache.containsKey(pipelineId)) {
+            return pipelineCache.get(pipelineId);
+
+        } else {
+            // 2. else, load it
+            // 2.1 read pipeline def
+            PipelineDef pipelineDef = store.getPipelineDef(pipelineId);
+            checkNotNull(pipelineDef, "could not find Pipeline with Id '"
+                    + pipelineId + "'");
+
+            // 2.3 resolve engines (and their bundles)
+            List<EngineDef> engineDefs = list();
+            Set<BundleDef> bundleDefs = set();
+            Map<String, String> repositoriesDefs = map();
+            for (PipelineEngine pengine : pipelineDef.getEngines()) {
+                EngineDef engineDef = store.getEngineDef(pengine.getId());
+                checkNotNull(engineDef, "could not find " + pengine);
+                engineDefs.add(engineDef);
+                BundleDef bundleDef = store.getBundleDef(engineDef
+                        .getBundleId());
+                checkNotNull(bundleDef, "could not find " + bundleDef);
+                bundleDefs.add(bundleDef);
+                for (Entry<String, String> id_url : bundleDef.getRepositories()
+                        .entrySet()) {
+                    repositoriesDefs.put(id_url.getKey(), id_url.getValue());
+                }
+            }
+
+            // 2.4 create fake POM from bundles and copy it
+            String fakePom = MavenPom.writePom(bundleDefs, pipelineName,
+                    version);
+
+            // 2.4 solve dependecies
+            solveDeps(fakePom, repositoriesDefs);
+
+            // 3 create pipeline and add components
+            Pipeline pipeline = new Pipeline(pipelineId);
+            for (EngineDef engineDef : engineDefs) {
+                pipeline.add(createEngine(engineDef.getClassz(),
+                        engineDef.getFlatParams()));
+            }
+
+            // 3.2 set annotations to output
+            pipeline.addOutputAnnotation(
+                    "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity",
+                    "value");
+            // FIXME
+
+            // 3.3 initialize pipeline and cache it
+            pipeline.initialize();
+            pipelineCache.put(pipelineId, pipeline);
+
+            return pipeline;
+        }
+    }
+
+    private void solveDeps(String fakePom, Map<String, String> repositoriesDefs)
+            throws ArtifactResolutionException, DependencyCollectionException,
+            IOException {
+    
+        RepositorySystem system = Booter.newRepositorySystem();
+        RepositorySystemSession session = Booter
+                .newRepositorySystemSession(system);
+    
+        Artifact rootArtifact = new DefaultArtifact(fakePom);
+    
+        CollectRequest collectRequest = new CollectRequest();
+        collectRequest.setRoot(new Dependency(rootArtifact, ""));
+        collectRequest.setRepositories(Booter.newRepositories(system, session,
+                new HashMap<String, String>()));
+    
+        CollectResult collectResult = system.collectDependencies(session,
+                collectRequest);
+    
+        collectResult.getRoot().accept(new ConsoleDependencyGraphDumper());
+    
+        PreorderNodeListGenerator p = new PreorderNodeListGenerator();
+        collectResult.getRoot().accept(p);
+        for (Dependency dependency : p.getDependencies(true)) {
+    
+            Artifact artifact = dependency.getArtifact();
+            ArtifactRequest artifactRequest = new ArtifactRequest();
+            artifactRequest.setArtifact(artifact);
+            artifactRequest.setRepositories(Booter.newRepositories(system,
+                    session, repositoriesDefs));
+    
+            ArtifactResult artifactResult = system.resolveArtifact(session,
+                    artifactRequest);
+            // System.out.println("RESOLVED:: " + artifactResult.isResolved());
+    
+            artifact = artifactResult.getArtifact();
+    
+            ClassPathHack.addFile(artifact.getFile());
+    
+            // System.out
+            // .println("FILE:: " + artifact.getFile().getAbsolutePath());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    static AnalysisEngineDescription createEngine(String cName,
+            Object... params) throws ClassNotFoundException,
+            ResourceInitializationException {
+    
+        // instantiate class
+        Class<? extends AnalysisComponent> classz = (Class<? extends AnalysisComponent>) Class
+                .forName(cName);
+        // create ae
+        AnalysisEngineDescription aed = AnalysisEngineFactory
+                .createEngineDescription(classz, params);
+    
+        return aed;
+    }
 
     /** reflection to bypass encapsulation */
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -69,141 +227,6 @@ public class Resolver {
                 throw new IOException(
                         "Error, could not add URL to system classloader");
             }
-        }
-    }
-
-    private void solveDeps(String fakePom) throws ArtifactResolutionException,
-            DependencyCollectionException, IOException {
-
-        RepositorySystem system = Booter.newRepositorySystem();
-        RepositorySystemSession session = Booter
-                .newRepositorySystemSession(system);
-
-        Artifact rootArtifact = new DefaultArtifact(fakePom);
-
-        CollectRequest collectRequest = new CollectRequest();
-        collectRequest.setRoot(new Dependency(rootArtifact, ""));
-        collectRequest.setRepositories(Booter.newRepositories(system, session,
-                new HashMap<String, String>()));
-
-        CollectResult collectResult = system.collectDependencies(session,
-                collectRequest);
-
-        collectResult.getRoot().accept(new ConsoleDependencyGraphDumper());
-
-        PreorderNodeListGenerator p = new PreorderNodeListGenerator();
-        collectResult.getRoot().accept(p);
-        for (Dependency dependency : p.getDependencies(true)) {
-
-            Artifact artifact = dependency.getArtifact();
-            ArtifactRequest artifactRequest = new ArtifactRequest();
-            artifactRequest.setArtifact(artifact);
-            artifactRequest.setRepositories(Booter.newRepositories(system,
-                    session, new HashMap<String, String>()));
-
-            ArtifactResult artifactResult = system.resolveArtifact(session,
-                    artifactRequest);
-            // System.out.println("RESOLVED:: " + artifactResult.isResolved());
-
-            artifact = artifactResult.getArtifact();
-
-            ClassPathHack.addFile(artifact.getFile());
-
-            // System.out
-            // .println("FILE:: " + artifact.getFile().getAbsolutePath());
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    static AnalysisEngineDescription createEngine(String cName,
-            Object... params) throws ClassNotFoundException,
-            ResourceInitializationException {
-
-        // instantiate class
-        Class<? extends AnalysisComponent> classz = (Class<? extends AnalysisComponent>) Class
-                .forName(cName);
-        // create ae
-        AnalysisEngineDescription aed = AnalysisEngineFactory
-                .createEngineDescription(classz, params);
-
-        return aed;
-    }
-
-    public static class AED {
-        String componentClass;
-        Object[] params;
-
-        public AED(String componentClass) {
-            this.componentClass = componentClass;
-            this.params = new Object[0];
-        }
-
-        public AED(String componentClass, Object... params) {
-            this.componentClass = componentClass;
-            this.params = params;
-        }
-
-        // AED add(Object param) {
-        // params.add(param);
-        // return this;
-        // }
-
-        public Object[] getParams() {
-            // return params.toArray(new Object[params.size()]);
-            return params;
-        }
-    }
-
-    private static final String SEP = ":::";
-    private Map<String, Pipeline> pipelineCache = map();
-
-    public Pipeline resolve(String pipelineName, String version)
-            throws UIMAException, ArtifactResolutionException,
-            DependencyCollectionException, IOException, ClassNotFoundException,
-            SAXException, CpeDescriptorException {
-
-        // 1. get pipeline from cache of components
-        if (pipelineCache.containsKey(pipelineName + SEP + version)) {
-            return pipelineCache.get(pipelineName + SEP + version);
-
-        } else {
-            // 2. else, create it
-            // 2.1 read pipeline def
-            // 2.2 resolve engines
-            List<AED> aeds = Create.list();
-            aeds.add(new AED(
-                    "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter"));
-            aeds.add(new AED(
-                    "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger"));
-            aeds.add(new AED(
-                    "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder",
-                    "modelVariant", "person"));
-            aeds.add(new AED(
-                    "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder",
-                    "modelVariant", "location"));
-
-            // 2.3 resolve bundles
-
-            // 2.4 create fake POM from bundles and copy it
-            String fakePom = "sherlok:sherlok:pom:1";
-            // 2.4 solve dependecies
-            solveDeps(fakePom);
-
-            // 3 create pipeline and add components
-            Pipeline p = new Pipeline(pipelineName, version);
-            for (AED aed : aeds) {
-                p.add(createEngine(aed.componentClass, aed.getParams()));
-            }
-
-            // 3.2 set annotations to output
-            p.addOutputAnnotation(
-                    "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity",
-                    "value");
-
-            // 3.3 initialize pipeline and cache it
-            p.initialize();
-            pipelineCache.put(pipelineName + SEP + version, p);
-            return p;
         }
     }
 }

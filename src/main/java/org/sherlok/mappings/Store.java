@@ -7,13 +7,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Set;
 
 import org.sherlok.Sherlok;
 import org.sherlok.mappings.TypesDef.TypeDef;
 import org.slf4j.Logger;
 
 public class Store {
-    private static Logger LOG = getLogger(Store.class);
+    private static final Logger LOG = getLogger(Store.class);
 
     public static final String TYPES_PATH = "config/types/";
     public static final String BUNDLES_PATH = "config/bundles/";
@@ -26,96 +27,76 @@ public class Store {
     private Map<String, PipelineDef> pipelineDefs;
 
     public Store load() {
+        LOG.debug("loading Store");
 
         // Types
         typesDefs = map(); // reinit
         // read Defs
         for (File tf : newArrayList(iterateFiles(new File(TYPES_PATH),
                 new String[] { "json" }, true))) {
-            try {
-                TypesDef tdefs = TypesDef.load(tf);
-                for (TypeDef type : tdefs.getTypes()) {
-                    String key = type.getShortName();
-                    if (typesDefs.containsKey(key)) {
-                        throw new RuntimeException(); // TODO
-                    } else {
-                        typesDefs.put(key, type);
-                    }
+            TypesDef tdefs = FileBased.loadTypes(tf);
+            for (TypeDef type : tdefs.getTypes()) {
+                String key = type.getShortName();
+                if (typesDefs.containsKey(key)) {
+                    throw new ValidationException("duplicate types: '" + key
+                            + "'");
+                } else {
+                    typesDefs.put(key, type);
                 }
-            } catch (Exception e) {
-                // TODO: handle exception
             }
         }
+        LOG.debug("loaded {} typeDefs", typesDefs.size());
 
         // BUNDLES
         bundleDefs = map(); // reinit
         // read Defs
         for (File bf : newArrayList(iterateFiles(new File(BUNDLES_PATH),
                 new String[] { "json" }, true))) {
-            try {
-                BundleDef bd = BundleDef.load(bf);
-                if (bd.validate()) {
-
-                    String key = bd.getName() + Sherlok.SEPARATOR
-                            + bd.getVersion();
-                    if (bundleDefs.containsKey(key)) {
-                        throw new RuntimeException(); // TODO
-                    } else {
-                        bundleDefs.put(key, bd);
-                    }
+            BundleDef bd = FileBased.loadBundle(bf);
+            if (bd.validate()) {
+                String key = bd.getName() + Sherlok.SEPARATOR + bd.getVersion();
+                if (bundleDefs.containsKey(key)) {
+                    throw new ValidationException("duplicate bundle ids: '"
+                            + key + "'");
                 } else {
-                    throw new RuntimeException(); // TODO
+                    bundleDefs.put(key, bd);
                 }
-            } catch (Exception e) {
-                // TODO: handle exception
             }
         }
+        LOG.debug("loaded {} bundleDefs", bundleDefs.size());
 
         // ENGINES
         engineDefs = map(); // reinit
         // read Defs
         for (File bf : newArrayList(iterateFiles(new File(ENGINES_PATH),
                 new String[] { "json" }, true))) {
-            try {
-                EngineDef ed = EngineDef.load(bf);
-                if (ed.validate()) {
-
-                    String key = ed.getName() + Sherlok.SEPARATOR
-                            + ed.getVersion();
-                    if (engineDefs.containsKey(key)) {
-                        throw new RuntimeException(); // TODO
-                    } else {
-                        engineDefs.put(key, ed);
-                    }
+            EngineDef ed = FileBased.loadEngine(bf);
+            if (ed.validate()) {
+                String key = ed.getName() + Sherlok.SEPARATOR + ed.getVersion();
+                if (engineDefs.containsKey(key)) {
+                    throw new ValidationException("duplicate engine ids: '"
+                            + key + "'");
                 } else {
-                    throw new RuntimeException(); // TODO
+                    engineDefs.put(key, ed);
                 }
-            } catch (Exception e) {
-                // TODO: handle exception
             }
         }
+        LOG.debug("loaded {} engineDefs", engineDefs.size());
 
         // PIPELINES
         pipelineDefs = map(); // reinit
         // read Defs
         for (File bf : newArrayList(iterateFiles(new File(PIPELINES_PATH),
                 new String[] { "json" }, true))) {
-            try {
-                PipelineDef pd = PipelineDef.load(bf);
-                if (pd.validate()) {
+            PipelineDef pd = FileBased.loadPipeline(bf);
+            if (pd.validate()) {
 
-                    String key = pd.getName() + Sherlok.SEPARATOR
-                            + pd.getVersion();
-                    if (pipelineDefs.containsKey(key)) {
-                        throw new RuntimeException(); // TODO
-                    } else {
-                        pipelineDefs.put(key, pd);
-                    }
+                if (pipelineDefs.containsKey(pd.getId())) {
+                    throw new ValidationException("duplicate pipeline ids: '"
+                            + pd.getId() + "'");
                 } else {
-                    throw new RuntimeException(); // TODO
+                    pipelineDefs.put(pd.getId(), pd);
                 }
-            } catch (Exception e) {
-                // TODO: handle exception
             }
         }
         return this;
@@ -135,5 +116,9 @@ public class Store {
 
     public PipelineDef getPipelineDef(String pipelineId) {
         return pipelineDefs.get(pipelineId);
+    }
+
+    public Set<String> getPipelineDefNames() {
+        return pipelineDefs.keySet();
     }
 }

@@ -27,8 +27,8 @@ public class EngineTest {
 
         File ef = new File("target/engineTest_" + currentTimeMillis() + ".json");
         EngineDef e = getOpenNlpEnSegmenter();
-        e.write(ef);
-        EngineDef e2 = EngineDef.load(ef);
+        FileBased.write(ef,e);
+        EngineDef e2 = FileBased.loadEngine(ef);
         assertEquals(e.getName(), e2.getName());
         assertEquals(e.getVersion(), e2.getVersion());
         assertEquals(e.getParameters().size(), e2.getParameters().size());

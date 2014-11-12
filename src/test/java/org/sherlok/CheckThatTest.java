@@ -17,7 +17,7 @@ public class CheckThatTest {
 
     @Test(expected = ValidationException.class)
     public void testParenth2() {
-        CheckThat.isOnlyAlphanumUnderscore("(asd)");
+        CheckThat.checkOnlyAlphanumUnderscore("(asd)");
     }
 
     @Test
@@ -27,12 +27,12 @@ public class CheckThatTest {
 
     @Test(expected = ValidationException.class)
     public void testDot() {
-        CheckThat.isOnlyAlphanumUnderscore("abAC09.32no__in23");
+        CheckThat.checkOnlyAlphanumUnderscore("abAC09.32no__in23");
     }
 
     @Test
     public void testUnderscore() {
-        CheckThat.isOnlyAlphanumUnderscore("abAC0adfsweMNOINW932no__in23");
+        CheckThat.checkOnlyAlphanumUnderscore("abAC0adfsweMNOINW932no__in23");
     }
 
     @Test

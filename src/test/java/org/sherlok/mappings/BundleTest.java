@@ -12,10 +12,7 @@ import org.sherlok.mappings.BundleDef.BundleDependency;
 public class BundleTest {
 
     public static BundleDef getDkproOpennlpEn() {
-        BundleDef b = new BundleDef()
-                .setName("dkpro_opennlp_en")
-                .setVersion("1.6.2")
-                .setDescription("all opennlp engines and models for English")
+        BundleDef b = (BundleDef) new BundleDef()
                 .addDependency(
                         new BundleDependency(
                                 mvn,
@@ -40,7 +37,9 @@ public class BundleTest {
                                 "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-location:20100907.0"))
                 .addRepository(
                         "dkpro",
-                        "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/");
+                        "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/")
+                .setName("dkpro_opennlp_en").setVersion("1.6.2")
+                .setDescription("all opennlp engines and models for English");
         return b;
     }
 
@@ -49,8 +48,8 @@ public class BundleTest {
 
         File bf = new File("target/bundleTest_" + currentTimeMillis() + ".json");
         BundleDef b = getDkproOpennlpEn();
-        b.write(bf);
-        BundleDef b2 = BundleDef.load(bf);
+        FileBased.write(bf, b);
+        BundleDef b2 = FileBased.loadBundle(bf);
         assertEquals(b.getName(), b2.getName());
         assertEquals(b.getVersion(), b2.getVersion());
         assertEquals(b.getDependencies().size(), b2.getDependencies().size());

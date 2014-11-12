@@ -11,9 +11,9 @@ public class StoreTest {
     public void test() {
         Store store = new Store().load();
 
-        PipelineDef pd = store.getPipelineDef("OpenNlpEnNers:1.6.2");
+        PipelineDef pd = store.getPipelineDef("opennlp_en_ners:1.6.2");
         assertEquals(true, pd.isLoadOnStartup());
-        assertEquals(1, pd.getEngines().size());
+        assertEquals(4, pd.getEngines().size());
         assertEquals("OpenNlpEnSegmenter:1.6.2", pd.getEngines().get(0).getId());
 
         

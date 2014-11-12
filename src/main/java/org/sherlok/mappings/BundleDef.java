@@ -14,6 +14,7 @@ import java.util.Map;
 import org.sherlok.CheckThat;
 import org.sherlok.Sherlok;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -26,17 +27,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * 
  * @author renaud@apache.org
  */
-public class BundleDef {
+public class BundleDef extends Def<BundleDef> {
 
-    /** a unique name for this bundle. Letters, numbers and underscore only */
-    private String name,
-    /**
-     * a unique version id for this bundle. Letters, numbers, dots and
-     * underscore only
-     */
-    version,
-    /** (optional) */
-    description;
     /** a list of all the dependencies of this bundle */
     private List<BundleDependency> dependencies = list();
     /** additional maven repositories */
@@ -81,64 +73,23 @@ public class BundleDef {
             this.value = value;
         }
 
+        @JsonIgnore
         public String getGroupId() {
             return value.split(Sherlok.SEPARATOR)[0];
         }
 
+        @JsonIgnore
         public String getArtifactId() {
             return value.split(Sherlok.SEPARATOR)[1];
         }
 
+        @JsonIgnore
         public String getVersion() {
             return value.split(Sherlok.SEPARATOR)[2];
         }
     }
 
-    // read/write
-
-    static final ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-    static {
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-    }
-
-    public void write(File f) throws JsonGenerationException,
-            JsonMappingException, IOException {
-        mapper.writeValue(f, this);
-    }
-
-    public static BundleDef load(File f) throws JsonParseException,
-            JsonMappingException, FileNotFoundException, IOException {
-        return mapper.readValue(new FileInputStream(f), BundleDef.class);
-    }
-
     // get/set
-
-    public String getName() {
-        return name;
-    }
-
-    public BundleDef setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public BundleDef setVersion(String version) {
-        this.version = version;
-        return this;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public BundleDef setDescription(String description) {
-        this.description = description;
-        return this;
-    }
 
     public List<BundleDependency> getDependencies() {
         return dependencies;
@@ -168,17 +119,9 @@ public class BundleDef {
         return this;
     }
 
-    @Override
-    public String toString() {
-        return name + ":" + version;
-    }
-
     public boolean validate() {
+        super.validate();
         try {
-            checkNotNull(name, "name should not be null");
-            CheckThat.isOnlyAlphanumUnderscore(name);
-            checkNotNull(version);
-            CheckThat.isOnlyAlphanumDotUnderscore(version);
             // TODO more
         } catch (Throwable e) {
             throw new ValidationException(e.getMessage());
