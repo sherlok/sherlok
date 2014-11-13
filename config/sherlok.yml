@@ -1,8 +1,0 @@
-##################### Sherlok Configuration Example #####################
-
-# This file contains an overview of various configuration settings of Sherlok.
-# Sherlok comes with reasonable defaults for most settings,
-# so you can try it out without bothering with configuration.
-
-
-sherlok.port: 9600

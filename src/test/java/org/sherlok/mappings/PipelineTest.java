@@ -27,7 +27,7 @@ public class PipelineTest {
                 + ".json");
         PipelineDef p = getOpennlp_ners();
         FileBased.write(pf, p);
-        PipelineDef p2 = FileBased.loadPipeline(pf);
+        PipelineDef p2 = FileBased.read(pf, PipelineDef.class);
         p2.validate("");
         assertEquals(p.getName(), p2.getName());
         assertEquals(p.getVersion(), p2.getVersion());

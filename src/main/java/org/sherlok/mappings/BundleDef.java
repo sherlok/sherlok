@@ -26,13 +26,13 @@ public class BundleDef extends Def {
     /** A dependency to some external UIMA code. */
     public static class BundleDependency {
         /** Dependencies can only have these formats */
-        enum DependencyType {
+        public enum DependencyType {
             /** corresponds to a released maven artifact */
             mvn, //
             /** any accessible git repository that contains a Maven project */
-            git, // TODO
+            git, // TODO git protocol not implemented
             /** corresponds to a local or remote jar */
-            jar // TODO
+            jar // TODO jar protocol not implemented
         }
 
         private DependencyType type;
@@ -108,10 +108,10 @@ public class BundleDef extends Def {
         return this;
     }
 
-    public boolean validate(String bundleObject) {
+    public boolean validate(String bundleObject) throws ValidationException {
         super.validate(bundleObject);
         try {
-            // TODO more
+            // TODO more validation
         } catch (Throwable e) {
             throw new ValidationException("" + bundleObject + ": "
                     + e.getMessage());

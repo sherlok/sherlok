@@ -2,7 +2,6 @@ package org.sherlok;
 
 import static org.sherlok.utils.Create.list;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
@@ -11,32 +10,30 @@ import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.cas.impl.FilteringTypeSystem;
 import org.apache.uima.cas.impl.XmiCasSerializer;
-import org.apache.uima.collection.metadata.CpeDescriptorException;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.util.InvalidXMLException;
-import org.sherlok.utils.CheckThat;
 import org.xml.sax.SAXException;
 
 /**
- * Lifecycle:<br>
+ * 
+ * Manages a UIMA pipeline (configuration, and then use/annotation). Lifecycle:<br>
  * <ol>
  * <li>create Pipeline</li>
  * <li>add engines</li>
  * <li>add output fields</li>
  * <li>initialize</li>
- * <li>annotate text</li>
+ * <li>annotate texts</li>
  * <li>close</li>
  * </ol>
  * 
  * @author renaud@apache.org
  */
-public class Pipeline {
+public class UimaPipeline {
 
-    private String pipelineName;
-    private String version;
+    private String pipelineId;
+    private String language;
 
     private List<AnalysisEngineDescription> aeds = list();
     private AnalysisEngine[] engines = null;
@@ -44,20 +41,17 @@ public class Pipeline {
 
     private XmiCasSerializer xcs;
 
-    public Pipeline(String pipelineName, String version) {
-        this.pipelineName = pipelineName;
-        this.version = version;
+    /**
+     * @param pipelineId
+     * @param lang
+     *            language, important e.g. for DKpro components.
+     */
+    public UimaPipeline(String pipelineId, String language) {
+        this.pipelineId = pipelineId;
+        this.language = language;
     }
 
-    public Pipeline(String pipelineId) {
-        CheckThat.checkValidId(pipelineId);
-        String[] split = pipelineId.split(Sherlok.SEPARATOR);
-        this.pipelineName = split[0];
-        this.version = split[1];
-    }
-
-    public void add(AnalysisEngineDescription aDesc) throws IOException,
-            SAXException, CpeDescriptorException, InvalidXMLException {
+    public void add(AnalysisEngineDescription aDesc) {
         if (engines != null)
             throw new IllegalArgumentException(
                     "cannot add more engines after first call to process()");
@@ -94,11 +88,15 @@ public class Pipeline {
         return engines;
     }
 
+    /**
+     * @param text
+     *            the text to annotate
+     */
     public String annotate(String text) throws UIMAException, SAXException {
 
         JCas jCas = JCasFactory.createJCas();
         jCas.setDocumentText(text);
-        jCas.setDocumentLanguage("en"); // important for DK pro components TODO
+        jCas.setDocumentLanguage(language);
 
         SimplePipeline.runPipeline(jCas, engines);
 
@@ -115,6 +113,6 @@ public class Pipeline {
 
     @Override
     public String toString() {
-        return pipelineName + ":" + version;
+        return pipelineId;
     }
 }

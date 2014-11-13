@@ -2,6 +2,7 @@ package org.sherlok.mappings;
 
 import static java.lang.System.currentTimeMillis;
 import static org.junit.Assert.assertEquals;
+import static org.sherlok.FileBased.read;
 import static org.sherlok.mappings.BundleDef.BundleDependency.DependencyType.mvn;
 
 import java.io.File;
@@ -51,7 +52,7 @@ public class BundleTest {
         File bf = new File("target/bundleTest_" + currentTimeMillis() + ".json");
         BundleDef b = getDkproOpennlpEn();
         FileBased.write(bf, b);
-        BundleDef b2 = FileBased.loadBundle(bf);
+        BundleDef b2 = read(bf, BundleDef.class);
         b2.validate("");
         assertEquals(b.getName(), b2.getName());
         assertEquals(b.getVersion(), b2.getVersion());

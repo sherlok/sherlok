@@ -1,6 +1,6 @@
 package org.sherlok.mappings;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static org.sherlok.utils.CheckThat.checkArgument;
 import static org.sherlok.utils.CheckThat.checkValidId;
 import static org.sherlok.utils.Create.list;
 
@@ -17,8 +17,8 @@ import org.sherlok.utils.ValidationException;
  */
 public class PipelineDef extends Def {
 
-    /** which language this pipeline works for (ISO code, or "all") */
-    private String language,
+    /** which language this pipeline works for (ISO code) */
+    private String language = "en",
     /**
      * Useful to group pipelines together. Letters, numbers, slashes and
      * underscore only
@@ -64,7 +64,10 @@ public class PipelineDef extends Def {
 
         @Override
         public String toString() {
-            return id;// TODO
+            if (id != null)
+                return id;
+            else
+                return script;
         }
     }
 
@@ -155,13 +158,21 @@ public class PipelineDef extends Def {
         return this;
     }
 
+    // TODO ignore in json or not?
+    // ** @return convenience info about how to use this pipeline for
+    // annotating */
+    // public String getUsage() {
+    // return "/annotate/" + name + "?version=" + version
+    // + "&text=the text to annotate";
+    // }
+
     // utils
 
-    public boolean validate(String pipelineObject) {
+    public boolean validate(String pipelineObject) throws ValidationException {
         super.validate(pipelineObject);
         try {
             checkArgument(domain.indexOf("..") == -1,
-                    "'domain' can not contain double dots");
+                    "'domain' can not contain double dots: '" + domain + "'");
             for (PipelineEngine engine : engines) {
                 checkArgument(engine.id != null || engine.script != null,
                         "Either id or script should be provided for engine '"
@@ -170,7 +181,7 @@ public class PipelineDef extends Def {
                     checkValidId(engine.id);
                 }
             }
-            // TODO more
+            // TODO more validation
         } catch (Throwable e) {
             throw new ValidationException("" + pipelineObject + ": "
                     + e.getMessage());

@@ -42,4 +42,19 @@ public class CheckThat {
         }
     }
 
+    public static <T> T checkNotNull(T reference, String errorMessage)
+            throws ValidationException {
+        if (reference == null) {
+            throw new ValidationException(errorMessage);
+        }
+        return reference;
+    }
+
+    public static void checkArgument(boolean expression, String errorMessage)
+            throws ValidationException {
+        if (!expression) {
+            throw new ValidationException(errorMessage);
+        }
+    }
+
 }

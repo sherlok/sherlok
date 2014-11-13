@@ -1,6 +1,6 @@
 package org.sherlok.mappings;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sherlok.utils.CheckThat.checkNotNull;
 import static org.sherlok.utils.Create.list;
 
 import java.util.List;
@@ -84,6 +84,21 @@ public class TypesDef {
             return this;
         }
 
+        /** WARNING: for this to work, all UIMA jars MUST be on the classpath! */
+        public boolean validate() throws ValidationException {
+            if (!isUimaAnnotation(getClassz())) {
+                throw new ValidationException("'" + toString()
+                        + "'is not a valid UIMA Annotation class");
+            }
+            try {
+                checkNotNull(shortName, "'shortName' of '" + toString()
+                        + "' should not be null");
+            } catch (Exception e) {
+                new ValidationException(e.getMessage());
+            }
+            return true;
+        }
+
         @Override
         public String toString() {
             return shortName + "[" + classz + "]";
@@ -120,22 +135,6 @@ public class TypesDef {
             sb.append(type).append("/n");
         }
         return sb.toString();
-    }
-
-    public boolean validate() {
-        for (TypeDef typeDef : types) {
-            if (!isUimaAnnotation(typeDef.getClassz())) {
-                throw new ValidationException("'" + typeDef + "' of '"
-                        + typeDef + "'is not a valid UIMA Annotation class");
-            }
-            try {
-                checkNotNull(typeDef.shortName, "'shortName' of '" + typeDef
-                        + "' should not be null");
-            } catch (Exception e) {
-                new ValidationException(e.getMessage());
-            }
-        }
-        return true;
     }
 
     @SuppressWarnings("unused")

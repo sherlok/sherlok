@@ -8,7 +8,7 @@
  * Contributors:
  *    Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package sherlok.aether;
+package org.sherlok.aether;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

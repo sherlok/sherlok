@@ -1,5 +1,6 @@
 package org.sherlok.utils;
 
+
 /**
  * Whenever something is not valid. The error message should provide meaningful
  * about 1) what object type was not valid 2) what object id and 3) what exactly
@@ -8,7 +9,7 @@ package org.sherlok.utils;
  * @author renaud@apache.org
  */
 @SuppressWarnings("serial")
-public class ValidationException extends RuntimeException {
+public class ValidationException extends Exception {
 
     public ValidationException(String message) {
         super(message);
@@ -16,6 +17,10 @@ public class ValidationException extends RuntimeException {
 
     public ValidationException(Exception e) {
         super(e);
+    }
+
+    public ValidationException(String msg, Exception e) {
+        super(msg, e);
     }
 
     public static class ValidationErrorMessage {

@@ -1,13 +1,9 @@
 package org.sherlok;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static org.apache.commons.io.FileUtils.iterateFiles;
-import static org.sherlok.Sherlok.CONFIG_DIR_PATH;
 import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -21,44 +17,34 @@ import org.sherlok.mappings.TypesDef.TypeDef;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
-public class Store {
-    private static final Logger LOG = getLogger(Store.class);
+public class Controller {
+    private static final Logger LOG = getLogger(Controller.class);
 
-    public static final String TYPES_PATH = CONFIG_DIR_PATH + "types/";
-    public static final String BUNDLES_PATH = CONFIG_DIR_PATH + "bundles/";
-    public static final String ENGINES_PATH = CONFIG_DIR_PATH + "engines/";
-    public static final String PIPELINES_PATH = CONFIG_DIR_PATH + "pipelines/";
-
-    private Map<String, TypeDef> typesDefs;
+    private Map<String, TypeDef> typeDefs;
     private Map<String, BundleDef> bundleDefs;
     private Map<String, EngineDef> engineDefs;
     private Map<String, PipelineDef> pipelineDefs;
 
-    public Store load() {
+    public Controller load() throws ValidationException {
 
-        // Types
-        typesDefs = map(); // reinit
-        // read Defs
-        for (File tf : newArrayList(iterateFiles(new File(TYPES_PATH),
-                new String[] { "json" }, true))) {
-            TypesDef tdefs = FileBased.loadTypes(tf);
+        // TYPES
+        typeDefs = map(); // reinit
+        for (TypesDef tdefs : FileBased.allTypesDefs()) {
+
             for (TypeDef type : tdefs.getTypes()) {
                 String key = type.getShortName();
-                if (typesDefs.containsKey(key)) {
+                if (typeDefs.containsKey(key)) {
                     throw new ValidationException("duplicate types: '" + key
                             + "'");
                 } else {
-                    typesDefs.put(key, type);
+                    typeDefs.put(key, type);
                 }
             }
         }
 
         // BUNDLES
         bundleDefs = map(); // reinit
-        // read Defs
-        for (File bf : newArrayList(iterateFiles(new File(BUNDLES_PATH),
-                new String[] { "json" }, true))) {
-            BundleDef bd = FileBased.loadBundle(bf);
+        for (BundleDef bd : FileBased.allBundleDefs()) {
             bd.validate(bd.toString());
             String key = createId(bd.getName(), bd.getVersion());
             if (bundleDefs.containsKey(key)) {
@@ -71,11 +57,7 @@ public class Store {
 
         // ENGINES
         engineDefs = map(); // reinit
-        // read Defs
-        for (File bf : newArrayList(iterateFiles(new File(ENGINES_PATH),
-                new String[] { "json" }, true))) {
-
-            EngineDef ed = FileBased.loadEngine(bf);
+        for (EngineDef ed : FileBased.allEngineDefs()) {
             ed.validate(ed.toString());
 
             // bundle must be found
@@ -94,11 +76,7 @@ public class Store {
 
         // PIPELINES
         pipelineDefs = map(); // reinit
-        // read Defs
-        for (File bf : newArrayList(iterateFiles(new File(PIPELINES_PATH),
-                new String[] { "json" }, true))) {
-
-            PipelineDef pd = FileBased.loadPipeline(bf);
+        for (PipelineDef pd : FileBased.allPipelineDefs()) {
             pd.validate(pd.toString());
 
             // all engines must be found
@@ -119,15 +97,51 @@ public class Store {
 
         LOG.debug(
                 "Done loading from Store: {} typeDefs, {} bundleDefs, {} engineDefs, {} pipelineDefs",
-                new Object[] { typesDefs.size(), bundleDefs.size(),
+                new Object[] { typeDefs.size(), bundleDefs.size(),
                         engineDefs.size(), pipelineDefs.size() });
         return this;
     }
 
+    // /////////////////////////////////////////////////////////////////////
     // access API, package visibility
 
+    // LIST all /////////////////////////////////////////////////////////////
+    Collection<TypeDef> listTypes() {
+        return typeDefs.values();
+    }
+
+    Collection<BundleDef> listBundles() {
+        return bundleDefs.values();
+    }
+
+    Collection<EngineDef> listEngines() {
+        return engineDefs.values();
+    }
+
+    Collection<PipelineDef> listPipelines() {
+        return pipelineDefs.values();
+    }
+
+    // LIST all names /////////////////////////////////////////////////////////
+    Set<String> listBundleDefNames() {
+        return bundleDefs.keySet();
+    }
+
+    Set<String> listTypeDefNames() {
+        return typeDefs.keySet();
+    }
+
+    Set<String> listEngineDefNames() {
+        return engineDefs.keySet();
+    }
+
+    Set<String> listPipelineDefNames() {
+        return pipelineDefs.keySet();
+    }
+
+    // GET by name /////////////////////////////////////////////////////////
     TypeDef getTypeDef(String typeShortName) {
-        return typesDefs.get(typeShortName);
+        return typeDefs.get(typeShortName);
     }
 
     BundleDef getBundleDef(String bundleId) {
@@ -142,12 +156,17 @@ public class Store {
         return pipelineDefs.get(pipelineId);
     }
 
-    Set<String> getPipelineDefNames() {
-        return pipelineDefs.keySet();
+    // PUT /////////////////////////////////////////////////////////////
+    String putBundle(String bundleStr) throws ValidationException {
+        BundleDef newBundle = FileBased.putBundle(bundleStr);
+        bundleDefs.put(newBundle.getId(), newBundle);
+        return newBundle.getId();
     }
 
-    Collection<PipelineDef> listPipelines() {
-        return pipelineDefs.values();
+    String putEngine(String engineStr) throws ValidationException {
+        EngineDef newEngine = FileBased.putEngine(engineStr);
+        engineDefs.put(newEngine.getId(), newEngine);
+        return newEngine.getId();
     }
 
     String putPipeline(String pipelineStr) throws ValidationException {
@@ -156,13 +175,31 @@ public class Store {
         return newPipeline.getId();
     }
 
-    void deletePipelineDef(String pipelineId) {
-        if (pipelineDefs.containsKey(pipelineId)) {
-            String domain = pipelineDefs.get(pipelineId).getDomain();
-            pipelineDefs.remove(pipelineId);
-            FileBased.deletePipeline(pipelineId, domain);
+    // DELETE /////////////////////////////////////////////////////////////
+    void deleteBundleDef(String bundleId) throws ValidationException {
+        if (!bundleDefs.containsKey(bundleId)) {
+            throw new ValidationException("bundle '" + bundleId + "' not found");
+        }
+        FileBased.deleteBundle(bundleId);
+        bundleDefs.remove(bundleId);
+    }
 
-        } else
-            throw new ValidationException("pipeline not found");
+    void deleteEngineDef(String engineId) throws ValidationException {
+        if (!engineDefs.containsKey(engineId)) {
+            throw new ValidationException("engine '" + engineId + "' not found");
+        }
+        String domain = engineDefs.get(engineId).getDomain();
+        FileBased.deleteEngine(engineId, domain);
+        engineDefs.remove(engineId);
+    }
+
+    void deletePipelineDef(String pipelineId) throws ValidationException {
+        if (!pipelineDefs.containsKey(pipelineId)) {
+            throw new ValidationException("pipeline '" + pipelineId
+                    + "' not found");
+        }
+        String domain = pipelineDefs.get(pipelineId).getDomain();
+        FileBased.deletePipeline(pipelineId, domain);
+        pipelineDefs.remove(pipelineId);
     }
 }

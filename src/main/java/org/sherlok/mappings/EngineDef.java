@@ -93,10 +93,10 @@ public class EngineDef extends Def {
         return this;
     }
 
-    public boolean validate(String engineObject) {
+    public boolean validate(String engineObject) throws ValidationException {
         super.validate(engineObject);
         try {
-            // TODO more
+            // TODO more validation
         } catch (Throwable e) {
             throw new ValidationException("" + engineObject + ": "
                     + e.getMessage());

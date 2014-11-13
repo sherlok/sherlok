@@ -1,4 +1,4 @@
-
+# TODOs
 
 Sentiment:
 
@@ -15,6 +15,12 @@ DkPro
 * list https://docs.google.com/spreadsheet/pub?key=0ApGcdapz0xSYdFNTREhKeFVEU1RsQzc0V0NKcE04b3c&single=true&gid=0&output=html
 mvn urls: http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/de/tudarmstadt/ukp/dkpro/core/
 
+
+---- 
+
+# Notes
+
+
 Spark framework
 
 * http://www.sparkjava.com/documentation.html
@@ -27,3 +33,7 @@ Integration testing:
 
 * https://code.google.com/p/rest-assured/
 * http://rest-assured.googlecode.com/svn/tags/2.3.4/apidocs/com/jayway/restassured/path/json/JsonPath.html
+
+Jacoco Reports:
+
+    mvn clean test jacoco:report

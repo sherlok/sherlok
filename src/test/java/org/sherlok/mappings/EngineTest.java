@@ -25,11 +25,11 @@ public class EngineTest {
 
     @Test
     public void testWriteRead() throws Exception {
-        
+
         File ef = new File("target/engineTest_" + currentTimeMillis() + ".json");
         EngineDef e = getOpenNlpEnSegmenter();
         FileBased.write(ef, e);
-        EngineDef e2 = FileBased.loadEngine(ef);
+        EngineDef e2 = FileBased.read(ef, EngineDef.class);
         e2.validate("");
         assertEquals(e.getName(), e2.getName());
         assertEquals(e.getVersion(), e2.getVersion());

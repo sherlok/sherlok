@@ -1,6 +1,6 @@
 package org.sherlok.mappings;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sherlok.utils.CheckThat.checkNotNull;
 import static org.sherlok.Sherlok.SEPARATOR;
 
 import org.sherlok.utils.CheckThat;
@@ -51,13 +51,13 @@ public abstract class Def {
         this.description = description;
     }
 
-    public boolean validate(String msgName) {
+    public boolean validate(String msgName) throws ValidationException {
         try {
             checkNotNull(name, "name should not be null");
             CheckThat.checkOnlyAlphanumUnderscore(name);
             checkNotNull(version, "version should not be null");
             CheckThat.checkOnlyAlphanumDotUnderscore(version);
-            // TODO more
+            // TODO more validation
         } catch (Throwable e) {
             throw new ValidationException("" + msgName + ": " + e.getMessage());
         }
