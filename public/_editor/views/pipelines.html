@@ -1,0 +1,18 @@
+<h2>All Pipelines <a class="btn btn-primary pull-right" href="#/pipelines/create"><i
+ class="icon-plus-sign icon-white"></i> New Pipeline</a></h2>
+
+<ul>
+    <li ng-repeat="pipeline in pipelines">
+        <div ng-click="open(pipeline)">
+            {{pipeline.name}} ({{pipeline.version}}): {{pipeline.description}}
+        </div>
+    </li>
+    <hr>
+    <ng-switch on="hasActivePipeOpen()">
+         <div ng-switch-when="true">
+                 {{activepipe.name}}: {{activepipe.id}}
+             <a ng-click="close()">[close]</a>
+             <a ng-click="beep()">[beep]</a>
+         </div>
+    </ng-switch>
+</ul>
