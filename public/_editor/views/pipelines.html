@@ -1,6 +1,29 @@
 <h2>All Pipelines <a class="btn btn-primary pull-right" href="#/pipelines/create"><i
  class="icon-plus-sign icon-white"></i> New Pipeline</a></h2>
 
+<div ng-controller="pipelines">
+
+        <md-content>
+
+        <section layout="vertical" layout-sm="horizontal" layout-align="center center">
+          <md-button>{{title1}}</md-button>
+          <md-button noink class="md-primary">Primary (noink)</md-button>
+          <md-button ng-disabled="isDisabled" class="md-primary">Disabled</md-button>
+          <md-button class="md-warn" ng-click="isDisabled = !isDisabled">{{title4}}</md-button>
+          <div class="label">flat</div>
+      </section>
+
+      <section layout="vertical" layout-sm="horizontal" layout-align="center center">
+      <md-text-float label="City" ng-model="user.city"> </md-text-float>
+          <md-button class="md-raised">Button</md-button>
+          <md-button class="md-raised md-primary">Primary</md-button>
+          <md-button disabled class="md-raised md-primary">Disabled</md-button>
+          <md-button class="md-raised md-warn">Warn</md-button>
+          <div class="label">raised</div>
+      </section>
+  </md-content>
+  </div>
+
 <ul>
     <li ng-repeat="pipeline in pipelines">
         <div ng-click="open(pipeline)">
@@ -9,10 +32,14 @@
     </li>
     <hr>
     <ng-switch on="hasActivePipeOpen()">
-         <div ng-switch-when="true">
-                 {{activepipe.name}}: {{activepipe.id}}
-             <a ng-click="close()">[close]</a>
-             <a ng-click="beep()">[beep]</a>
-         </div>
+        <div ng-switch-when="true">
+        {{activepipe.name}}
+        <md-content>
+            <md-text-float label="Name" ng-model="activepipe.name"> </md-text-float>
+            <md-text-float label="Id" ng-model="activepipe.id"> </md-text-float>
+            <md-content>
+            <a ng-click="close()">[close]</a>
+            <a ng-click="beep()">[beep]</a>
+        </div>
     </ng-switch>
 </ul>

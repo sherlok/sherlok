@@ -2,6 +2,7 @@ var app = angular.module('sherlok_editor', [
     'ngCookies',
     'ngResource',
     'ngSanitize',
+    'ngMaterial',
     'ngRoute'
 ]);
 app.config(function ($routeProvider) {
