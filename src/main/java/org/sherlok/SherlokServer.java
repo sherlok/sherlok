@@ -3,8 +3,7 @@ package org.sherlok;
 import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.utils.CheckThat.checkArgument;
 import static org.sherlok.utils.CheckThat.checkNotNull;
-import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
-import static org.sherlok.utils.CheckThat.checkOnlyAlphanumUnderscore;
+import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.slf4j.LoggerFactory.getLogger;
 import static spark.Spark.delete;
 import static spark.Spark.externalStaticFileLocation;
@@ -68,7 +67,7 @@ public class SherlokServer {
         try {
             checkNotNull(pipelineName,
                     "'pipeline' req parameter should not be null");
-            checkOnlyAlphanumUnderscore(pipelineName);
+            checkOnlyAlphanumDot(pipelineName);
             checkNotNull(text, "'text' req parameter should not be null");
             checkArgument(text.length() > 0,
                     "'text' req parameter should not be empty");
@@ -346,8 +345,8 @@ public class SherlokServer {
             throws ValidationException {
         checkNotNull(name, "'name' should not be null");
         checkNotNull(version, "'version' should not be null");
-        checkOnlyAlphanumUnderscore(name);
-        checkOnlyAlphanumDotUnderscore(version);
+        checkOnlyAlphanumDot(name);
+        checkOnlyAlphanumDot(version);
         return createId(name, version);
     }
 

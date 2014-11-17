@@ -27,6 +27,8 @@
   <logger name="org.eclipse.jetty" level="INFO" />
   <logger name="org.eclipse.jetty.server" level="WARN" />
   <logger name="spark" level="INFO" />
+  <logger name="de.tudarmstadt.ukp.dkpro.core.api.resources.ResourceObjectProviderBase" level="INFO" />
+
 
 
 </configuration>

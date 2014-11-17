@@ -37,7 +37,7 @@ public class PipelineLoaderIntegrationTest {
     public void testResolve() throws Exception {
 
         UimaPipeline pipeline = new PipelineLoader(new Controller().load())
-                .resolvePipeline("opennlp_en_ners", null);
+                .resolvePipeline("opennlp.ners.en", null);
         String result = (pipeline.annotate(TEST_TEXT));
         LOG.debug(result);
 

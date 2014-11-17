@@ -13,13 +13,13 @@ public class ControllerTest {
     public void test() throws Exception {
         Controller controller = new Controller().load();
 
-        PipelineDef pd = controller.getPipelineDef("opennlp_en_ners:1.6.2");
+        PipelineDef pd = controller.getPipelineDef("opennlp.ners.en:1.6.2");
         assertEquals(true, pd.isLoadOnStartup());
         assertEquals(4, pd.getEngines().size());
-        assertEquals("OpenNlpEnSegmenter:1.6.2", pd.getEngines().get(0).getId());
+        assertEquals("opennlp.segmenter.en:1.6.2", pd.getEngines().get(0).getId());
 
         
-        EngineDef ed = controller.getEngineDef("OpenNlpEnSegmenter:1.6.2");
+        EngineDef ed = controller.getEngineDef("opennlp.segmenter.en:1.6.2");
         assertEquals(1, ed.getParameters().size());
         assertEquals("en", ed.getParameter("language"));
 

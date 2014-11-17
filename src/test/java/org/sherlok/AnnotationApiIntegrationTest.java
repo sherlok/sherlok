@@ -45,7 +45,7 @@ public class AnnotationApiIntegrationTest {
     @Test
     public void test010_GETAnnotate() {
         given().param("text", TEST_TEXT).when()
-                .get(API_URL + "/opennlp_en_ners").then().contentType(JSON)
+                .get(API_URL + "/opennlp.ners.en").then().contentType(JSON)
                 .statusCode(STATUS_OK).body(containsString(TEST_TEXT))//
                 .body("@cas_feature_structures.538.value", equalTo("person"));
     }
@@ -53,7 +53,7 @@ public class AnnotationApiIntegrationTest {
     @Test
     public void test011_POSTAnnotate() {
         given().param("text", TEST_TEXT).when()
-                .post(API_URL + "/opennlp_en_ners").then().contentType(JSON)
+                .post(API_URL + "/opennlp.ners.en").then().contentType(JSON)
                 .statusCode(STATUS_OK).body(containsString(TEST_TEXT))//
                 .body("@cas_feature_structures.538.value", equalTo("person"));
     }
@@ -66,7 +66,7 @@ public class AnnotationApiIntegrationTest {
 
     @Test
     public void test020MissingText() throws JsonProcessingException {
-        when().post(API_URL + "/opennlp_en_ners")//
+        when().post(API_URL + "/opennlp.ners.en")//
                 .then().statusCode(STATUS_INVALID);
     }
 

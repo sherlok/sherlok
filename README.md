@@ -114,12 +114,12 @@ A Bundle helps group together a set of library dependencies.
 * Dependencies: a list of all the dependencies of this bundle 
 * Repositories: additional maven repositories
 
-Dependencies can have the following formats: 
+Dependencies can optionally have the following formats: 
 
     { "mvn": "{group_id}:{artifact_id}:{version}"}
     { "git": "{git_url}:{revision_id}"}
     { "jar": "{jar_url_or_path}"}
 
-* `mvn` corresponds to a released maven artifact 
+* `mvn` corresponds to a released maven artifact, this is the default value.
 * `git` can be any accessible git repository that contains a Maven project (TODO)
 * `jar` corresponds to a local or remote jar (TODO)

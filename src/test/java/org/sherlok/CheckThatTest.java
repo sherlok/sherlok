@@ -10,32 +10,17 @@ public class CheckThatTest {
 
     @Test(expected = ValidationException.class)
     public void testStar() throws Exception {
-        CheckThat.checkOnlyAlphanumDotUnderscore("*_");
+        CheckThat.checkOnlyAlphanumDot("*_");
     }
 
     @Test(expected = ValidationException.class)
     public void testParenthesis() throws Exception {
-        CheckThat.checkOnlyAlphanumDotUnderscore("(asd)");
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testParenthesis2() throws Exception {
-        CheckThat.checkOnlyAlphanumUnderscore("(asd)");
+        CheckThat.checkOnlyAlphanumDot("(asd)");
     }
 
     @Test
     public void test() throws Exception {
-        CheckThat.checkOnlyAlphanumDotUnderscore("abAC09.32no__in23");
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testDot() throws Exception {
-        CheckThat.checkOnlyAlphanumUnderscore("abAC09.32no__in23");
-    }
-
-    @Test
-    public void testUnderscore() throws Exception {
-        CheckThat.checkOnlyAlphanumUnderscore("abAC0adfsweMNOINW932no__in23");
+        CheckThat.checkOnlyAlphanumDot("abAC09.32no__in23");
     }
 
     @Test

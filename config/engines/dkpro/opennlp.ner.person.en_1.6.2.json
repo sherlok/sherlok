@@ -1,12 +1,12 @@
 {
-  "name" : "OpenNlpEnLocationNer",
+  "name" : "opennlp.ner.person.en",
   "version" : "1.6.2",
   "domain" : "dkpro",
   "description" : null,
-  "bundle_id" : "dkpro_opennlp_en:1.6.2",
+  "bundle_id" : "dkpro.opennlp.en:1.6.2",
   "parameters" : {
     "language" : "en",
-    "modelVariant": "location"
+    "modelVariant": "person"
   },
   "script" : null,
   "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder"

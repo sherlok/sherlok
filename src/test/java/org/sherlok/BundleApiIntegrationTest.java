@@ -51,16 +51,16 @@ public class BundleApiIntegrationTest {
     @Test
     public void test010GetBundles() {
         get(API_URL).then().contentType(JSON).statusCode(STATUS_OK)
-                .content(containsString("\"name\" : \"dkpro_opennlp_en\","));
+                .content(containsString("\"name\" : \"dkpro.opennlp.en\","));
     }
 
     @Test
     public void test020GetBundle() {
-        get(API_URL + "/dkpro_opennlp_en/1.6.2")
+        get(API_URL + "/dkpro.opennlp.en/1.6.2")
                 .then()
                 .contentType(JSON)
                 .statusCode(STATUS_OK)
-                .body("name", equalTo("dkpro_opennlp_en"))
+                .body("name", equalTo("dkpro.opennlp.en"))
                 .body("version", equalTo("1.6.2"))
                 .body("repositories.dkpro",
                         equalTo("http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"));

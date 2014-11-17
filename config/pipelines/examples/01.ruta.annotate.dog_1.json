@@ -1,5 +1,5 @@
 {
-  "name" : "ruta_01_annotate_dog",
+  "name" : "01.ruta.annotate.dog",
   "version" : "1",
   "domain" : "examples",
   "description" : "Example that annotates 'dog' as an Animal",

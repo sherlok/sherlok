@@ -15,7 +15,7 @@ public class UimaPipelineTest {
     public void testDog() throws Exception {
 
         UimaPipeline pipeline = new PipelineLoader(new Controller().load())
-                .resolvePipeline("ruta_01_annotate_dog", null);
+                .resolvePipeline("01.ruta.annotate.dog", null);
         String result = (pipeline.annotate("dog"));
         LOG.debug(result);
 
@@ -35,7 +35,7 @@ public class UimaPipelineTest {
     public void testCountries() throws Exception {
 
         UimaPipeline pipeline = new PipelineLoader(new Controller().load())
-                .resolvePipeline("ruta_02_annotate_countries", null);
+                .resolvePipeline("02.ruta.annotate.countries", null);
         String result = (pipeline.annotate("Switzerland"));
         LOG.debug(result);
 

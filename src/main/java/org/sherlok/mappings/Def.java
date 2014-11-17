@@ -1,8 +1,8 @@
 package org.sherlok.mappings;
 
 import static org.sherlok.utils.CheckThat.checkNotNull;
+import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 
-import org.sherlok.utils.CheckThat;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author renaud@apache.org
  */
 public abstract class Def {
-    
+
     public static final String SEPARATOR = ":";
 
     /** a unique name for this bundle. Letters, numbers and underscore only */
@@ -55,9 +55,9 @@ public abstract class Def {
     public boolean validate(String msgName) throws ValidationException {
         try {
             checkNotNull(name, "name should not be null");
-            CheckThat.checkOnlyAlphanumUnderscore(name);
+            checkOnlyAlphanumDot(name);
             checkNotNull(version, "version should not be null");
-            CheckThat.checkOnlyAlphanumDotUnderscore(version);
+            checkOnlyAlphanumDot(version);
             // TODO more validation
         } catch (Throwable e) {
             throw new ValidationException("" + msgName + ": " + e.getMessage());

@@ -51,16 +51,16 @@ public class EngineApiIntegrationTest {
                 .then()
                 .contentType(JSON)
                 .statusCode(STATUS_OK)
-                .content(containsString("OpenNlpEnPersonNer"))
+                .content(containsString("opennlp.ner.person.en"))
                 .content(
                         containsString("\"class\" : \"de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder\","));
     }
 
     @Test
     public void test020GetEngine() {
-        get(API_URL + "/OpenNlpEnPersonNer/1.6.2").then()//
+        get(API_URL + "/opennlp.ner.person.en/1.6.2").then()//
                 .contentType(JSON).statusCode(STATUS_OK)//
-                .body("name", equalTo("OpenNlpEnPersonNer"))//
+                .body("name", equalTo("opennlp.ner.person.en"))//
                 .body("version", equalTo("1.6.2"))//
                 .body("domain", equalTo("dkpro"))//
                 .body("parameters.modelVariant", equalTo("person"));
@@ -71,7 +71,7 @@ public class EngineApiIntegrationTest {
     public void test030PutEngine() throws JsonProcessingException {
         EngineDef e = new EngineDef()
                 .setDomain("test")
-                .setBundleId("dkpro_opennlp_en:1.6.2")
+                .setBundleId("dkpro.opennlp.en:1.6.2")
                 .setClassz(
                         "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter");
         e.setName("test");

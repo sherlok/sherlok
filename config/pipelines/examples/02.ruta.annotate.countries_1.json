@@ -1,5 +1,5 @@
 {
-  "name" : "ruta_02_annotate_countries",
+  "name" : "02.ruta.annotate.countries",
   "version" : "1",
   "domain" : "examples",
   "description" : "Example that annotates countries as an Country",

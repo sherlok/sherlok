@@ -162,7 +162,8 @@ public class UimaPipeline {
     }
 
     public void addRutaEngine(List<String> scriptLines, String pipelineId)
-            throws ResourceInitializationException, IOException, ValidationException {
+            throws ResourceInitializationException, IOException,
+            ValidationException {
 
         String script = StringUtils.join(scriptLines, "\n").trim();
         String nameSpace;
@@ -184,14 +185,16 @@ public class UimaPipeline {
         }
 
         // write Ruta script to file
+        // ruta does not like dots
+        String scriptName = pipelineId.replace(".", "_");
         File scriptFile = new File(FileBased.RUTA_PIPELINE_CACHE_PATH
-                + pipelineId + SCRIPT_FILE_EXTENSION);
+                + scriptName + SCRIPT_FILE_EXTENSION);
         saveString2File(script, scriptFile);
 
         aeds.add(createEngineDescription(RutaEngine.class, //
                 PARAM_SCRIPT_PATHS, scriptFile.getParent(), //
                 RutaEngine.PARAM_RESOURCE_PATHS, FileBased.RUTA_RESOURCES_PATH, //
-                PARAM_MAIN_SCRIPT, pipelineId));
+                PARAM_MAIN_SCRIPT, scriptName));
     }
 
     public TypeSystemDescription getTypeSystemDescription() {

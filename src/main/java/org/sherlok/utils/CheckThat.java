@@ -6,29 +6,16 @@ import java.util.regex.Pattern;
 
 public class CheckThat {
 
-    /** Letters, numbers and underscore only */
     /** Letters, numbers, dots and underscore only */
-
-    private static final Pattern alphanumUnderscore = Pattern
-            .compile("[^a-zA-Z0-9_]");
-    private static final Pattern alphanumDotUnderscore = Pattern
+    private static final Pattern ALPHANUM_DOT = Pattern
             .compile("[^a-zA-Z0-9\\._]");
 
-    public static void checkOnlyAlphanumUnderscore(String test)
+    public static void checkOnlyAlphanumDot(String test)
             throws ValidationException {
-        if (alphanumUnderscore.matcher(test).find()) {
+        if (ALPHANUM_DOT.matcher(test).find()) {
             throw new ValidationException("'" + test
                     + "' contains something else than"
-                    + " letters, numbers or underscore");
-        }
-    }
-
-    public static void checkOnlyAlphanumDotUnderscore(String test)
-            throws ValidationException {
-        if (alphanumDotUnderscore.matcher(test).find()) {
-            throw new ValidationException("'" + test
-                    + "' contains something else than"
-                    + " letters, numbers, dots or underscore");
+                    + " letters, numbers or dots");
         }
     }
 

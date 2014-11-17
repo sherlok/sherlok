@@ -13,7 +13,7 @@ public class MavenPomTest {
     public void test() throws Exception {
 
         BundleDef bundle = new Controller().load().getBundleDef(
-                "dkpro_opennlp_en:1.6.2");
+                "dkpro.opennlp.en:1.6.2");
         MavenPom.writePom(set(bundle), "test", "1");
         // TODO assertions
     }

@@ -51,19 +51,19 @@ public class PipelineApiIntegrationTest {
                 .then()
                 .contentType(JSON)
                 .statusCode(STATUS_OK)
-                .content(containsString("opennlp_en_ners"))
+                .content(containsString("opennlp.ners.en"))
                 .content(
                         containsString("\"annotations\" : [ \"dkpro.NamedEntity\" ],"));
     }
 
     @Test
     public void test020GetPipeline() {
-        get(API_URL + "/opennlp_en_ners/1.6.2").then()//
+        get(API_URL + "/opennlp.ners.en/1.6.2").then()//
                 .contentType(JSON).statusCode(STATUS_OK)//
-                .body("name", equalTo("opennlp_en_ners"))//
+                .body("name", equalTo("opennlp.ners.en"))//
                 .body("version", equalTo("1.6.2"))//
                 .body("loadOnStartup", equalTo(true))//
-                .body("engines[0].id", equalTo("OpenNlpEnSegmenter:1.6.2"))//
+                .body("engines[0].id", equalTo("opennlp.segmenter.en:1.6.2"))//
                 .body("engines[0].script", equalTo(null));
     }
 
@@ -71,7 +71,7 @@ public class PipelineApiIntegrationTest {
     /** Let's put a new test pipeline*/
     public void test030PutPipeline() throws JsonProcessingException {
         PipelineDef e = new PipelineDef().setDomain("test").addEngine(
-                new PipelineEngine("SampleEngine:1"));
+                new PipelineEngine("sample.engine:1"));
         e.setName("test");
         e.setVersion("1");
         String testPipelineDef = FileBased.writeAsString(e);
@@ -92,7 +92,7 @@ public class PipelineApiIntegrationTest {
     @Test
     /** Putting a faulty pipeline should fail (id is missing) */
     public void test032PutFaultyPipeline() throws JsonProcessingException {
-        given().content("{  \"name\" : \"opennlp_en_ners\"}")//
+        given().content("{  \"name\" : \"opennlp.ners.en\"}")//
                 .when().put(API_URL)//
                 .then().statusCode(STATUS_INVALID);
     }
@@ -104,7 +104,7 @@ public class PipelineApiIntegrationTest {
                 .contentType(JSON).statusCode(STATUS_OK)//
                 .body("name", equalTo("test"))//
                 .body("version", equalTo("1"))//
-                .body("engines[0].id", equalTo("SampleEngine:1"))//
+                .body("engines[0].id", equalTo("sample.engine:1"))//
                 .body("engines[0].script", equalTo(null))//
         ;
     }

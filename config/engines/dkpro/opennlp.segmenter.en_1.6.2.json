@@ -1,9 +1,9 @@
 {
-  "name" : "OpenNlpEnSegmenter",
+  "name" : "opennlp.segmenter.en",
   "version" : "1.6.2",
   "domain" : "dkpro",
   "description" : null,
-  "bundle_id" : "dkpro_opennlp_en:1.6.2",
+  "bundle_id" : "dkpro.opennlp.en:1.6.2",
   "parameters" : {
     "language" : "en"
   },

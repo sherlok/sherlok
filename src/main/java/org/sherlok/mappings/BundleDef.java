@@ -34,7 +34,7 @@ public class BundleDef extends Def {
             jar // TODO jar protocol not implemented
         }
 
-        private DependencyType type;
+        private DependencyType type = DependencyType.mvn;
         String value;
 
         public BundleDependency() {

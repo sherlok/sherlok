@@ -1,18 +1,18 @@
 {
-  "name" : "opennlp_en_ners",
+  "name" : "opennlp.ners.en",
   "version" : "1.6.2",
   "language" : "en",
   "domain" : "dkpro",
   "description" : "Annotates persons and locations",
   "loadOnStartup" : true,
   "engines" : [ {
-    "id" : "OpenNlpEnSegmenter:1.6.2"
+    "id" : "opennlp.segmenter.en:1.6.2"
   }, {
-    "id" : "OpenNlpEnPosTagger:1.6.2"
+    "id" : "opennlp.pos.en:1.6.2"
   }, {
-    "id" : "OpenNlpEnPersonNer:1.6.2"
+    "id" : "opennlp.ner.person.en:1.6.2"
   }, {
-    "id" : "OpenNlpEnLocationNer:1.6.2"
+    "id" : "opennlp.ner.location.en:1.6.2"
   } ],
   "output" : {
     "annotations" : [ "dkpro.NamedEntity" ],
