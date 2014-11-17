@@ -1,6 +1,5 @@
 package org.sherlok;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
 import static org.sherlok.utils.CheckThat.checkArgument;
@@ -11,10 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.uima.cas.CAS;
-import org.apache.uima.jcas.tcas.Annotation;
-import org.sherlok.utils.CheckThat;
-
-import com.google.common.base.Preconditions;
+import org.sherlok.utils.ValidationException;
 
 public class RutaHelper {
 
@@ -22,10 +18,6 @@ public class RutaHelper {
     final static Pattern TYPES = compile(format(
             "DECLARE (?<superType>%s +)?(?<id>%s)(?<inlineids>(, *?%s)+)?(?<features> *?\\(.*\\))?",
             IDENTIFIER, IDENTIFIER, IDENTIFIER));
-
-    // final static Pattern FEATURES = compile(format(
-    // "(%s) +(%s)(?: *?, *?(%s) +(%s))*?", IDENTIFIER, IDENTIFIER,
-    // IDENTIFIER, IDENTIFIER));
 
     /*-
     Syntax of declarations:
@@ -36,7 +28,8 @@ public class RutaHelper {
     FeatureDeclaration  -> ( (AnnotationType | "STRING" | "INT" | "FLOAT"
                        "DOUBLE" | "BOOLEAN") Identifier) )+
      */
-    static List<TypeDTO> parseDeclaredTypes(String rutaScript) {
+    static List<TypeDTO> parseDeclaredTypes(String rutaScript)
+            throws ValidationException {
         List<TypeDTO> types = list();
 
         // Remove comments; they start with "//" and always go to end of line.
@@ -46,7 +39,7 @@ public class RutaHelper {
         }
         String cleanScript = cleanScriptB.toString();
 
-        // Normalize Whitetext and remove new lines
+        // Normalize whitespace and remove new lines
         cleanScript = cleanScript.replaceAll("\\r?\\n", " ");
         cleanScript = cleanScript.replaceAll(" +", " ");
 
@@ -69,6 +62,7 @@ public class RutaHelper {
                                 .replaceAll("[\\(\\)]", "")
                                 .replaceAll(" +", " ").trim();
 
+                        // split by comma, then space
                         for (String featureStr : featuresStr.split(",")) {
                             String[] split = featureStr.trim().split(" ");
                             checkArgument(split.length == 2,
@@ -77,7 +71,8 @@ public class RutaHelper {
                             features.add(new TypeFeatureDTO(split[1].trim(),
                                     "", split[0].trim()));
                         }
-                    } catch (Exception e) {// nope
+                    } catch (NullPointerException e) {
+                        // not catching (happens if m.group() not found).
                     }
 
                     String id = m.group("id");

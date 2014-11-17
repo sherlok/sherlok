@@ -1,19 +1,19 @@
 package org.sherlok;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.sherlok.RutaHelper.parseDeclaredTypes;
 
 import java.util.List;
-import java.util.regex.Matcher;
 
 import org.junit.Test;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
+import org.sherlok.utils.ValidationException;
 
 public class RutaHelperTest {
 
     @Test
-    public void testEmpty() {
+    public void testEmpty() throws Exception {
         List<TypeDTO> types = parseDeclaredTypes("PACKAGE oh;");
         assertEquals(0, types.size());
         types = parseDeclaredTypes("DECLARE;");
@@ -25,7 +25,7 @@ public class RutaHelperTest {
     }
 
     @Test
-    public void testBasic() {
+    public void testBasic() throws Exception {
         List<TypeDTO> types = parseDeclaredTypes("PACKAGE oh;\nDECLARE Dog;\nW{REGEXP(\"dog\") -> MARK(Dog)};");
         assertEquals(1, types.size());
         TypeDTO t = types.get(0);
@@ -33,7 +33,7 @@ public class RutaHelperTest {
     }
 
     @Test
-    public void testComment() {
+    public void testComment() throws Exception {
         List<TypeDTO> types = parseDeclaredTypes("PACKAGE oh;\nDECLARE//blah\nDog;");
         assertEquals(1, types.size());
         TypeDTO t = types.get(0);
@@ -44,7 +44,7 @@ public class RutaHelperTest {
     }
 
     @Test
-    public void testInline() {
+    public void testInline() throws Exception {
         List<TypeDTO> types = parseDeclaredTypes("DECLARE Dog, Car, Home;");
         assertEquals(3, types.size());
         TypeDTO t2 = types.get(1);
@@ -54,7 +54,7 @@ public class RutaHelperTest {
     }
 
     @Test
-    public void testSuper() {
+    public void testSuper() throws Exception {
         List<TypeDTO> types = parseDeclaredTypes("DECLARE Aaa Bbb;");
         assertEquals(1, types.size());
         TypeDTO t = types.get(0);
@@ -63,13 +63,13 @@ public class RutaHelperTest {
     }
 
     @Test
-    public void testMultiple() {
+    public void testMultiple() throws Exception {
         List<TypeDTO> types = parseDeclaredTypes("DECLARE Aaa;\nDECLARE Bbb;\nDECLARE Ccc;\n\nDECLARE Ddd, Eee;\n");
         assertEquals(5, types.size());
     }
 
     @Test
-    public void testFeatures() {
+    public void testFeatures() throws Exception {
         List<TypeDTO> types = parseDeclaredTypes("DECLARE Aaa  Bbb  ( INT  cc);");
         assertEquals(1, types.size());
         TypeDTO t = types.get(0);
@@ -80,7 +80,7 @@ public class RutaHelperTest {
     }
 
     @Test
-    public void testFeatures2() {
+    public void testFeatures2() throws Exception {
         List<TypeDTO> types = parseDeclaredTypes("DECLARE Aa (INT  cc, Blah dd);");
         assertEquals(1, types.size());
         TypeDTO t = types.get(0);
@@ -93,11 +93,13 @@ public class RutaHelperTest {
         assertEquals("Blah", tf2.rangeTypeName);
     }
 
-    @Test
-    public void testFeatures3() {
-        List<TypeDTO> types = parseDeclaredTypes("DECLARE Aa (INT asf cc, Blah dd);");
-        assertEquals(1, types.size());
-        TypeDTO t = types.get(0);
-        assertEquals(0, t.getTypeFeatures().size());
+    @Test(expected = ValidationException.class)
+    public void testFeatures3() throws Exception {
+        parseDeclaredTypes("DECLARE Aa (INT);");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testFeatures4() throws Exception {
+        parseDeclaredTypes("DECLARE Aa (INT asf cc, Blah dd);");
     }
 }

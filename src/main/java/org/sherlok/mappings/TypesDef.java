@@ -103,7 +103,7 @@ public class TypesDef {
             if (!isUimaAnnotation(getClassz())) {
                 throw new ValidationException("'" + toString()
                         + "'is not a valid UIMA Annotation class");
-            }
+            }*/
             try {
                 checkArgument(classz.endsWith("."), "'Class name' of '"
                         + toString() + "' should not end with a dot");
@@ -111,7 +111,7 @@ public class TypesDef {
                         + toString() + "' should not end with .class");
             } catch (Exception e) {
                 new ValidationException(e.getMessage());
-            }*/
+            }
             return true;
         }
 
@@ -122,9 +122,10 @@ public class TypesDef {
 
         public void validate(TypeSystemDescription tsd)
                 throws ValidationException {
-           checkArgument(tsd.getType(classz) != null, "'Class name' of '"
+            // FIXME test error in Eclipse
+            checkArgument(tsd.getType(classz) != null, "'Class name' of '"
                     + toString() + "' should not end with a dot");
-
+            validate();
         }
     }
 

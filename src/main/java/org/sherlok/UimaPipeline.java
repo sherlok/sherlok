@@ -29,9 +29,9 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeDescription;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.ruta.engine.RutaEngine;
-import org.apache.uima.util.FileUtils;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
+import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
@@ -162,7 +162,7 @@ public class UimaPipeline {
     }
 
     public void addRutaEngine(List<String> scriptLines, String pipelineId)
-            throws ResourceInitializationException, IOException {
+            throws ResourceInitializationException, IOException, ValidationException {
 
         String script = StringUtils.join(scriptLines, "\n").trim();
         String nameSpace;
