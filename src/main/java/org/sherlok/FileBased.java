@@ -2,7 +2,6 @@ package org.sherlok;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.io.FileUtils.iterateFiles;
-import static org.sherlok.Sherlok.CONFIG_DIR_PATH;
 import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
 import static org.sherlok.utils.Create.list;
@@ -35,11 +34,17 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 public class FileBased {
 
+    public static final String CONFIG_DIR_PATH = "config/";
+
     protected static final String TYPES_PATH = CONFIG_DIR_PATH + "types/";
     protected static final String BUNDLES_PATH = CONFIG_DIR_PATH + "bundles/";
     protected static final String ENGINES_PATH = CONFIG_DIR_PATH + "engines/";
     protected static final String PIPELINES_PATH = CONFIG_DIR_PATH
             + "pipelines/";
+    protected static final String RUTA_RESOURCES_PATH = CONFIG_DIR_PATH
+            + "ruta/";
+    protected static final String RUTA_PIPELINE_CACHE_PATH = RUTA_RESOURCES_PATH
+            + ".pipelines/";
 
     private static final ObjectMapper MAPPER = new ObjectMapper(
             new JsonFactory());

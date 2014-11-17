@@ -31,15 +31,15 @@ A pipeline describes the steps to perform a text mining analysis (e.g. split wor
 
     {   
         "name": "opennlp_ners",
-        "version": "1",
+        "version": "1a.2",
         "language": "en",
         "description": "annotates English persons and locations using OpenNLP models",
         "load_on_startup": true,
         "engines" : [
-            { "name": "OpenNlpEnSegmenter:1.6.2" },
-            { "name": "OpenNlpEnPosTagger:1.6.2" },
-            { "name": "OpenNlpEnPersonFinder:1.6.2" },
-            { "name": "OpenNlpEnLocationFinder:1.6.2" }
+            { "id": "OpenNlpEnSegmenter:1.6.2" },
+            { "id": "OpenNlpEnPosTagger:1.6.2" },
+            { "id": "OpenNlpEnPersonFinder:1.6.2" },
+            { "id": "OpenNlpEnLocationFinder:1.6.2" }
         ],
         "output" : {
             "annotations": [
@@ -62,7 +62,7 @@ A pipeline describes the steps to perform a text mining analysis (e.g. split wor
 * Payloads (optional): which payloads to include in the output JSON (see Payload chapter below)
 
 Engines can have the following formats: 
-    { "name": "engineId (see chapter below)"}
+    { "id": "engine id (see chapter below)"}
     { "script": "Ruta script (see chapter below)"}
 
 ### Engines

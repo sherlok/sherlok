@@ -1,9 +1,10 @@
 package org.sherlok;
 
-import static org.sherlok.utils.CheckThat.checkNotNull;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
+import static org.sherlok.utils.CheckThat.checkNotNull;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.Create.set;
@@ -53,13 +54,19 @@ import org.sherlok.utils.ValidationException;
 public class PipelineLoader {
 
     private Controller controller;
+    private Map<String, UimaPipeline> uimaPipelinesCache = map();
 
     public PipelineLoader(Controller controller) {
         this.controller = controller;
     }
 
-    private Map<String, UimaPipeline> uimaPipelinesCache = map();
-
+    /**
+     * @param pipelineName
+     * @param version
+     *            or ('null' or null) to try to fallback on the 'highest'
+     *            version
+     * @return the {@link UimaPipeline}
+     */
     public UimaPipeline resolvePipeline(String pipelineName, String version)
             throws ValidationException {
 
@@ -95,19 +102,28 @@ public class PipelineLoader {
             Set<BundleDef> bundleDefs = set();
             Map<String, String> repositoriesDefs = map();
             for (PipelineEngine pengine : pipelineDef.getEngines()) {
-                EngineDef engineDef = controller.getEngineDef(pengine.getId());
-                checkNotNull(engineDef, "could not find " + pengine);
-                engineDefs.add(engineDef);
-                BundleDef bundleDef = controller.getBundleDef(engineDef
-                        .getBundleId());
-                checkNotNull(bundleDef,
-                        "could not find bundle '" + engineDef.getBundleId()
-                                + "' that is required by engine '" + engineDef
-                                + "'");
-                bundleDefs.add(bundleDef);
-                for (Entry<String, String> id_url : bundleDef.getRepositories()
-                        .entrySet()) {
-                    repositoriesDefs.put(id_url.getKey(), id_url.getValue());
+
+                if (pengine.isRuta()) { // Ruta engine
+                    engineDefs.add(new EngineDef().setScript(pengine
+                            .getScript()));
+
+                } else { // uimaFIT engine
+                    EngineDef engineDef = controller.getEngineDef(pengine
+                            .getId());
+                    checkNotNull(engineDef, "could not find " + pengine);
+                    engineDefs.add(engineDef);
+                    BundleDef bundleDef = controller.getBundleDef(engineDef
+                            .getBundleId());
+                    checkNotNull(bundleDef, "could not find bundle '"
+                            + engineDef.getBundleId()
+                            + "' that is required by engine '" + engineDef
+                            + "'");
+                    bundleDefs.add(bundleDef);
+                    for (Entry<String, String> id_url : bundleDef
+                            .getRepositories().entrySet()) {
+                        repositoriesDefs
+                                .put(id_url.getKey(), id_url.getValue());
+                    }
                 }
             }
 
@@ -134,8 +150,22 @@ public class PipelineLoader {
                     pipelineDef.getLanguage());
             for (EngineDef engineDef : engineDefs) {
                 try {
-                    uimaPipeline.add(createEngine(engineDef.getClassz(),
-                            engineDef.getFlatParams()));
+                    if (engineDef.isRuta()) { // Ruta engine
+                        try {
+                            uimaPipeline.addRutaEngine(
+                                    engineDef.getScript(), pipelineId);
+                        } catch (Exception e) {
+                            throw new ValidationException(
+                                    "could not parse script '"
+                                            + join(engineDef.getScript(), ";")
+                                            + "' from pipeline '" + pipelineId
+                                            + "'", e);
+                        }
+
+                    } else { // UIMA engine
+                        uimaPipeline.add(createEngine(engineDef.getClassz(),
+                                engineDef.getFlatParams()));
+                    }
                 } catch (ResourceInitializationException e) {
                     throw new ValidationException(
                             "could not initialize UIMA pipeline engine '"
@@ -152,7 +182,7 @@ public class PipelineLoader {
             for (String typeShortName : pipelineDef.getOutput()
                     .getAnnotations()) {
                 TypeDef typeDef = controller.getTypeDef(typeShortName);
-                typeDef.validate();
+                typeDef.validate(uimaPipeline.getTypeSystemDescription());
                 checkNotNull(typeDef, "could not find bundle '" + typeShortName
                         + "' that is required by pipeline '" + pipelineId + "'");
                 uimaPipeline.addOutputAnnotation(
@@ -166,7 +196,7 @@ public class PipelineLoader {
                 uimaPipeline.initialize();
             } catch (UIMAException e) {
                 throw new ValidationException(
-                        "could not initialinze UIMA pipeline '" + uimaPipeline
+                        "could not initialize UIMA pipeline '" + uimaPipeline
                                 + "': " + e.getMessage(), e);
             }
             uimaPipelinesCache.put(pipelineId, uimaPipeline);
@@ -215,7 +245,7 @@ public class PipelineLoader {
     }
 
     @SuppressWarnings("unchecked")
-    static AnalysisEngineDescription createEngine(String cName,
+    private static AnalysisEngineDescription createEngine(String cName,
             Object... params) throws ClassNotFoundException,
             ResourceInitializationException {
 
@@ -231,13 +261,8 @@ public class PipelineLoader {
 
     /** reflection to bypass encapsulation */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static class ClassPathHack {
+    private static class ClassPathHack {
         private static final Class[] parameters = new Class[] { URL.class };
-
-        public static void addFile(String s) throws IOException {
-            File f = new File(s);
-            addFile(f);
-        }
 
         public static void addFile(File f) throws IOException {
             addURL(f.toURI().toURL());

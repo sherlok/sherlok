@@ -35,7 +35,7 @@ public class EngineDef extends Def {
     /** UIMA parameters. Overwrites default parameters */
     private Map<String, Object> parameters = map();
     /** Or you can just specify a Ruta script */
-    String script;
+    private List<String> script;
 
     // get/set
 
@@ -84,11 +84,11 @@ public class EngineDef extends Def {
         return this.parameters.get(key);
     }
 
-    public String getScript() {
+    public List<String> getScript() {
         return script;
     }
 
-    public EngineDef setScript(String script) {
+    public EngineDef setScript(List<String> script) {
         this.script = script;
         return this;
     }
@@ -113,5 +113,11 @@ public class EngineDef extends Def {
             flatParams.add(en.getValue());
         }
         return flatParams.toArray(new Object[flatParams.size()]);
+    }
+
+    /** @return whether this is a Ruta engine; false if it is a UIMAfit engine */
+    @JsonIgnore
+    public boolean isRuta() {
+        return getScript() != null && getScript().size() > 0;
     }
 }

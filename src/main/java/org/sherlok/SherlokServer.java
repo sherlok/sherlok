@@ -29,7 +29,7 @@ import spark.ResponseTransformerRoute;
 import spark.Route;
 
 /**
- * Main Sherlok server
+ * REST-endpoint for Sherlok
  * 
  * @author renaud@apache.org
  */
@@ -40,7 +40,7 @@ public class SherlokServer {
     private static final String PUBLIC = "public";
 
     // http://www.kammerl.de/ascii/AsciiSignature.php font 'thin'
-    private static final String LOGO = ",---.|              |         |    \n`---.|---.,---.,---.|    ,---.|__/ \n    ||   ||---'|    |    |   ||  \\ \n`---'`   '`---'`    `---'`---'`   `\n";
+    private static final String LOGO = "\n,---.|              |         |    \n`---.|---.,---.,---.|    ,---.|__/ \n    ||   ||---'|    |    |   ||  \\ \n`---'`   '`---'`    `---'`---'`   `\n\n";
     private static final String VERSION = "Sherlok Server          version 0.1\n";
     static {
         System.out.println(LOGO + VERSION);

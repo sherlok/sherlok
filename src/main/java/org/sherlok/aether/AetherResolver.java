@@ -18,12 +18,14 @@ import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
-import org.sherlok.Sherlok;
 
 /**
  * A helper to boot the repository system and a repository system session.
  */
 public class AetherResolver {
+    
+    public static final String LOCAL_REPO_PATH = "local_repo";
+
 
     public static RepositorySystem newRepositorySystem() {
         /*
@@ -57,12 +59,12 @@ public class AetherResolver {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils
                 .newSession();
 
-        LocalRepository localRepo = new LocalRepository(Sherlok.LOCAL_REPO_PATH);
+        LocalRepository localRepo = new LocalRepository(LOCAL_REPO_PATH);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(
                 session, localRepo));
 
         // session.setTransferListener(new ConsoleTransferListener());
-        session.setRepositoryListener(new ConsoleRepositoryListener());
+       // session.setRepositoryListener(new ConsoleRepositoryListener());
 
         // uncomment to generate dirty trees
         // session.setDependencyGraphTransformer( null );

@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.sherlok.Sherlok;
+import org.sherlok.aether.AetherResolver;
 import org.sherlok.mappings.BundleDef.BundleDependency;
 
 import freemarker.template.Configuration;
@@ -68,8 +68,7 @@ public class MavenPom {
         data.put("repos", repoDefs);
 
         // File output
-
-        File dir = new File(Sherlok.LOCAL_REPO_PATH + "/org/sherlok/"
+        File dir = new File(AetherResolver.LOCAL_REPO_PATH + "/org/sherlok/"
                 + pipelineName + "/" + version);
         dir.mkdirs();
 

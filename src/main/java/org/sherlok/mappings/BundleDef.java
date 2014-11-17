@@ -6,7 +6,6 @@ import static org.sherlok.utils.Create.map;
 import java.util.List;
 import java.util.Map;
 
-import org.sherlok.Sherlok;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -64,17 +63,17 @@ public class BundleDef extends Def {
 
         @JsonIgnore
         public String getGroupId() {
-            return value.split(Sherlok.SEPARATOR)[0];
+            return value.split(SEPARATOR)[0];
         }
 
         @JsonIgnore
         public String getArtifactId() {
-            return value.split(Sherlok.SEPARATOR)[1];
+            return value.split(SEPARATOR)[1];
         }
 
         @JsonIgnore
         public String getVersion() {
-            return value.split(Sherlok.SEPARATOR)[2];
+            return value.split(SEPARATOR)[2];
         }
     }
 

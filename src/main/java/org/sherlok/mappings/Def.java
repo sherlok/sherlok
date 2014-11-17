@@ -1,7 +1,6 @@
 package org.sherlok.mappings;
 
 import static org.sherlok.utils.CheckThat.checkNotNull;
-import static org.sherlok.Sherlok.SEPARATOR;
 
 import org.sherlok.utils.CheckThat;
 import org.sherlok.utils.ValidationException;
@@ -14,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author renaud@apache.org
  */
 public abstract class Def {
+    
+    public static final String SEPARATOR = ":";
 
     /** a unique name for this bundle. Letters, numbers and underscore only */
     protected String name,

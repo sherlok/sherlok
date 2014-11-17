@@ -1,15 +1,18 @@
 package org.sherlok.mappings;
 
-import static org.sherlok.utils.CheckThat.checkNotNull;
+import static org.sherlok.utils.CheckThat.checkArgument;
 import static org.sherlok.utils.Create.list;
 
 import java.util.List;
 
 import org.apache.uima.cas.Type;
+import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.sherlok.utils.ValidationException;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
- * Description of UIMA Types
+ * Description of UIMA annotation types
  * 
  * @author renaud@apache.org
  */
@@ -24,9 +27,13 @@ public class TypesDef {
     /** Represents a UIMA {@link Type}. */
     public static class TypeDef {
         /** The {@link Type} class name */
-        private String classz,
-        /** Short name to be used in output. Should be unique. */
-        shortName,
+        @JsonProperty("class")
+        private String classz;
+        /**
+         * Short name to be used in output (optional, falls back on annotation
+         * class' shortName()
+         */
+        private String shortName,
         /** CSS color, for client (optional) */
         color,
         /** Description of this type (optional) */
@@ -44,6 +51,12 @@ public class TypesDef {
         }
 
         public String getShortName() {
+            if (shortName == null) {
+                if (classz.contains(".")) {
+                    return classz.substring(classz.lastIndexOf('.') + 1);
+                } else
+                    return classz;
+            }
             return shortName;
         }
 
@@ -86,22 +99,32 @@ public class TypesDef {
 
         /** WARNING: for this to work, all UIMA jars MUST be on the classpath! */
         public boolean validate() throws ValidationException {
+            /*- FIXME
             if (!isUimaAnnotation(getClassz())) {
                 throw new ValidationException("'" + toString()
                         + "'is not a valid UIMA Annotation class");
             }
             try {
-                checkNotNull(shortName, "'shortName' of '" + toString()
-                        + "' should not be null");
+                checkArgument(classz.endsWith("."), "'Class name' of '"
+                        + toString() + "' should not end with a dot");
+                checkArgument(!classz.endsWith(".class"), "'Class name' of '"
+                        + toString() + "' should not end with .class");
             } catch (Exception e) {
                 new ValidationException(e.getMessage());
-            }
+            }*/
             return true;
         }
 
         @Override
         public String toString() {
             return shortName + "[" + classz + "]";
+        }
+
+        public void validate(TypeSystemDescription tsd)
+                throws ValidationException {
+           checkArgument(tsd.getType(classz) != null, "'Class name' of '"
+                    + toString() + "' should not end with a dot");
+
         }
     }
 

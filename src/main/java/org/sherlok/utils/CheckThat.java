@@ -1,6 +1,6 @@
 package org.sherlok.utils;
 
-import static org.sherlok.Sherlok.SEPARATOR;
+import static org.sherlok.mappings.Def.SEPARATOR;
 
 import java.util.regex.Pattern;
 

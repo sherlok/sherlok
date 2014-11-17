@@ -37,3 +37,10 @@ Integration testing:
 Jacoco Reports:
 
     mvn clean test jacoco:report
+
+Gitstats Reports:
+
+    cd /Users/richarde/dev_hdd/sources/gitstats
+    git clone git://repo.or.cz/gitstats.git
+    ./gitstats ../../uima/sherlok/sherlok_core ../../uima/sherlok/sherlok_core/target/gitstats
+    open ../../uima/sherlok/sherlok_core/target/gitstats/index.html

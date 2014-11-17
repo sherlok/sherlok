@@ -1,0 +1,16 @@
+{
+  "name" : "ruta_02_annotate_countries",
+  "version" : "1",
+  "domain" : "examples",
+  "description" : "Example that annotates countries as an Country",
+  "engines" : [ {
+    "script" : [
+      "WORDLIST CountriesList = 'countries.txt';",
+      "DECLARE Country;",
+      "Document{-> MARKFAST(Country, CountriesList)};"
+    ]
+  } ],
+  "output" : {
+    "annotations" : [ "Country" ]
+  }
+}
