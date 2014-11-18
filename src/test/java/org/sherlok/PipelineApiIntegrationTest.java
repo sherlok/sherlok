@@ -62,7 +62,7 @@ public class PipelineApiIntegrationTest {
                 .contentType(JSON).statusCode(STATUS_OK)//
                 .body("name", equalTo("opennlp.ners.en"))//
                 .body("version", equalTo("1.6.2"))//
-                .body("loadOnStartup", equalTo(true))//
+                .body("loadOnStartup", equalTo(false))//
                 .body("engines[0].id", equalTo("opennlp.segmenter.en:1.6.2"))//
                 .body("engines[0].script", equalTo(null));
     }

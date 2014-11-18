@@ -6,8 +6,8 @@
   "bundle_id" : "dkpro.maltparser.en:1.6.2",
   "parameters" : {
     "language" : "en",
-    "modelVariant": "location"
+    "modelVariant": "linear"
   },
   "script" : null,
-  "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder"
+  "class" : "de.tudarmstadt.ukp.dkpro.core.maltparser.MaltParser"
 }

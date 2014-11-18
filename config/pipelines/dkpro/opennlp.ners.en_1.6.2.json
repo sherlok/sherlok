@@ -1,10 +1,8 @@
 {
   "name" : "opennlp.ners.en",
   "version" : "1.6.2",
-  "language" : "en",
   "domain" : "dkpro",
   "description" : "Annotates persons and locations",
-  "loadOnStartup" : true,
   "engines" : [ {
     "id" : "opennlp.segmenter.en:1.6.2"
   }, {
@@ -15,7 +13,6 @@
     "id" : "opennlp.ner.location.en:1.6.2"
   } ],
   "output" : {
-    "annotations" : [ "dkpro.NamedEntity" ],
-    "payloads" : [ ]
+    "annotations" : [ "dkpro.NamedEntity" ]
   }
 }

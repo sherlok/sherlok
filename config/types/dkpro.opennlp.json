@@ -1,9 +1,15 @@
 {
   "types" : [ {
-    "class" : "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity",
     "shortName" : "dkpro.NamedEntity",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity",
     "color" : null,
     "description" : null,
     "properties" : [ "value" ]
+  }, {
+    "shortName" : "dkpro.Dependency",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency",
+    "color" : null,
+    "description" : null,
+    "properties" : [ "Governor", "Dependent", "DependencyType" ]
   } ]
 }

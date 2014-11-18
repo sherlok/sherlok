@@ -14,7 +14,7 @@ public class ControllerTest {
         Controller controller = new Controller().load();
 
         PipelineDef pd = controller.getPipelineDef("opennlp.ners.en:1.6.2");
-        assertEquals(true, pd.isLoadOnStartup());
+        assertEquals(false, pd.isLoadOnStartup());
         assertEquals(4, pd.getEngines().size());
         assertEquals("opennlp.segmenter.en:1.6.2", pd.getEngines().get(0).getId());
 

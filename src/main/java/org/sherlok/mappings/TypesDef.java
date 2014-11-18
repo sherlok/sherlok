@@ -26,30 +26,22 @@ public class TypesDef {
 
     /** Represents a UIMA {@link Type}. */
     public static class TypeDef {
+        /**
+         * Short name to be used in output (falls back on annotation class'
+         * shortName()
+         */
+        private String shortName;
         /** The {@link Type} class name */
         @JsonProperty("class")
         private String classz;
-        /**
-         * Short name to be used in output (optional, falls back on annotation
-         * class' shortName()
-         */
-        private String shortName,
         /** CSS color, for client (optional) */
-        color,
+        private String color,
         /** Description of this type (optional) */
         description;
         /** Properties to be outputed(optional) */
         private List<String> properties = list();
 
-        public String getClassz() {
-            return classz;
-        }
-
-        public TypeDef setClassz(String classz) {
-            this.classz = classz;
-            return this;
-        }
-
+        /** Short name, or falls back on annotation class' shortName() */
         public String getShortName() {
             if (shortName == null) {
                 if (classz.contains(".")) {
@@ -62,6 +54,15 @@ public class TypesDef {
 
         public TypeDef setShortName(String shortName) {
             this.shortName = shortName;
+            return this;
+        }
+
+        public String getClassz() {
+            return classz;
+        }
+
+        public TypeDef setClassz(String classz) {
+            this.classz = classz;
             return this;
         }
 

@@ -1,0 +1,16 @@
+{
+  "name" : "opennlp.maltparser.en",
+  "version" : "1.6.2",
+  "domain" : "dkpro",
+  "description" : "Parses syntactic tree",
+  "engines" : [ {
+    "id" : "opennlp.segmenter.en:1.6.2"
+  }, {
+    "id" : "opennlp.pos.en:1.6.2"
+  }, {
+    "id" : "opennlp.maltparser.en:1.6.2"
+  } ],
+  "output" : {
+    "annotations" : [ "dkpro.Dependency" ]
+  }
+}
