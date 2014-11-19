@@ -1,45 +1,122 @@
-<h2>All Pipelines <a class="btn btn-primary pull-right" href="#/pipelines/create"><i
- class="icon-plus-sign icon-white"></i> New Pipeline</a></h2>
+<div layout="row">
 
-<div ng-controller="pipelines">
-
-        <md-content>
-
-        <section layout="vertical" layout-sm="horizontal" layout-align="center center">
-          <md-button>{{title1}}</md-button>
-          <md-button noink class="md-primary">Primary (noink)</md-button>
-          <md-button ng-disabled="isDisabled" class="md-primary">Disabled</md-button>
-          <md-button class="md-warn" ng-click="isDisabled = !isDisabled">{{title4}}</md-button>
-          <div class="label">flat</div>
-      </section>
-
-      <section layout="vertical" layout-sm="horizontal" layout-align="center center">
-      <md-text-float label="City" ng-model="user.city"> </md-text-float>
-          <md-button class="md-raised">Button</md-button>
-          <md-button class="md-raised md-primary">Primary</md-button>
-          <md-button disabled class="md-raised md-primary">Disabled</md-button>
-          <md-button class="md-raised md-warn">Warn</md-button>
-          <div class="label">raised</div>
-      </section>
-  </md-content>
+  <!-- AVAILABLE PIPELINES -->
+  <div>
+    <md-toolbar theme="blue">
+      <h2 class="md-toolbar-tools">
+        <span>Available Pipelines</span>
+        <span flex></span>
+        <md-button ng-click="newPipe()" aria-label="new pipeline">New</md-button>
+      </h2>
+    </md-toolbar>
+    <md-content>
+      <md-list "overflow:scroll">
+        <md-item ng-repeat="pipeline in pipelines">
+          <md-item-content ng-click="openPipe(pipeline)">
+            <!-- <div class="md-tile-left"></div> -->
+            <div class="md-tile-content">
+              <h3>{{pipeline.name}}</h3>
+              <h4>version {{pipeline.version}}</h4>
+              <p>{{pipeline.description | limitTo : 50}}</p>
+            </div>
+          </md-item-content>
+          <md-divider ng-if="!$last"></md-divider>
+        </md-item>
+      </md-list>
+    </md-content>
   </div>
 
-<ul>
-    <li ng-repeat="pipeline in pipelines">
-        <div ng-click="open(pipeline)">
-            {{pipeline.name}} ({{pipeline.version}}): {{pipeline.description}}
-        </div>
-    </li>
-    <hr>
+  <!-- ACTIVE PIPELINE -->
+  <div flex style="padding-left:15px; border-left: 1px solid grey;">
     <ng-switch on="hasActivePipeOpen()">
-        <div ng-switch-when="true">
-        {{activepipe.name}}
-        <md-content>
-            <md-text-float label="Name" ng-model="activepipe.name"> </md-text-float>
-            <md-text-float label="Id" ng-model="activepipe.id"> </md-text-float>
-            <md-content>
-            <a ng-click="close()">[close]</a>
-            <a ng-click="beep()">[beep]</a>
+      <div class="animate-switch" ng-switch-when="false">
+        <div ng-include="splash_page"></div>
+      </div>
+      <div class="animate-switch" ng-switch-when="true">
+        <md-toolbar md-theme="indigo">
+          <h2 class="md-toolbar-tools">
+            <span>Pipeline '{{activePipe.name}}'</span>
+            <span flex></span>
+            <md-button ng-click="deletePipe()"aria-label="delete pipeline">delete</md-button>
+            <md-button ng-click="savePipe()" aria-label="save pipeline">save</md-button>
+            <md-button ng-click="closePipe()"aria-label="close pipeline">close</md-button>
+          </h2>
+        </md-toolbar>
+        <div layout="row" layout-padding>
+          <md-text-float class="wide" label="Pipeline Name" ng-model="activePipe.name"> </md-text-float>
+          <md-text-float label="Version" ng-model="activePipe.version"> </md-text-float>
         </div>
+        <div layout="row" layout-padding>
+          <md-input-group tabindex="-1" ng-model="activePipe.description" label="Description" class="ng-isolate-scope md-default-theme md-input-has-value ng-valid" aria-invalid="false">
+            <label for="p_desc" class="ng-binding">Description</label>
+            <textarea rows="2" cols="60" id="p_desc" aria-disabled="false"
+              class="ng-valid ng-touched">{{activePipe.description}}</textarea>
+          </md-input-group>
+        </div>
+
+        <!-- PIPELINE ENGINES -->
+        <div>
+          <md-toolbar class="thin" md-theme="indigo">
+            <h2 class="md-toolbar-tools">
+              <span>Pipeline Elements</span>
+              <span flex></span>
+              <md-button ng-click="addEngine()" aria-label="add engine">add</md-button>
+            </h2>
+          </md-toolbar>
+          <md-content>
+            <md-list "overflow:scroll">
+              <md-item ng-repeat="pipeEngine in activePipe.engines">
+                <md-item-content>
+                  <ng-switch on="isRuta(pipeEngine)">
+                    <!-- Ruta engine -->
+                    <div ng-switch-when="true" class="script-border">
+                      <md-input-group id="ruta_script" ng-click="openRutaEngine($index)">
+                        <textarea rows="{{pipeEngine.script.length + 1}}" cols="80"
+                          aria-disabled="false">{{pipeEngine.script | joinBy:'\n'}}</textarea>
+                      </md-input-group>
+                    </div>
+                    <!-- uimaFIT engine -->
+                    <div ng-switch-when="false" class="engine-border">
+                      <div ng-click="openEngine(pipeEngine)">{{pipeEngine.id}}</div>
+                    </div>
+                  </ng-switch>
+                </md-item-content>
+                <md-divider ng-if="!$last"></md-divider>
+              </md-item>
+            </md-list>
+          </md-content>
+        </div>
+
+        <!-- TESTS -->
+        <br/><br/>
+        <div>
+          <md-toolbar class="thin" md-theme="indigo">
+            <h2 class="md-toolbar-tools">
+              <span>Tests</span>
+              <span flex></span>
+              <md-button ng-click="runAllTests()">run all tests</md-button>
+            </h2>
+          </md-toolbar>
+          <div ng-repeat="test in activePipe.tests">
+            <md-subheader class="md-primary">Test {{$index + 1}}</md-subheader>
+            <md-input-group class="test_area">
+              <textarea rows="3" cols="80">{{test.in}}</textarea>
+            </md-input-group>
+            <div data-ng-bind-html="test.out"></div>
+            <div data-ng-bind-html="test.out2"></div>
+            <div>{{test.out3}}</div>
+          </div>
+        </div>
+
+        <a ng-click="savePipe()">[save]</a>
+        <a ng-click="closePipe()">[close]</a>
+      </div>
+      <md-divider/>
     </ng-switch>
-</ul>
+  </div>
+
+  <!--RIGHT PANEL -->
+  <div flex=10 style="padding-left:15px; border-left: 1px solid grey;">
+    RIGHT
+  </div>
+</div>

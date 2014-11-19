@@ -1,52 +1,50 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
-    <title>Sherlok :: Demo</title>
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+  <title>Sherlok :: Demo</title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
 
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
-    <script src="sherlok.js" type="text/javascript"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+  <script src="sherlok.js" type="text/javascript"></script>
 
-    <script type="text/javascript">
-        $(document).ready(function() {
-
-            $("#annotate_btn").click(function(){
-                $("#annotated").empty();
-                Sherlok.annotate("to_annotate");
-                $("#container_input").hide();
-                $("#container_output").show();
-            });
-            $("#back_btn").click(function(){
-                Sherlok.annotate("to_annotate");
-                $("#container_input").show();
-                $("#container_output").hide();
-            });
-        });
-    </script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $("#annotate_btn").click(function(){
+        $("#annotated").empty();
+        Sherlok.annotate('opennlp.ners.en', $("#to_annotate").val(),"annotated");
+        $("#input").hide();
+        $("#output").show();
+      });
+      $("#back_btn").click(function(){
+        $("#input").show();
+        $("#output").hide();
+      });
+    });
+  </script>
 </head>
 <body>
+  <div class="container">
+    <h3 id="title">Welcome to Sherlok!</h3>
+    <div id="input">
+      <form role="form">
+        <button id="annotate_btn" type="button" class="btn btn-default">Annotate!</button>
+        <div class="form-group">
+          <textarea id="to_annotate" class="form-control" rows="12">Jack Burton (born April 29, 1954 in El Paso), also known as Jake Burton, is an American snowboarder and founder of Burton Snowboards. He grew up in Cedarhurst, New York. Carpenter's high school education began in Brooks School North Andover, Massachusetts. After graduating from The Marvelwood School, at that time in Cornwall, CT, he enrolled at the University of Colorado in Boulder. An avid skier, Carpenter hoped to join the university's ski team; however, his competitive skiing career ended in a car accident. After several years away from college he resumed his studies at New York University, graduating with a degree in economics. After college, Carpenter's interests returned to the slopes. Working from a barn in Londonderry, Vermont, he improved on the Snurfer, a basic toy snowboard which featured a rope to allow the rider some basic SMD control over the board. By the late 70's, he joined a small cadre of manufacturers who had begun selling snowboards with design features such as a bentwood laminate core and a rigid binding which held the board firmly to the wearer's boot. Carpenter continues to run the Burton company, which has grown into one of the world's largest snowboard and snowboarding-equipment manufacturers. Carpenter currently resides in Stowe, Vermont, where he lives with his wife, Donna and his son, Timi. Carpenter also has two other sons, George and Taylor. Burton Carpenter is a member of the Vermont Sports Hall of Fame.</textarea>
+        </div>
+      </form>
+    </div>
+    <div id="output" style="display:none">
+      <button id="back_btn" type="button" class="btn btn-default">Back to form</button>
+      <div id="annotated" class="form-control" ></div>
+    </div>
+  </div>
+  <div class="footer">
     <div class="container">
-        <h3 id="title">Welcome to Sherlok!</h3>
-        <div id="container_input">
-            <form role="form">
-                <button id="annotate_btn" type="button" class="btn btn-default">Annotate!</button>
-                <div class="form-group">
-                    <textarea id="to_annotate" class="form-control" rows="12">Jack Burton (born April 29, 1954 in El Paso), also known as Jake Burton, is an American snowboarder and founder of Burton Snowboards. He grew up in Cedarhurst, New York. Carpenter's high school education began in Brooks School North Andover, Massachusetts. After graduating from The Marvelwood School, at that time in Cornwall, CT, he enrolled at the University of Colorado in Boulder. An avid skier, Carpenter hoped to join the university's ski team; however, his competitive skiing career ended in a car accident. After several years away from college he resumed his studies at New York University, graduating with a degree in economics. After college, Carpenter's interests returned to the slopes. Working from a barn in Londonderry, Vermont, he improved on the Snurfer, a basic toy snowboard which featured a rope to allow the rider some basic SMD control over the board. By the late 70's, he joined a small cadre of manufacturers who had begun selling snowboards with design features such as a bentwood laminate core and a rigid binding which held the board firmly to the wearer's boot. Carpenter continues to run the Burton company, which has grown into one of the world's largest snowboard and snowboarding-equipment manufacturers. Carpenter currently resides in Stowe, Vermont, where he lives with his wife, Donna and his son, Timi. Carpenter also has two other sons, George and Taylor. Burton Carpenter is a member of the Vermont Sports Hall of Fame.</textarea>
-                </div>
-            </form>
-        </div>
-        <div id="container_output" style="display:none">
-            <button id="back_btn" type="button" class="btn btn-default">Back to form</button>
-            <div id="annotated" class="form-control" ></div>
-        </div>
-    </div>
-    <div class="footer">
-      <div class="container">
-        <p class="text-muted myfooter">Sherlok ~ Created by <a href="mailto:renaud.richardet@gmail.com">Renaud Richardet</a>.</p>
-    </div>
+    <p class="text-muted myfooter">Sherlok ~ Created by <a href="mailto:renaud.richardet@gmail.com">Renaud Richardet</a>.</p>
+  </div>
 </div>
 </body>
 </html>

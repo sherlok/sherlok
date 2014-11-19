@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.sherlok.FileBased;
 import org.sherlok.mappings.PipelineDef.PipelineEngine;
 
-public class PipelineTest {
+public class PipelineDefTest {
 
     public static PipelineDef getOpennlp_ners() {
         PipelineDef p = new PipelineDef().setDomain("dkpro")

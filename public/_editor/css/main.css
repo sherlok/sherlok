@@ -1,31 +1,53 @@
-.success-true{
-    text-decoration: line-through;
+/* Ruta fields */
+md-input-group#ruta_script{
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-right: 0px;
+}
+md-input-group#ruta_script > textarea, md-input-group.test_area > textarea {
+    width: 100%;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* wide input field, e.g. for pipeline name */
+md-input-group.wide > input {
+    width: 280px;
+}
+
+/* thinner toolbar */
+md-toolbar.thin {
+    min-height: 35px;
+}
+md-toolbar.thin > h2.md-toolbar-tools {
+    height: 35px;
+    font-size: 0.8em;
+}
+
+
+div.engine-border {
+    background-color: #ffeb3b;
+    padding: 7px;
+    width: 700px;
+}
+div.script-border {
+    border: 7px solid green;
+    width: 700px;
+}
+/* Welcome text */
+#welcome{
+    margin: 80px;
+    max-width: 650px;
 }
 
 
 
-.buttondemoBasicUsage {
-  /** From vulcanized demo **/ }
 
-.buttondemoBasicUsage section {
-background: #f7f7f7;
-border-radius: 3px;
-text-align: center;
-margin: 1em;
-position: relative !important;
-padding-bottom: 10px; }
-.buttondemoBasicUsage md-content {
-margin-right: 7px; }
-.buttondemoBasicUsage section .md-button:not(.md-fab) {
-width: 10em; }
-.buttondemoBasicUsage section .md-button {
-display: block;
-margin: 1em;
-line-height: 25px; }
-.buttondemoBasicUsage .label {
-position: absolute;
-bottom: 5px;
-left: 7px;
-color: #ccc;
-font-size: 14px; }
-
+/* toast with different color */
+/*md-toast.md-default-theme {
+    background-color: #00FF99;
+    color: black;
+}*/

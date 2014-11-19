@@ -38,6 +38,9 @@ public class PipelineDef extends Def {
     /** Controls the output of this pipeline */
     private PipelineOutput output = new PipelineOutput();
 
+    /** tests */
+    private List<PipelineTest> tests = list();
+
     /** An engine definition */
     public static class PipelineEngine {
         private String id;
@@ -93,7 +96,7 @@ public class PipelineDef extends Def {
         }
     }
 
-    /** An engine definition */
+    /** Output definition: annots and payload */
     public static class PipelineOutput {
         List<String> annotations = list();
         List<String> payloads = list();
@@ -115,7 +118,29 @@ public class PipelineDef extends Def {
             this.payloads = payloads;
             return this;
         }
+    }
 
+    /** An engine definition */
+    public static class PipelineTest {
+        private String in, out;
+
+        public String getIn() {
+            return in;
+        }
+
+        public PipelineTest setIn(String in) {
+            this.in = in;
+            return this;
+        }
+
+        public String getOut() {
+            return out;
+        }
+
+        public PipelineTest setOut(String out) {
+            this.out = out;
+            return this;
+        }
     }
 
     // get/set
@@ -178,6 +203,19 @@ public class PipelineDef extends Def {
     public PipelineDef addOutputPayload(String payload) {
         this.output.payloads.add(payload);
         return this;
+    }
+
+    public List<PipelineTest> getTests() {
+        return tests;
+    }
+
+    public PipelineDef setTests(List<PipelineTest> tests) {
+        this.tests = tests;
+        return this;
+    }
+
+    public void addTests(PipelineTest test) {
+        this.tests.add(test);
     }
 
     // TODO ignore in json or not?

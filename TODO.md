@@ -15,6 +15,13 @@ DkPro
 * list https://docs.google.com/spreadsheet/pub?key=0ApGcdapz0xSYdFNTREhKeFVEU1RsQzc0V0NKcE04b3c&single=true&gid=0&output=html
 mvn urls: http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/de/tudarmstadt/ukp/dkpro/core/
 
+License
+* http://www.gnu.org/licenses/gpl-faq.html#NFUseGPLPlugins
+    * If the program dynamically links plug-ins, and they make function calls to each other and share data structures, we **believe** they form a single program, which must be treated as an extension of both the main program and the plug-ins. 
+* http://stackoverflow.com/questions/2111047/does-the-gpl-state-that-dependencies-of-gpld-software-also-have-to-be-released
+    *  Dynamic linking is debatable. 
+* http://www.gnu.org/licenses/lgpl-java.html
+* http://stackoverflow.com/questions/3752385/does-licensing-matter-for-maven-artifacts-that-are-runtime-or-test-scoped
 
 ---- 
 

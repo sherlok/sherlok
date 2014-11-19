@@ -352,7 +352,7 @@ public class SherlokServer {
 
     private static Object invalid(String errorMsg, ValidationException ve,
             Response resp) {
-        LOG.info("could not " + errorMsg, ve);
+        LOG.info("could not " + errorMsg);
         resp.status(STATUS_INVALID);
         resp.type(JSON);
         return ve.toJson();
