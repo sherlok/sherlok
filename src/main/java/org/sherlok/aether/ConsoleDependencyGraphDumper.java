@@ -1,148 +1,44 @@
-/*******************************************************************************
- * Copyright (c) 2010, 2013 Sonatype, Inc.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * Copyright (C) 2014 Renaud Richardet (renaud@apache.org)
  *
- * Contributors:
- *    Sonatype, Inc. - initial API and implementation
- *******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.sherlok.aether;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
-import org.eclipse.aether.util.artifact.ArtifactIdUtils;
-import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
-import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.slf4j.Logger;
 
-/**
- * A dependency visitor that dumps the graph to the console.
- */
-public class ConsoleDependencyGraphDumper
-    implements DependencyVisitor
-{
+/** A dependency visitor that logs the graph. */
+public class ConsoleDependencyGraphDumper implements DependencyVisitor {
+    private static final Logger LOG = getLogger(ConsoleDependencyGraphDumper.class);
 
-    private PrintStream out;
+    private String currentIndent = "";
 
-    private List<ChildInfo> childInfos = new ArrayList<ChildInfo>();
-
-    public ConsoleDependencyGraphDumper()
-    {
-        this( null );
-    }
-
-    public ConsoleDependencyGraphDumper( PrintStream out )
-    {
-        this.out = ( out != null ) ? out : System.out;
-    }
-
-    public boolean visitEnter( DependencyNode node )
-    {
-        out.println( formatIndentation() + formatNode( node ) );
-        childInfos.add( new ChildInfo( node.getChildren().size() ) );
-        return true;
-    }
-
-    private String formatIndentation()
-    {
-        StringBuilder buffer = new StringBuilder( 128 );
-        for ( Iterator<ChildInfo> it = childInfos.iterator(); it.hasNext(); )
-        {
-            buffer.append( it.next().formatIndentation( !it.hasNext() ) );
-        }
-        return buffer.toString();
-    }
-
-    private String formatNode( DependencyNode node )
-    {
-        StringBuilder buffer = new StringBuilder( 128 );
-        Artifact a = node.getArtifact();
-        Dependency d = node.getDependency();
-        buffer.append( a );
-        if ( d != null && d.getScope().length() > 0 )
-        {
-            buffer.append( " [" ).append( d.getScope() );
-            if ( d.isOptional() )
-            {
-                buffer.append( ", optional" );
-            }
-            buffer.append( "]" );
-        }
-        {
-            String premanaged = DependencyManagerUtils.getPremanagedVersion( node );
-            if ( premanaged != null && !premanaged.equals( a.getBaseVersion() ) )
-            {
-                buffer.append( " (version managed from " ).append( premanaged ).append( ")" );
-            }
-        }
-        {
-            String premanaged = DependencyManagerUtils.getPremanagedScope( node );
-            if ( premanaged != null && !premanaged.equals( d.getScope() ) )
-            {
-                buffer.append( " (scope managed from " ).append( premanaged ).append( ")" );
-            }
-        }
-        DependencyNode winner = (DependencyNode) node.getData().get( ConflictResolver.NODE_DATA_WINNER );
-        if ( winner != null && !ArtifactIdUtils.equalsId( a, winner.getArtifact() ) )
-        {
-            Artifact w = winner.getArtifact();
-            buffer.append( " (conflicts with " );
-            if ( ArtifactIdUtils.toVersionlessId( a ).equals( ArtifactIdUtils.toVersionlessId( w ) ) )
-            {
-                buffer.append( w.getVersion() );
-            }
-            else
-            {
-                buffer.append( w );
-            }
-            buffer.append( ")" );
-        }
-        return buffer.toString();
-    }
-
-    public boolean visitLeave( DependencyNode node )
-    {
-        if ( !childInfos.isEmpty() )
-        {
-            childInfos.remove( childInfos.size() - 1 );
-        }
-        if ( !childInfos.isEmpty() )
-        {
-            childInfos.get( childInfos.size() - 1 ).index++;
+    public boolean visitEnter(DependencyNode node) {
+        LOG.debug(currentIndent + node);
+        if (currentIndent.length() <= 0) {
+            currentIndent = "+- ";
+        } else {
+            currentIndent = "|  " + currentIndent;
         }
         return true;
     }
 
-    private static class ChildInfo
-    {
-
-        final int count;
-
-        int index;
-
-        public ChildInfo( int count )
-        {
-            this.count = count;
-        }
-
-        public String formatIndentation( boolean end )
-        {
-            boolean last = index + 1 >= count;
-            if ( end )
-            {
-                return last ? "\\- " : "+- ";
-            }
-            return last ? "   " : "|  ";
-        }
-
+    public boolean visitLeave(DependencyNode node) {
+        currentIndent = currentIndent.substring(3, currentIndent.length());
+        return true;
     }
-
 }
