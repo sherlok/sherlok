@@ -204,6 +204,7 @@ public class UimaPipeline {
         String scriptName = pipelineId.replace(".", "_");
         File scriptFile = new File(FileBased.RUTA_PIPELINE_CACHE_PATH
                 + scriptName + SCRIPT_FILE_EXTENSION);
+        scriptFile.getParentFile().mkdirs();
         saveString2File(script, scriptFile);
 
         aeds.add(createEngineDescription(RutaEngine.class, //

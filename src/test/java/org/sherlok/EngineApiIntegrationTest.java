@@ -63,7 +63,7 @@ public class EngineApiIntegrationTest {
     @Test
     public void test010GetEngines() {
         get(API_URL)
-                .then()
+                .then().log().everything()
                 .contentType(JSON)
                 .statusCode(STATUS_OK)
                 .content(containsString("opennlp.ner.person.en"))
@@ -73,7 +73,7 @@ public class EngineApiIntegrationTest {
 
     @Test
     public void test020GetEngine() {
-        get(API_URL + "/opennlp.ner.person.en/1.6.2").then()//
+        get(API_URL + "/opennlp.ner.person.en/1.6.2").then().log().everything()//
                 .contentType(JSON).statusCode(STATUS_OK)//
                 .body("name", equalTo("opennlp.ner.person.en"))//
                 .body("version", equalTo("1.6.2"))//
@@ -94,7 +94,7 @@ public class EngineApiIntegrationTest {
 
         given().content(FileBased.writeAsString(e))//
                 .when().put(API_URL)//
-                .then().statusCode(STATUS_OK);
+                .then().log().everything().statusCode(STATUS_OK);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class EngineApiIntegrationTest {
     public void test031PutFaultyEngine() throws JsonProcessingException {
         given().content("blah")//
                 .when().put(API_URL)//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
@@ -110,14 +110,14 @@ public class EngineApiIntegrationTest {
     public void test032PutFaultyEngine() throws JsonProcessingException {
         given().content("{  \"name\" : \"blabla\"}")//
                 .when().put(API_URL)//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
     /** .. and check that the new test engine is here */
     public void test040GetTestEngine() {
         get(API_URL + "/test/17")
-                .then()
+                .then().log().everything()
                 .contentType(JSON)
                 .statusCode(STATUS_OK)
                 .body("name", equalTo("test"))
@@ -131,20 +131,20 @@ public class EngineApiIntegrationTest {
     /** .. and check that a bogus engine is NOT here */
     public void test041GetFaultyTestEngine() {
         get(API_URL + "/test/1000000000198198")//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
     /** Now let's delete the test engine */
     public void test050DeleteEngine() throws JsonProcessingException {
         when().delete(API_URL + "/test/17").//
-                then().statusCode(STATUS_OK);
+                then().log().everything().statusCode(STATUS_OK);
     }
 
     @Test
     /** ... and check that it is gone. */
     public void test060GetTestEngineGone() {
         get(API_URL + "/test/17")//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 }

@@ -64,6 +64,8 @@ public class PipelineApiIntegrationTest {
     public void test010GetPipelines() {
         get(API_URL)
                 .then()
+                .log()
+                .everything()
                 .contentType(JSON)
                 .statusCode(STATUS_OK)
                 .content(containsString("opennlp.ners.en"))
@@ -73,7 +75,7 @@ public class PipelineApiIntegrationTest {
 
     @Test
     public void test020GetPipeline() {
-        get(API_URL + "/opennlp.ners.en/1.6.2").then()//
+        get(API_URL + "/opennlp.ners.en/1.6.2").then().log().everything()
                 .contentType(JSON).statusCode(STATUS_OK)//
                 .body("name", equalTo("opennlp.ners.en"))//
                 .body("version", equalTo("1.6.2"))//
@@ -93,7 +95,7 @@ public class PipelineApiIntegrationTest {
 
         given().content(testPipelineDef)//
                 .when().put(API_URL)//
-                .then().statusCode(STATUS_OK);
+                .then().log().everything().statusCode(STATUS_OK);
     }
 
     @Test
@@ -101,7 +103,7 @@ public class PipelineApiIntegrationTest {
     public void test031PutFaultyPipeline() throws JsonProcessingException {
         given().content("blah")//
                 .when().put(API_URL)//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
@@ -109,13 +111,13 @@ public class PipelineApiIntegrationTest {
     public void test032PutFaultyPipeline() throws JsonProcessingException {
         given().content("{  \"name\" : \"opennlp.ners.en\"}")//
                 .when().put(API_URL)//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
     /** .. and check that the new test pipeline is here */
     public void test040GetTestPipeline() {
-        get(API_URL + "/test/1").then()//
+        get(API_URL + "/test/1").then().log().everything()//
                 .contentType(JSON).statusCode(STATUS_OK)//
                 .body("name", equalTo("test"))//
                 .body("version", equalTo("1"))//
@@ -128,20 +130,20 @@ public class PipelineApiIntegrationTest {
     /** .. and check that a bogus pipelien is NOT here */
     public void test041GetFaultyTestPipeline() {
         get(API_URL + "/test/1000000000198198")//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
     /** Now let's delete the test pipeline*/
     public void test050DeletePipeline() throws JsonProcessingException {
         when().delete(API_URL + "/test/1").//
-                then().statusCode(STATUS_OK);
+                then().log().everything().statusCode(STATUS_OK);
     }
 
     @Test
     /** ... and check that it is gone. */
     public void test060GetTestPipelineGone() {
         get(API_URL + "/test/1")//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 }

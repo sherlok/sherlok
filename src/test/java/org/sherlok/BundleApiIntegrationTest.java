@@ -65,7 +65,8 @@ public class BundleApiIntegrationTest {
 
     @Test
     public void test010GetBundles() {
-        get(API_URL).then().contentType(JSON).statusCode(STATUS_OK)
+        get(API_URL).then().log().everything().contentType(JSON)
+                .statusCode(STATUS_OK)
                 .content(containsString("\"name\" : \"dkpro.opennlp.en\","));
     }
 
@@ -73,6 +74,8 @@ public class BundleApiIntegrationTest {
     public void test020GetBundle() {
         get(API_URL + "/dkpro.opennlp.en/1.6.2")
                 .then()
+                .log()
+                .everything()
                 .contentType(JSON)
                 .statusCode(STATUS_OK)
                 .body("name", equalTo("dkpro.opennlp.en"))
@@ -93,7 +96,7 @@ public class BundleApiIntegrationTest {
 
         given().content(writeAsString(e))//
                 .when().put(API_URL)//
-                .then().statusCode(STATUS_OK);
+                .then().log().everything().statusCode(STATUS_OK);
     }
 
     @Test
@@ -101,7 +104,7 @@ public class BundleApiIntegrationTest {
     public void test031PutFaultyBundle() throws JsonProcessingException {
         given().content("blah")//
                 .when().put(API_URL)//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
@@ -109,7 +112,7 @@ public class BundleApiIntegrationTest {
     public void test032PutFaultyBundle() throws JsonProcessingException {
         given().content("{  \"name\" : \"blabla\"}")//
                 .when().put(API_URL)//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
@@ -117,6 +120,8 @@ public class BundleApiIntegrationTest {
     public void test040GetTestBundle() {
         get(API_URL + "/test/172")
                 .then()
+                .log()
+                .everything()
                 .contentType(JSON)
                 .statusCode(STATUS_OK)
                 .body("name", equalTo("test"))
@@ -130,20 +135,20 @@ public class BundleApiIntegrationTest {
     /** .. and check that a bogus bundle is NOT here */
     public void test041GetFaultyTestBundle() {
         get(API_URL + "/test/1000000000198198")//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
     /** Now let's delete the test bundle */
     public void test050DeleteBundle() throws JsonProcessingException {
         when().delete(API_URL + "/test/172").//
-                then().statusCode(STATUS_OK);
+                then().log().everything().statusCode(STATUS_OK);
     }
 
     @Test
     /** ... and check that it is gone. */
     public void test060GetTestBundleGone() {
         get(API_URL + "/test/172")//
-                .then().statusCode(STATUS_INVALID);
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 }
