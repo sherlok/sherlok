@@ -9,6 +9,12 @@
   <version>${pipelineVersion}</version>
   
   <dependencies>
+    <!-- latest (unreleased), for Json writer -->
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>uimaj-core</artifactId>
+      <version>2.6.1-json</version>
+    </dependency>
   <#list deps as dep>
     <dependency>
       <groupId>${dep.groupId}</groupId>

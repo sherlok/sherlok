@@ -33,6 +33,7 @@ import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
@@ -55,6 +56,7 @@ public class PipelineLoader {
 
     private Controller controller;
     private Map<String, UimaPipeline> uimaPipelinesCache = map();
+    private Set<String> jarsAddedToClasspath = set();
 
     public PipelineLoader(Controller controller) {
         this.controller = controller;
@@ -152,8 +154,8 @@ public class PipelineLoader {
                 try {
                     if (engineDef.isRuta()) { // Ruta engine
                         try {
-                            uimaPipeline.addRutaEngine(
-                                    engineDef.getScript(), pipelineId);
+                            uimaPipeline.addRutaEngine(engineDef.getScript(),
+                                    pipelineId);
                         } catch (Exception e) {
                             throw new ValidationException(
                                     "could not parse script '"
@@ -227,20 +229,26 @@ public class PipelineLoader {
 
         PreorderNodeListGenerator p = new PreorderNodeListGenerator();
         collectResult.getRoot().accept(p);
+        List<RemoteRepository> repos = AetherResolver.newRepositories(system,
+                session, repositoriesDefs);
         for (Dependency dependency : p.getDependencies(true)) {
 
             Artifact artifact = dependency.getArtifact();
             ArtifactRequest artifactRequest = new ArtifactRequest();
             artifactRequest.setArtifact(artifact);
-            artifactRequest.setRepositories(AetherResolver.newRepositories(
-                    system, session, repositoriesDefs));
+            artifactRequest.setRepositories(repos);
 
             ArtifactResult artifactResult = system.resolveArtifact(session,
                     artifactRequest);
 
             artifact = artifactResult.getArtifact();
+            String id = artifact.toString();
 
-            ClassPathHack.addFile(artifact.getFile());
+            // add this jar to the classpath (if it has not been added before)
+            if (!jarsAddedToClasspath.contains(id)) {
+                ClassPathHack.addFile(artifact.getFile());
+                jarsAddedToClasspath.add(id);
+            }
         }
     }
 

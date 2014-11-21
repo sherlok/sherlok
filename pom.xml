@@ -10,7 +10,7 @@
     <name>Sherlok</name>
     <url>https://github.com/renaud/sherlok</url>
   </organization>
-
+  <inceptionYear>2014</inceptionYear>
   <developers>
     <developer>
       <name>Renaud Richardet</name>
@@ -216,9 +216,9 @@
             </goals>
           </execution>
         </executions>
-      </plugin>     
-            
-      <!-- LICENSE 
+      </plugin>
+
+      <!-- LICENSE -->
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
@@ -233,16 +233,21 @@
             <exclude>**/README</exclude>
             <exclude>src/test/resources/**</exclude>
             <exclude>src/main/resources/**</exclude>
+            <exclude>doc/**</exclude>
+            <exclude>config/**</exclude>
+            <exclude>public/**</exclude>
+            <exclude>src/main/java/org/sherlok/utils/Strings.java</exclude>
+            <exclude>src/main/java/org/sherlok/aether/Console*</exclude>
           </excludes>
         </configuration>
         <executions>
           <execution>
             <goals>
-              <goal>check</goal>
+              <goal>format</goal>
             </goals>
           </execution>
         </executions>
-      </plugin>-->
+      </plugin>
       <!-- APPASEMBLER to create one portable application -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>

@@ -2,6 +2,8 @@ package org.sherlok.aether;
 
 import static org.sherlok.utils.Create.list;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,9 +25,8 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
  * A helper to boot the repository system and a repository system session.
  */
 public class AetherResolver {
-    
-    public static final String LOCAL_REPO_PATH = "local_repo";
 
+    public static final String LOCAL_REPO_PATH = "local_repo";
 
     public static RepositorySystem newRepositorySystem() {
         /*
@@ -64,7 +65,7 @@ public class AetherResolver {
                 session, localRepo));
 
         // session.setTransferListener(new ConsoleTransferListener());
-       // session.setRepositoryListener(new ConsoleRepositoryListener());
+        // session.setRepositoryListener(new ConsoleRepositoryListener());
 
         // uncomment to generate dirty trees
         // session.setDependencyGraphTransformer( null );
@@ -74,8 +75,20 @@ public class AetherResolver {
 
     public static List<RemoteRepository> newRepositories(
             RepositorySystem system, RepositorySystemSession session,
-            Map<String, String> otherRepos) {
-        List<RemoteRepository> repos = list(newCentralRepository());// ,
+            Map<String, String> otherRepos) throws MalformedURLException {
+
+        List<RemoteRepository> repos = list();
+        // local repo (added as remote)
+        File localRepo = new File(System.getProperty("user.home")
+                + "/.m2/repository/");
+        if (localRepo.exists()) {
+            repos.add(new RemoteRepository.Builder("local_default", "default",
+                    localRepo.toURI().toURL().toString()).build());
+        }
+        // Maven central
+        repos.add(new RemoteRepository.Builder("central", "default",
+                "http://central.maven.org/maven2/").build());
+
         for (Entry<String, String> id_url : otherRepos.entrySet()) {
             repos.add(new RemoteRepository.Builder(id_url.getKey(), "default",
                     id_url.getValue()).build());
@@ -83,8 +96,4 @@ public class AetherResolver {
         return repos;
     }
 
-    private static RemoteRepository newCentralRepository() {
-        return new RemoteRepository.Builder("central", "default",
-                "http://central.maven.org/maven2/").build();
-    }
 }

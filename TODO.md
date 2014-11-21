@@ -45,6 +45,10 @@ Jacoco Reports:
 
     mvn clean test jacoco:report
 
+License
+
+    mvn license:format
+
 Gitstats Reports:
 
     cd /Users/richarde/dev_hdd/sources/gitstats
