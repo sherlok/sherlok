@@ -87,7 +87,7 @@ public class SherlokServer {
             checkArgument(text.length() > 0,
                     "'text' req parameter should not be empty");
         } catch (ValidationException ve) {
-            return invalid("could not annotate text  '" + text + "'", ve, resp);
+            return invalid("annotate text  '" + text + "'", ve, resp);
         }
         // annotate
         try {
@@ -95,9 +95,9 @@ public class SherlokServer {
             return (pipelineLoader.resolvePipeline(pipelineName, version)
                     .annotate(text));
         } catch (ValidationException ve) {
-            return invalid("could not annotate text  '" + text + "'", ve, resp);
+            return invalid("annotate text  '" + text + "'", ve, resp);
         } catch (Exception e) {
-            return error("could not annotate text '" + text + "'", e, resp);
+            return error("annotate text '" + text + "'", e, resp);
         }
     }
 
@@ -367,7 +367,7 @@ public class SherlokServer {
 
     private static Object invalid(String errorMsg, ValidationException ve,
             Response resp) {
-        LOG.info("could not " + errorMsg);
+        LOG.info("could not " + errorMsg + " " + ve.getMessage());
         resp.status(STATUS_INVALID);
         resp.type(JSON);
         return ve.toJson();

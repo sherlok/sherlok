@@ -28,6 +28,7 @@ import static org.sherlok.SherlokServer.STATUS_OK;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.mappings.EngineDef;
@@ -50,6 +51,9 @@ public class EngineApiIntegrationTest {
     static final String API_URL = "http://localhost:" + TEST_PORT + "/"
             + ENGINES;
 
+    @Rule
+    public MethodNameLoggerWatcher mdlw = new MethodNameLoggerWatcher();
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         SherlokServer.init(TEST_PORT);
@@ -63,7 +67,9 @@ public class EngineApiIntegrationTest {
     @Test
     public void test010GetEngines() {
         get(API_URL)
-                .then().log().everything()
+                .then()
+                .log()
+                .everything()
                 .contentType(JSON)
                 .statusCode(STATUS_OK)
                 .content(containsString("opennlp.ner.person.en"))
@@ -117,7 +123,9 @@ public class EngineApiIntegrationTest {
     /** .. and check that the new test engine is here */
     public void test040GetTestEngine() {
         get(API_URL + "/test/17")
-                .then().log().everything()
+                .then()
+                .log()
+                .everything()
                 .contentType(JSON)
                 .statusCode(STATUS_OK)
                 .body("name", equalTo("test"))

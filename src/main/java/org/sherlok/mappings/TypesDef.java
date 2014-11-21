@@ -139,8 +139,8 @@ public class TypesDef {
         public void validate(TypeSystemDescription tsd)
                 throws ValidationException {
             // FIXME test error in Eclipse
-            checkArgument(tsd.getType(classz) != null, "'Class name' of '"
-                    + toString() + "' should not end with a dot");
+            checkArgument(tsd.getType(classz) != null, "'class' of '"
+                    + shortName + "' should be present in the typesystem.");
             validate();
         }
     }

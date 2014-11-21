@@ -21,6 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Rule;
 import org.junit.Test;
 import org.sherlok.utils.Strings;
 import org.slf4j.Logger;
@@ -30,6 +31,9 @@ public class PipelineLoaderIntegrationTest {
 
     public static final String TEST_TEXT = "Jack Burton (born April 29, 1954 in El Paso), "
             + "also known as Jake Burton, is an American snowboarder and founder of Burton Snowboards.";
+
+    @Rule
+    public MethodNameLoggerWatcher mdlw = new MethodNameLoggerWatcher();
 
     @Test
     public void testNaturalOrdering() {

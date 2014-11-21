@@ -30,6 +30,7 @@ import static org.sherlok.mappings.BundleDef.BundleDependency.DependencyType.mvn
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.mappings.BundleDef;
@@ -52,6 +53,9 @@ public class BundleApiIntegrationTest {
     static final int TEST_PORT = 9608;
     static final String API_URL = "http://localhost:" + TEST_PORT + "/"
             + BUNDLES;
+
+    @Rule
+    public MethodNameLoggerWatcher mdlw = new MethodNameLoggerWatcher();
 
     @BeforeClass
     public static void beforeClass() throws Exception {

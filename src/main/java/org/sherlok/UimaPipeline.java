@@ -54,7 +54,8 @@ import org.xml.sax.SAXException;
  * 
  * Manages a UIMA pipeline (configuration, and then use/annotation). Lifecycle:<br>
  * <ol>
- * <li>create Pipeline</li>
+ * <li>add deps on classpath (to have TypeSystems scannable)</li>
+ * <li>create UimaPipeline</li>
  * <li>add engines</li>
  * <li>add output fields</li>
  * <li>initialize</li>
@@ -89,9 +90,9 @@ public class UimaPipeline {
         this.pipelineId = pipelineId;
         this.language = language;
         try {
+            // needed since we might have added new jars to the classpath
+            TypeSystemDescriptionFactory.forceTypeDescriptorsScan();
             tsd = TypeSystemDescriptionFactory.createTypeSystemDescription();
-            // for(TypeDescription t: tsd.getTypes())
-            // System.err.println(t);
         } catch (ResourceInitializationException e) {
             throw new RuntimeException(e);// should not happen
         }

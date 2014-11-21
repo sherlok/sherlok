@@ -27,6 +27,7 @@ import static org.sherlok.SherlokServer.STATUS_OK;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.mappings.PipelineDef;
@@ -49,6 +50,9 @@ public class PipelineApiIntegrationTest {
     static final int TEST_PORT = 9606;
     static final String API_URL = "http://localhost:" + TEST_PORT + "/"
             + PIPELINES;
+
+    @Rule
+    public MethodNameLoggerWatcher mdlw = new MethodNameLoggerWatcher();
 
     @BeforeClass
     public static void beforeClass() throws Exception {
