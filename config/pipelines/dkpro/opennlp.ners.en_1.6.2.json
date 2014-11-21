@@ -2,7 +2,7 @@
   "name" : "opennlp.ners.en",
   "version" : "1.6.2",
   "domain" : "dkpro",
-  "description" : "Annotates persons and locations",
+  "description" : "annotates English persons and locations using OpenNLP models",
   "engines" : [ {
     "id" : "opennlp.segmenter.en:1.6.2"
   }, {

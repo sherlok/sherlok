@@ -29,35 +29,30 @@ WARNING: some features below are not yet implemented!
 
 A pipeline describes the steps to perform a text mining analysis (e.g. split words, remove determinants, annotate locations, ...). For example, the pipeline below first performs some preprocessing: segmenting raw text in sentences and tokens (words), then tagging words with their corresponding [part-of-speech](http://en.wikipedia.org/wiki/Part-of-speech_tagging). This preprocessing is then used by two [named entity recognizers](http://en.wikipedia.org/wiki/Named-entity_recognition) (NERs) that identify persons and location.
 
-    {   
-        "name": "opennlp_ners",
-        "version": "1a.2",
-        "language": "en",
-        "description": "annotates English persons and locations using OpenNLP models",
-        "load_on_startup": true,
-        "engines" : [
-            { "id": "OpenNlpEnSegmenter:1.6.2" },
-            { "id": "OpenNlpEnPosTagger:1.6.2" },
-            { "id": "OpenNlpEnPersonFinder:1.6.2" },
-            { "id": "OpenNlpEnLocationFinder:1.6.2" }
+    {
+      "name" : "opennlp.ners.en",
+      "version" : "1.6.2",
+      "language" : "en",
+      "domain" : "dkpro",
+      "description" : "annotates English persons and locations using OpenNLP models",
+      "engines" : [ 
+        { "id" : "opennlp.segmenter.en:1.6.2" }, 
+        { "id" : "opennlp.pos.en:1.6.2" }, 
+        { "id" : "opennlp.ner.person.en:1.6.2" }, 
+        { "id" : "opennlp.ner.location.en:1.6.2"}
         ],
-        "output" : {
-            "annotations": [
-                "person",
-                "location"
-            ],
-            "payloads": [
-            ]
-        }
+      "output" : {
+        "annotations" : [ "dkpro.NamedEntity" ]
+      }
     }
 
 
 * Name: a unique name for this pipeline. Letters, numbers and underscore only
 * Version: a unique id for this pipeline. Letters, numbers and underscore only
-* Language: which language this pipeline works for (ISO code, or "all")
+* Language: (optional, defaults to 'en') which ISO language this pipeline works for.
 * Domain: useful to group pipelines together. Letters, numbers, slashes and underscore only
 * Description (optional):
-* Load_on_startup (optional): whether this pipeline should be loaded on server startup. Defaults to `false`
+* Load_on_startup (optional, defaults to `false`): whether this pipeline should be loaded on server startup
 * Annotations: which annotations to include in the output JSON
 * Payloads (optional): which payloads to include in the output JSON (see Payload chapter below)
 
@@ -70,11 +65,11 @@ Engines can have the following formats:
 An engine performs a single text analysis step in a pipeline. Engines can be reused across different pipelines. This is how we can define its configuration settings:
 
     {
-        "name": "OpenNlpEnSegmenter",
+        "name": "opennlp.segmenter.en",
         "version": "1.6.2",
         "domain": "dkpro",
         "class": "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter",
-        "bundle": "dkpro_opennlp_en:1.6.2",
+        "bundle": "dkpro.opennlp.en:1.6.2",
         "params" {
             "language": "en"
         }
@@ -93,7 +88,7 @@ An engine performs a single text analysis step in a pipeline. Engines can be reu
 A Bundle helps group together a set of library dependencies.
 
     {
-      "name" : "dkpro_opennlp_en",
+      "name" : "dkpro.opennlp.en",
       "version" : "1.6.2",
       "description" : "all opennlp engines and models for English",
       "repositories" : {
