@@ -14,6 +14,7 @@
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-core</artifactId>
       <version>2.6.1-json</version>
+      <scope>provided</scope>
     </dependency>
   <#list deps as dep>
     <dependency>

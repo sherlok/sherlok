@@ -12,5 +12,9 @@
   } ],
   "output" : {
     "annotations" : [ "Country" ]
-  }
+  },
+  "tests" : [
+    { "in": "Switzerland is close to Italy, the land of pasta and Michelangelo.", "out": "<Country>Switzerland</Country>" },
+    { "in": "China's GDP has taken over the United States.", "out": "" }
+  ]
 }
