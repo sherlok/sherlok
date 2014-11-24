@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#######################################
+# OpenShift start script for Sherlok  #
+#######################################
+
+cd ${OPENSHIFT_REPO_DIR}
+
+nohup mvn clean install exec:java \
+-Dmaven.test.skip=true \
+-Dexec.mainClass="org.sherlok.SherlokServer" \
+-Dexec.classpathScope=runtime \
+-Dexec.args="-port ${OPENSHIFT_DIY_PORT} -address ${OPENSHIFT_DIY_IP}" \
+> $OPENSHIFT_LOG_DIR/sherlok.log 2>&1 &

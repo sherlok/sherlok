@@ -1,0 +1,8 @@
+#!/bin/bash
+
+######################################
+# OpenShift stop script for Sherlok  #
+######################################
+
+kill `ps -ef | grep SherlokServer | grep -v grep | awk '{ print $2 }'` > /dev/null 2>&1
+exit 0

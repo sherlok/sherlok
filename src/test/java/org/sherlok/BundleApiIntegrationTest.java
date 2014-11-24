@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.sherlok.FileBased.writeAsString;
 import static org.sherlok.SherlokServer.BUNDLES;
+import static org.sherlok.SherlokServer.DEFAULT_IP;
 import static org.sherlok.SherlokServer.STATUS_INVALID;
 import static org.sherlok.SherlokServer.STATUS_OK;
 import static org.sherlok.mappings.BundleDef.BundleDependency.DependencyType.mvn;
@@ -59,7 +60,7 @@ public class BundleApiIntegrationTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        SherlokServer.init(TEST_PORT);
+        SherlokServer.init(TEST_PORT, DEFAULT_IP);
     }
 
     @AfterClass

@@ -25,6 +25,7 @@ import static spark.Spark.externalStaticFileLocation;
 import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.put;
+import static spark.Spark.setIpAddress;
 import static spark.Spark.setPort;
 
 import java.io.File;
@@ -42,6 +43,9 @@ import spark.Response;
 import spark.ResponseTransformerRoute;
 import spark.Route;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+
 /**
  * REST-endpoint for Sherlok
  * 
@@ -50,7 +54,6 @@ import spark.Route;
 public class SherlokServer {
     private static Logger LOG = getLogger(SherlokServer.class);
 
-    private static final int DEFAULT_PORT = 9600;
     private static final String PUBLIC = "public";
 
     // http://www.kammerl.de/ascii/AsciiSignature.php font 'thin'
@@ -101,16 +104,17 @@ public class SherlokServer {
         }
     }
 
-    static void init(int port) throws ValidationException {
+    static void init(int port, String ip) throws ValidationException {
 
         final Controller controller = new Controller().load();
         final PipelineLoader pipelineLoader = new PipelineLoader(controller);
         // config
         setPort(port);
+        setIpAddress(ip);
+
         // Static files. E.g. public/css/style.css is made available as
         // http://{host}:{port}/css/style.css
         externalStaticFileLocation(PUBLIC);
-        // TODO setIpAddress("");
         validatePlugins(PUBLIC);
 
         // ROUTES: ANNOTATE
@@ -125,6 +129,22 @@ public class SherlokServer {
             @Override
             public Object handle(Request req, Response resp) {
                 return annotateRequest(req, resp, pipelineLoader);
+            }
+        });
+        // ROUTES: UTILS
+        // ////////////////////////////////////////////////////////////////////////////
+        get(new Route("/reload") {
+            @Override
+            public Object handle(Request req, Response resp) {
+                try {
+                    controller.load();
+                    pipelineLoader.clearCache();
+                    return "OK";
+                } catch (ValidationException ve) {
+                    return invalid("reload", ve, resp);
+                } catch (Exception e) {
+                    return error("reload", e, resp);
+                }
             }
         });
 
@@ -391,7 +411,7 @@ public class SherlokServer {
             try {
                 return FileBased.writeAsString(o);
             } catch (Exception e) {
-                throw new RuntimeException(e);// should not happen
+                throw new RuntimeException(e); // should not happen
             }
         }
     }
@@ -410,7 +430,21 @@ public class SherlokServer {
         return outStr;
     }*/
 
+    // MAIN stuff
+    // ////////////////////////////////////////////////////////////////////////////
+    public static final int DEFAULT_PORT = 9600;
+    public static final String DEFAULT_IP = "0.0.0.0";
+
+    static class Arg {
+        @Parameter(names = "-port", description = "Which port to use.")
+        int port = DEFAULT_PORT;
+        @Parameter(names = "-address", description = "Which ip address to use.")
+        String address = DEFAULT_IP;
+    }
+
     public static void main(String[] args) throws Exception {
-        init(DEFAULT_PORT);
+        Arg arg = new Arg();
+        new JCommander(arg, args);
+        init(arg.port, arg.address);
     }
 }

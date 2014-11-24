@@ -312,4 +312,8 @@ public class PipelineLoader {
     public void removeFromCache(String pipelineId) {
         uimaPipelinesCache.remove(pipelineId);
     }
+
+    public void clearCache() {
+        uimaPipelinesCache.clear();
+    }
 }
