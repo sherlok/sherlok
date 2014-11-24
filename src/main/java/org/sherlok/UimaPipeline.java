@@ -32,18 +32,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.impl.FilteringTypeSystem;
 import org.apache.uima.cas.impl.XmiCasSerializer;
+import org.apache.uima.fit.component.NoOpAnnotator;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
-import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
-import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeDescription;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.ruta.engine.RutaEngine;
+import org.apache.uima.util.CasPool;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
 import org.sherlok.utils.ValidationException;
@@ -79,7 +80,8 @@ public class UimaPipeline {
     private TypeSystemDescription tsd;
 
     private XmiCasSerializer xcs;
-    private JCas jCas;
+
+    private CasPool casPool;
 
     /**
      * @param pipelineId
@@ -109,6 +111,7 @@ public class UimaPipeline {
         filter.includeType(typeName, properties);
     }
 
+    /** Initializes Engines and CAS */
     public void initialize() throws UIMAException {
         // initialize Engines
         if (engines == null) {
@@ -122,7 +125,14 @@ public class UimaPipeline {
         }
 
         // initialize CAS
-        jCas = JCasFactory.createJCas(tsd);
+        // for (TypeDescription td : tsd.getTypes()) {
+        // LOG.debug("type: {}", td);
+        // }
+        // jCas = JCasFactory.createJCas(tsd);
+
+        AnalysisEngine noOpEngine = AnalysisEngineFactory.createEngine(
+                NoOpAnnotator.class, tsd);
+        casPool = new CasPool(10, noOpEngine);
     }
 
     private static AnalysisEngine[] createEngines(
@@ -144,32 +154,24 @@ public class UimaPipeline {
      */
     public String annotate(String text) throws UIMAException, SAXException {
 
-        JCas annotated = annotateJCas(text);
-
-        StringWriter sw = new StringWriter();
-        xcs.serializeJson(annotated.getCas(), sw);
-        return sw.toString();
-    }
-
-    /**
-     * @param text
-     *            the text to annotate
-     */
-    public JCas annotateJCas(String text) throws UIMAException, SAXException {
-
+        CAS cas = null;
         try {
-            jCas.reset();
-        } catch (Throwable t) {
-            // re-initialize CAS, see "Can't flush CAS, flushing is disabled"
-            // https://www.mail-archive.com/uima-user@incubator.apache.org/msg02749.html
-            jCas = JCasFactory.createJCas(tsd);
+            cas = casPool.getCas(0);
+            // cas.reset() is done by casPool
+
+            cas.setDocumentText(text);
+            cas.setDocumentLanguage(language);
+
+            SimplePipeline.runPipeline(cas, engines);
+
+            StringWriter sw = new StringWriter();
+            xcs.serializeJson(cas, sw);
+            return sw.toString();
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            casPool.releaseCas(cas);
         }
-
-        jCas.setDocumentText(text);
-        jCas.setDocumentLanguage(language);
-
-        SimplePipeline.runPipeline(jCas, engines);
-        return jCas;
     }
 
     public void close() {
@@ -198,9 +200,16 @@ public class UimaPipeline {
         }
 
         for (TypeDTO t : RutaHelper.parseDeclaredTypes(script)) {
-            LOG.debug("adding type {}", t);
-            TypeDescription typeD = tsd.addType(nameSpace + "." + t.typeName,
-                    t.description, t.supertypeName);
+            // fix type and supertype names (add namespace)
+            String typeName = nameSpace + "." + t.typeName;
+            String supertypeName = t.supertypeName;
+            if (supertypeName.indexOf('.') == -1) {
+                supertypeName = nameSpace + "." + supertypeName;
+            }
+            LOG.debug("adding type {}::{}", typeName, supertypeName);
+
+            TypeDescription typeD = tsd.addType(typeName, t.description,
+                    supertypeName);
             for (TypeFeatureDTO f : t.getTypeFeatures()) {
                 typeD.addFeature(f.featureName, f.description, f.rangeTypeName);
             }

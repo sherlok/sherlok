@@ -85,14 +85,17 @@ public class PipelineLoader {
     }
 
     /**
+     * This is synchronized, so that no two threads can access it during
+     * initialization. TODO release the lock earlier
+     * 
      * @param pipelineName
      * @param version
      *            or ('null' or null) to try to fallback on the 'highest'
      *            version
      * @return the {@link UimaPipeline}
      */
-    public UimaPipeline resolvePipeline(String pipelineName, String version)
-            throws ValidationException {
+    public synchronized UimaPipeline resolvePipeline(String pipelineName,
+            String version) throws ValidationException {
 
         // 0. resolve (fallback) version=null
         if (version == null || version.equals("null")) {

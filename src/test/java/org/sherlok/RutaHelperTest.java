@@ -18,7 +18,9 @@ package org.sherlok;
 import static org.junit.Assert.assertEquals;
 import static org.sherlok.RutaHelper.parseDeclaredTypes;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.sherlok.RutaHelper.TypeDTO;
@@ -29,7 +31,7 @@ public class RutaHelperTest {
 
     @Test
     public void testEmpty() throws Exception {
-        List<TypeDTO> types = parseDeclaredTypes("PACKAGE oh;");
+        Set<TypeDTO> types = parseDeclaredTypes("PACKAGE oh;");
         assertEquals(0, types.size());
         types = parseDeclaredTypes("DECLARE;");
         assertEquals(0, types.size());
@@ -41,17 +43,17 @@ public class RutaHelperTest {
 
     @Test
     public void testBasic() throws Exception {
-        List<TypeDTO> types = parseDeclaredTypes("PACKAGE oh;\nDECLARE Dog;\nW{REGEXP(\"dog\") -> MARK(Dog)};");
+        Set<TypeDTO> types = parseDeclaredTypes("PACKAGE oh;\nDECLARE Dog;\nW{REGEXP(\"dog\") -> MARK(Dog)};");
         assertEquals(1, types.size());
-        TypeDTO t = types.get(0);
+        TypeDTO t = types.iterator().next();
         assertEquals("Dog", t.typeName);
     }
 
     @Test
     public void testComment() throws Exception {
-        List<TypeDTO> types = parseDeclaredTypes("PACKAGE oh;\nDECLARE//blah\nDog;");
+        Set<TypeDTO> types = parseDeclaredTypes("PACKAGE oh;\nDECLARE//blah\nDog;");
         assertEquals(1, types.size());
-        TypeDTO t = types.get(0);
+        TypeDTO t = types.iterator().next();
         assertEquals("Dog", t.typeName);
 
         types = parseDeclaredTypes("PACKAGE oh;\nDECLARE Dog;//blah");
@@ -60,34 +62,44 @@ public class RutaHelperTest {
 
     @Test
     public void testInline() throws Exception {
-        List<TypeDTO> types = parseDeclaredTypes("DECLARE Dog, Car, Home;");
+        List<TypeDTO> types = new ArrayList<TypeDTO>(
+                parseDeclaredTypes("DECLARE Dog, Car, Home;"));
         assertEquals(3, types.size());
-        TypeDTO t2 = types.get(1);
-        assertEquals("Car", t2.typeName);
-        TypeDTO t3 = types.get(2);
-        assertEquals("Home", t3.typeName);
+        TypeDTO t1 = types.get(1);
+        assertEquals("Car", t1.typeName);
+        TypeDTO t2 = types.get(2);
+        assertEquals("Home", t2.typeName);
     }
 
     @Test
     public void testSuper() throws Exception {
-        List<TypeDTO> types = parseDeclaredTypes("DECLARE Aaa Bbb;");
+        Set<TypeDTO> types = parseDeclaredTypes("DECLARE Aaa Bbb;");
         assertEquals(1, types.size());
-        TypeDTO t = types.get(0);
+        TypeDTO t = types.iterator().next();
+        assertEquals("Aaa", t.supertypeName);
+        assertEquals("Bbb", t.typeName);
+    }
+
+    @Test
+    public void testDuplicates() throws Exception {
+        Set<TypeDTO> types = parseDeclaredTypes("DECLARE Aaa Bbb;\nDECLARE Aaa Bbb;");
+        assertEquals(1, types.size());
+        TypeDTO t = types.iterator().next();
         assertEquals("Aaa", t.supertypeName);
         assertEquals("Bbb", t.typeName);
     }
 
     @Test
     public void testMultiple() throws Exception {
-        List<TypeDTO> types = parseDeclaredTypes("DECLARE Aaa;\nDECLARE Bbb;\nDECLARE Ccc;\n\nDECLARE Ddd, Eee;\n");
+        Set<TypeDTO> types = parseDeclaredTypes("DECLARE Aaa;\nDECLARE Bbb;\nDECLARE Ccc;\n\nDECLARE Ddd, Eee;\n");
         assertEquals(5, types.size());
     }
 
     @Test
     public void testFeatures() throws Exception {
-        List<TypeDTO> types = parseDeclaredTypes("DECLARE Aaa  Bbb  ( INT  cc);");
+        Set<TypeDTO> types = parseDeclaredTypes("DECLARE Aaa  Bbb  ( INT  cc);");
         assertEquals(1, types.size());
-        TypeDTO t = types.get(0);
+        TypeDTO t = types.iterator().next();
         assertEquals(1, t.getTypeFeatures().size());
         TypeFeatureDTO tf = t.getTypeFeatures().get(0);
         assertEquals("cc", tf.featureName);
@@ -96,7 +108,8 @@ public class RutaHelperTest {
 
     @Test
     public void testFeatures2() throws Exception {
-        List<TypeDTO> types = parseDeclaredTypes("DECLARE Aa (INT  cc, Blah dd);");
+        List<TypeDTO> types = new ArrayList<TypeDTO>(
+                parseDeclaredTypes("DECLARE Aa (INT  cc, Blah dd);"));
         assertEquals(1, types.size());
         TypeDTO t = types.get(0);
         assertEquals(2, t.getTypeFeatures().size());

@@ -20,7 +20,9 @@ import static java.util.regex.Pattern.compile;
 import static org.sherlok.utils.CheckThat.checkArgument;
 import static org.sherlok.utils.Create.list;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,9 +45,10 @@ public class RutaHelper {
     FeatureDeclaration  -> ( (AnnotationType | "STRING" | "INT" | "FLOAT"
                        "DOUBLE" | "BOOLEAN") Identifier) )+
      */
-    static List<TypeDTO> parseDeclaredTypes(String rutaScript)
+    static Set<TypeDTO> parseDeclaredTypes(String rutaScript)
             throws ValidationException {
-        List<TypeDTO> types = list();
+        // insertion order is important & avoids duplicate TypeDTOs
+        LinkedHashSet<TypeDTO> types = new LinkedHashSet<TypeDTO>();
 
         // Remove comments; they start with "//" and always go to end of line.
         StringBuilder cleanScriptB = new StringBuilder();
@@ -130,6 +133,19 @@ public class RutaHelper {
         @Override
         public String toString() {
             return typeName + ":" + supertypeName;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof TypeDTO
+                    && ((TypeDTO) obj).typeName.equals(typeName))
+                return true;
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return typeName.hashCode();
         }
     }
 
