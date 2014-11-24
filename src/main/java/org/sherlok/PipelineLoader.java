@@ -23,18 +23,24 @@ import static org.sherlok.utils.CheckThat.checkNotNull;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.Create.set;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_component.AnalysisComponent;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
@@ -63,15 +69,16 @@ import org.sherlok.mappings.PipelineDef.PipelineEngine;
 import org.sherlok.mappings.TypesDef.TypeDef;
 import org.sherlok.utils.Strings;
 import org.sherlok.utils.ValidationException;
+import org.slf4j.Logger;
 
 /**
  * Resolves the transitive dependencies of an artifact.
  */
 public class PipelineLoader {
+    private static final Logger LOG = getLogger(PipelineLoader.class);
 
     private Controller controller;
     private Map<String, UimaPipeline> uimaPipelinesCache = map();
-    private Set<String> jarsAddedToClasspath = set();
 
     public PipelineLoader(Controller controller) {
         this.controller = controller;
@@ -257,12 +264,10 @@ public class PipelineLoader {
                     artifactRequest);
 
             artifact = artifactResult.getArtifact();
-            String id = artifact.toString();
 
             // add this jar to the classpath (if it has not been added before)
-            if (!jarsAddedToClasspath.contains(id)) {
+            if (!isAlreadyOnClasspath(artifact.getFile())) {
                 ClassPathHack.addFile(artifact.getFile());
-                jarsAddedToClasspath.add(id);
             }
         }
     }
@@ -280,6 +285,57 @@ public class PipelineLoader {
                 .createEngineDescription(classz, params);
 
         return aed;
+    }
+
+    private boolean isAlreadyOnClasspath(File jar) throws IOException {
+
+        if (!FilenameUtils.getExtension(jar.getName()).equals("jar")) {
+            return false;
+
+        } else {
+            LOG.trace("jar: " + jar.getName());
+            double exists = 0, new_ = 0;
+            for (String className : getClasses(jar)) {
+                try {
+                    Class.forName(className);
+                    exists++;
+                } catch (Throwable e) {
+                    new_++;
+                    LOG.trace("new::" + className);
+                }
+                if (exists + new_ > 20) {
+                    break;
+                }
+            }
+            LOG.trace("new {} exists {}", new_, exists);
+            if (exists > 0)
+                return true;
+            else
+                return false;
+        }
+    }
+
+    private List<String> getClasses(File jar) throws IOException {
+
+        List<String> classNames = new ArrayList<String>();
+        ZipInputStream zip = new ZipInputStream(new FileInputStream(jar));
+        for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip
+                .getNextEntry()) {
+            if (entry.getName().endsWith(".class") && !entry.isDirectory()) {
+                StringBuilder className = new StringBuilder();
+                for (String part : entry.getName().split("/")) {
+                    if (className.length() != 0)
+                        className.append(".");
+                    className.append(part);
+                    if (part.endsWith(".class"))
+                        className.setLength(className.length()
+                                - ".class".length());
+                }
+                classNames.add(className.toString());
+            }
+        }
+        zip.close();
+        return classNames;
     }
 
     /** reflection to bypass encapsulation */
