@@ -26,6 +26,11 @@ md-toolbar.thin > h2.md-toolbar-tools {
     height: 35px;
     font-size: 0.8em;
 }
+/* thinner item list */
+md-item-content.thin div.md-tile-content {
+    padding: 5px;
+    padding-left: 10px;
+}
 
 
 div.engine-border {

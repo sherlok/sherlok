@@ -10,15 +10,6 @@ var app = angular.module('sherlok_editor', [
     return function (input, delimiter) {
       return (input || []).join(delimiter || ',').trim();
     };
-  // })
-  // .filter('snippet', function () {
-  //   return function (input, maxsize) {
-  //     if ((input || "").length < (maxsize - 4)){
-  //       return input;
-  //     } else {
-  //       return (input || "").substring()
-  //     }
-  //   };
   });
 
 app.config(function ($routeProvider) {
@@ -32,7 +23,6 @@ app.config(function ($routeProvider) {
     redirectTo: '/'
   })
 });
-
 
 app.controller('pipelines', function PipelineController($scope, $http, $location, $mdToast, $mdDialog) {
   $scope.splash_page = 'splash_page.html'

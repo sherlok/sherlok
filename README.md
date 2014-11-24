@@ -1,5 +1,7 @@
 # Sherlok
 
+[![Build Status](https://travis-ci.org/renaud/sherlok.svg?branch=master)](https://travis-ci.org/renaud/sherlok)
+
 _Distributed restful text mining._
 
 Sherlok is a flexible and powerful open source, distributed, real-time text-mining engine. Sherlok works as a RESTful annotation server based on [Apache UIMA](http://uima.apache.org/). For example, Sherlok can:

@@ -12,8 +12,7 @@
     <md-content>
       <md-list "overflow:scroll">
         <md-item ng-repeat="pipeline in pipelines">
-          <md-item-content ng-click="openPipe(pipeline)">
-            <!-- <div class="md-tile-left"></div> -->
+          <md-item-content class="thin" ng-click="openPipe(pipeline)">
             <div class="md-tile-content">
               <h3>{{pipeline.name}}</h3>
               <h4>version {{pipeline.version}}</h4>
@@ -27,7 +26,7 @@
   </div>
 
   <!-- ACTIVE PIPELINE -->
-  <div flex style="padding-left:15px; border-left: 1px solid grey;">
+  <div flex style="border-left: 1px solid grey;">
     <ng-switch on="hasActivePipeOpen()">
       <div class="animate-switch" ng-switch-when="false">
         <div ng-include="splash_page"></div>
