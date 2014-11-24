@@ -156,6 +156,11 @@ public class PipelineDef extends Def {
             this.out = out;
             return this;
         }
+
+        @Override
+        public String toString() {
+            return in + "::" + out;
+        }
     }
 
     // get/set
@@ -232,14 +237,6 @@ public class PipelineDef extends Def {
     public void addTests(PipelineTest test) {
         this.tests.add(test);
     }
-
-    // TODO ignore in json or not?
-    // ** @return convenience info about how to use this pipeline for
-    // annotating */
-    // public String getUsage() {
-    // return "/annotate/" + name + "?version=" + version
-    // + "&text=the text to annotate";
-    // }
 
     // utils
 

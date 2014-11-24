@@ -157,12 +157,18 @@ public class UimaPipeline {
      */
     public JCas annotateJCas(String text) throws UIMAException, SAXException {
 
-        jCas.reset();
+        try {
+            jCas.reset();
+        } catch (Throwable t) {
+            // re-initialize CAS, see "Can't flush CAS, flushing is disabled"
+            // https://www.mail-archive.com/uima-user@incubator.apache.org/msg02749.html
+            jCas = JCasFactory.createJCas(tsd);
+        }
+
         jCas.setDocumentText(text);
         jCas.setDocumentLanguage(language);
 
         SimplePipeline.runPipeline(jCas, engines);
-
         return jCas;
     }
 
