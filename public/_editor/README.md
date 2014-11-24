@@ -12,3 +12,6 @@ https://github.com/angular/bower-material/blob/master/README.md
 
     add <!-- bower:js --> and <!-- endbower --> in index.html
     grunt wiredep
+
+
+[Theme colors](http://www.google.com/design/spec/style/color.html#color-color-palette)

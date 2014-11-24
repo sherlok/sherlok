@@ -13,7 +13,7 @@ var Sherlok = {
         var annot = annotated_json["@cas_feature_structures"][fs];
         if (blacklist.indexOf(annot["@type"]) == -1) {
           var begin = annot["begin"] || 0, end = annot["end"];
-          var value = annot["value"] || 'annotation';
+          var value = annot["value"] || annot["@type"].toLowerCase();
           annots[annots.length] = {begin: begin, end: end, value: value};
         }
       });
@@ -22,7 +22,7 @@ var Sherlok = {
       var newTxt = "";
       var last = txt.length;
       $.each(annots.sort(predicatBy("end")), function(index3, a){
-        console.log("ANNOT: " + a.begin);
+        //console.log("ANNOT: " + a.begin);
         if (a.end < last){
           newTxt = '<span class="inline-a np_'+ a.value + '" title="'+a.value+'">' + txt.substring(a.begin, a.end) + '</span>' +  txt.substring(a.end, last) + newTxt;
           last = a.begin;

@@ -1,11 +1,4 @@
 /* Ruta fields */
-md-input-group#ruta_script{
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-    margin-right: 0px;
-}
 md-input-group#ruta_script > textarea, md-input-group.test_area > textarea {
     width: 100%;
     -moz-box-sizing: border-box;
@@ -31,16 +24,37 @@ md-item-content.thin div.md-tile-content {
     padding: 5px;
     padding-left: 10px;
 }
+/* active pipe in list is dunkler */
+md-item-content.pipe_open_true div.md-tile-content {
+    background-color: #3f51b5;
+    color: white;
+}
+
 
 
 div.engine-border {
-    background-color: #ffeb3b;
-    padding: 7px;
-    width: 700px;
+    background-color: #fff176;/*#ffeb3b;*/
+    padding: 12px;
 }
 div.script-border {
-    border: 7px solid green;
-    width: 700px;
+    background-color: #c5e1a5; /*#8bc34a;*/
+}
+md-input-group#ruta_script{
+    margin: 0px;
+}
+md-input-group.test_area, .test_out {
+    padding-left: 16px;
+}
+md-input-group.test_area{
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+div.test_out label {
+    font-size: 12px;
+}
+div.test_out  {
+    padding-bottom: 8px;
 }
 /* Welcome text */
 #welcome{
@@ -55,4 +69,4 @@ div.script-border {
 /*md-toast.md-default-theme {
     background-color: #00FF99;
     color: black;
-}*/
+    }*/

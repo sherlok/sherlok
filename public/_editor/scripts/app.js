@@ -4,7 +4,7 @@ var app = angular.module('sherlok_editor', [
   'ngResource',
   'ngMaterial',
   'ngRoute',
-  'http-post-fix'
+ // 'http-post-fix'
   ])
   .filter('joinBy', function () {
     return function (input, delimiter) {
@@ -33,7 +33,6 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
       $scope.pipelines = data;
     }).error(function (data, status) {
       alert(JSON.stringify(data));
-      console.log('Could not load pipelines:: '+ data);
     })
   }
   loadPipelines();
@@ -78,6 +77,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
   };
 
   $scope.savePipe = function() {
+    console.log($scope.activePipe);
     $http.put('/pipelines', $scope.activePipe).success(function (data) {
       toast($mdToast, 'pipeline \''+$scope.activePipe.name+'\' saved!');
       // refresh and set activePipe
@@ -99,15 +99,29 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     console.log(id);
   };
   $scope.runAllTests = function(){
-    var test = $scope.activePipe.tests[0];
-    Sherlok.annotate($scope.activePipe.name, $scope.activePipe.version,
-      test['in'], function(txt){
-      console.log(txt);
-      $scope.activePipe.tests[0].out2 = "<strong>wow</strong>";
-      $scope.activePipe.tests[0].out3 = "yep";
-    });
+    var ap = $scope.activePipe;
+    for (var i = ap.tests.length - 1; i >= 0; i--) {
+      runTest($scope.activePipe, i);
+    };
   };
+  runTest = function(ap, id){
+    var test = ap.tests[id];
+    Sherlok.annotate(ap.name, ap.version, test['in'], function(annotatedHtml){
+      $('div#test_out_' + id).html(annotatedHtml);
+    });
+  }
 
+  // ADD ENGINE (toggling)
+  $scope.toggleAddEngine = function(){
+    $scope.isToggle = true;
+  }
+  $scope.toggledAddEngine = function(){
+    return $scope.isToggle === true;
+  }
+  $scope.addScript = function(id){
+
+    return $scope.isToggle === true;
+  }
 
   // ENGINE
   $scope.openEngine = function(_engineId){
@@ -149,6 +163,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
   loadEngines();
 
 });
+
 
 toast = function(toaster, msg){
   toaster.show({

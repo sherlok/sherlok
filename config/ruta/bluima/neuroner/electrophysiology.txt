@@ -1,0 +1,12 @@
+bursting
+burst firing
+hyperpolarized
+depolarized
+fast-spiking
+fast spiking
+late spiking
+late-spiking
+low threshold spiking
+accomodating
+non-accomodating
+nonaccomodating
