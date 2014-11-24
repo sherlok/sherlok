@@ -6,7 +6,11 @@
 
 cd ${OPENSHIFT_REPO_DIR}
 
+# Fix Maven local repo
+echo -e  "<settings>\n   <localRepository>$OPENSHIFT_DATA_DIR/.m2</localRepository>\n</settings>\n" > settings.xml
+
 nohup mvn clean install exec:java \
+-s settings.xml \
 -Dmaven.test.skip=true \
 -Dexec.mainClass="org.sherlok.SherlokServer" \
 -Dexec.classpathScope=runtime \

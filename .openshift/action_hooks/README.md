@@ -1,15 +1,22 @@
-## OpenShift
+# OpenShift
 
-Sherlok can be easily deployed on [OpenShift](http://openshift.redhat.com).
-
-
-
-## Create new OpenShift application
-
-    rhc app create sherlok -t diy-0.1 --from-code=https://github.com/renaud/sherlok.git
+Sherlok can be easily deployed on [OpenShift](http://openshift.redhat.com). OpenShift lets you deploy up to 3 applications (gears) at no cost.
 
 
-## Test locally
+### Create new OpenShift application
+
+    rhc app create sherlokopenshift -t diy-0.1 --from-code=https://github.com/renaud/sherlok.git
+    cd sherlokopenshift
+
+
+### OpenShift Logs
+
+1. SSH into application ('Remote Access' on OpenShift application page)
+2. Change directory into logs directory `cd $OPENSHIFT_LOG_DIR`
+3. List the contents `ls`
+
+
+### Test start/stop scripts locally
 
     export OPENSHIFT_REPO_DIR=`pwd`
     export OPENSHIFT_DIY_PORT='9688'
@@ -23,13 +30,8 @@ Then
 
     sh .openshift/action_hooks/stop
 
-## OpenShift Logs
 
-1. SSH into my gear rhc ssh
-2. Change directory into my logs directory `cd $OPENSHIFT_LOG_DIR`
-3. List the contents ls
-
-## Source
+### Source / Acknowledgments
 
 The start/stop script have been adapted from: 
 
