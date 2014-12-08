@@ -7,6 +7,5 @@
   "parameters" : {
     "language" : "en"
   },
-  "script" : null,
   "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter"
 }

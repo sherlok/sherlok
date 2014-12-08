@@ -15,7 +15,7 @@
  */
 package org.sherlok.mappings;
 
-import static org.sherlok.utils.CheckThat.checkArgument;
+import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.list;
 
 import java.util.List;
@@ -113,24 +113,6 @@ public class TypesDef {
             return this;
         }
 
-        /** WARNING: for this to work, all UIMA jars MUST be on the classpath! */
-        public boolean validate() throws ValidationException {
-            /*- FIXME
-            if (!isUimaAnnotation(getClassz())) {
-                throw new ValidationException("'" + toString()
-                        + "'is not a valid UIMA Annotation class");
-            }*/
-            try {
-                checkArgument(classz.endsWith("."), "'Class name' of '"
-                        + toString() + "' should not end with a dot");
-                checkArgument(!classz.endsWith(".class"), "'Class name' of '"
-                        + toString() + "' should not end with .class");
-            } catch (Exception e) {
-                new ValidationException(e.getMessage());
-            }
-            return true;
-        }
-
         @Override
         public String toString() {
             return shortName + "[" + classz + "]";
@@ -138,10 +120,12 @@ public class TypesDef {
 
         public void validate(TypeSystemDescription tsd)
                 throws ValidationException {
-            // FIXME test error in Eclipse
-            checkArgument(tsd.getType(classz) != null, "'class' of '"
+            validateArgument(!classz.endsWith("."), "'Class name' of '"
+                    + toString() + "' should not end with a dot");
+            validateArgument(!classz.endsWith(".class"), "'Class name' of '"
+                    + toString() + "' should not end with .class");
+            validateArgument(tsd.getType(classz) != null, "'class' of '"
                     + shortName + "' should be present in the typesystem.");
-            validate();
         }
     }
 

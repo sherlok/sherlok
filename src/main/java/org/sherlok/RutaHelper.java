@@ -17,7 +17,7 @@ package org.sherlok;
 
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
-import static org.sherlok.utils.CheckThat.checkArgument;
+import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.list;
 
 import java.util.LinkedHashSet;
@@ -45,7 +45,7 @@ public class RutaHelper {
     FeatureDeclaration  -> ( (AnnotationType | "STRING" | "INT" | "FLOAT"
                        "DOUBLE" | "BOOLEAN") Identifier) )+
      */
-    static Set<TypeDTO> parseDeclaredTypes(String rutaScript)
+    public static Set<TypeDTO> parseDeclaredTypes(String rutaScript)
             throws ValidationException {
         // insertion order is important & avoids duplicate TypeDTOs
         LinkedHashSet<TypeDTO> types = new LinkedHashSet<TypeDTO>();
@@ -83,7 +83,7 @@ public class RutaHelper {
                         // split by comma, then space
                         for (String featureStr : featuresStr.split(",")) {
                             String[] split = featureStr.trim().split(" ");
-                            checkArgument(split.length == 2,
+                            validateArgument(split.length == 2,
                                     "features should come in the form of 'AnnotationType Identifier', was: "
                                             + split);
                             features.add(new TypeFeatureDTO(split[1].trim(),

@@ -15,11 +15,10 @@
  */
 package org.sherlok;
 
-import static org.apache.commons.lang3.StringUtils.join;
 import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
-import static org.sherlok.utils.CheckThat.checkNotNull;
+import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.Create.set;
@@ -42,9 +41,6 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.uima.UIMAException;
-import org.apache.uima.analysis_component.AnalysisComponent;
-import org.apache.uima.analysis_engine.AnalysisEngineDescription;
-import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -65,7 +61,6 @@ import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.MavenPom;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.mappings.PipelineDef.PipelineEngine;
 import org.sherlok.mappings.TypesDef.TypeDef;
 import org.sherlok.utils.Strings;
 import org.sherlok.utils.ValidationException;
@@ -121,36 +116,29 @@ public class PipelineLoader {
             // 2. else, load it
             // 2.1 read pipeline def
             PipelineDef pipelineDef = controller.getPipelineDef(pipelineId);
-            checkNotNull(pipelineDef, "could not find Pipeline with Id '"
+            validateNotNull(pipelineDef, "could not find Pipeline with Id '"
                     + pipelineId + "'");
 
             // 2.3 resolve engines (and their bundles)
             List<EngineDef> engineDefs = list();
             Set<BundleDef> bundleDefs = set();
             Map<String, String> repositoriesDefs = map();
-            for (PipelineEngine pengine : pipelineDef.getEngines()) {
 
-                if (pengine.isRuta()) { // Ruta engine
-                    engineDefs.add(new EngineDef().setScript(pengine
-                            .getScript()));
+            for (String pengineId : pipelineDef.getEnginesFromScript()) {
 
-                } else { // uimaFIT engine
-                    EngineDef engineDef = controller.getEngineDef(pengine
-                            .getId());
-                    checkNotNull(engineDef, "could not find " + pengine);
-                    engineDefs.add(engineDef);
-                    BundleDef bundleDef = controller.getBundleDef(engineDef
-                            .getBundleId());
-                    checkNotNull(bundleDef, "could not find bundle '"
-                            + engineDef.getBundleId()
-                            + "' that is required by engine '" + engineDef
-                            + "'");
-                    bundleDefs.add(bundleDef);
-                    for (Entry<String, String> id_url : bundleDef
-                            .getRepositories().entrySet()) {
-                        repositoriesDefs
-                                .put(id_url.getKey(), id_url.getValue());
-                    }
+                EngineDef engineDef = controller.getEngineDef(pengineId);
+                validateNotNull(engineDef, "could not find " + pengineId);
+                engineDefs.add(engineDef);
+                BundleDef bundleDef = controller.getBundleDef(engineDef
+                        .getBundleId());
+                validateNotNull(bundleDef,
+                        "could not find bundle '" + engineDef.getBundleId()
+                                + "' that is required by engine '" + engineDef
+                                + "'");
+                bundleDefs.add(bundleDef);
+                for (Entry<String, String> id_url : bundleDef.getRepositories()
+                        .entrySet()) {
+                    repositoriesDefs.put(id_url.getKey(), id_url.getValue());
                 }
             }
 
@@ -173,36 +161,15 @@ public class PipelineLoader {
             }
 
             // 3 create UIMA pipeline and add components
-            UimaPipeline uimaPipeline = new UimaPipeline(pipelineId,
-                    pipelineDef.getLanguage());
-            for (EngineDef engineDef : engineDefs) {
-                try {
-                    if (engineDef.isRuta()) { // Ruta engine
-                        try {
-                            uimaPipeline.addRutaEngine(engineDef.getScript(),
-                                    pipelineId);
-                        } catch (Exception e) {
-                            throw new ValidationException(
-                                    "could not parse script '"
-                                            + join(engineDef.getScript(), ";")
-                                            + "' from pipeline '" + pipelineId
-                                            + "'", e);
-                        }
-
-                    } else { // UIMA engine
-                        uimaPipeline.add(createEngine(engineDef.getClassz(),
-                                engineDef.getFlatParams()));
-                    }
-                } catch (ResourceInitializationException e) {
-                    throw new ValidationException(
-                            "could not initialize UIMA pipeline engine '"
-                                    + engineDef + "': " + e.getMessage(), e);
-                } catch (ClassNotFoundException e) {
-                    throw new ValidationException("could not find class '"
-                            + engineDef.getClassz()
-                            + "' to initialize UIMA pipeline engine '"
-                            + engineDef + "'");
-                }
+            UimaPipeline uimaPipeline;
+            try {
+                uimaPipeline = new UimaPipeline(pipelineId,
+                        pipelineDef.getLanguage(), engineDefs,
+                        pipelineDef.getScriptLines());
+            } catch (ResourceInitializationException | IOException e) {
+                throw new ValidationException(
+                        "could not initialize UIMA pipeline: " + e.getMessage(),
+                        e);
             }
 
             // 3.2 set annotations to UIMA pipeline output
@@ -210,7 +177,7 @@ public class PipelineLoader {
                     .getAnnotations()) {
                 TypeDef typeDef = controller.getTypeDef(typeShortName);
                 typeDef.validate(uimaPipeline.getTypeSystemDescription());
-                checkNotNull(typeDef, "could not find bundle '" + typeShortName
+                validateNotNull(typeDef, "could not find bundle '" + typeShortName
                         + "' that is required by pipeline '" + pipelineId + "'");
                 uimaPipeline.addOutputAnnotation(
                         typeDef.getClassz(),
@@ -273,21 +240,6 @@ public class PipelineLoader {
                 ClassPathHack.addFile(artifact.getFile());
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static AnalysisEngineDescription createEngine(String cName,
-            Object... params) throws ClassNotFoundException,
-            ResourceInitializationException {
-
-        // instantiate class
-        Class<? extends AnalysisComponent> classz = (Class<? extends AnalysisComponent>) Class
-                .forName(cName);
-        // create ae
-        AnalysisEngineDescription aed = AnalysisEngineFactory
-                .createEngineDescription(classz, params);
-
-        return aed;
     }
 
     private boolean isAlreadyOnClasspath(File jar) throws IOException {

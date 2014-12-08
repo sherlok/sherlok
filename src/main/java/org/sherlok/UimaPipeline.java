@@ -16,7 +16,9 @@
 package org.sherlok;
 
 import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
+import static org.apache.uima.ruta.engine.RutaEngine.PARAM_DESCRIPTOR_PATHS;
 import static org.apache.uima.ruta.engine.RutaEngine.PARAM_MAIN_SCRIPT;
+import static org.apache.uima.ruta.engine.RutaEngine.PARAM_RESOURCE_PATHS;
 import static org.apache.uima.ruta.engine.RutaEngine.PARAM_SCRIPT_PATHS;
 import static org.apache.uima.ruta.engine.RutaEngine.SCRIPT_FILE_EXTENSION;
 import static org.apache.uima.util.FileUtils.saveString2File;
@@ -24,12 +26,14 @@ import static org.sherlok.utils.Create.list;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.UIMAException;
+import org.apache.uima.analysis_component.AnalysisComponent;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.cas.CAS;
@@ -47,6 +51,7 @@ import org.apache.uima.ruta.engine.RutaEngine;
 import org.apache.uima.util.CasPool;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
+import org.sherlok.mappings.EngineDef;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
@@ -56,11 +61,10 @@ import org.xml.sax.SAXException;
  * Manages a UIMA pipeline (configuration, and then use/annotation). Lifecycle:<br>
  * <ol>
  * <li>add deps on classpath (to have TypeSystems scannable)</li>
- * <li>create UimaPipeline</li>
- * <li>add engines</li>
+ * <li>create UimaPipeline with script and engines</li>
  * <li>add output fields</li>
  * <li>initialize</li>
- * <li>annotate texts</li>
+ * <li>annotate texts...</li>
  * <li>close</li>
  * </ol>
  * 
@@ -83,14 +87,26 @@ public class UimaPipeline {
 
     private CasPool casPool;
 
+    private List<String> scriptLines;
+    private List<EngineDef> engineDefs;
+
     /**
      * @param pipelineId
+     * @param engineDefs
+     * @param list
+     * @param engineDefs
      * @param lang
      *            language, important e.g. for DKpro components.
      */
-    public UimaPipeline(String pipelineId, String language) {
+    public UimaPipeline(String pipelineId, String language,
+            List<EngineDef> engineDefs, List<String> scriptLines)
+            throws ResourceInitializationException, IOException,
+            ValidationException {
         this.pipelineId = pipelineId;
         this.language = language;
+        this.engineDefs = engineDefs;
+        this.scriptLines = list(scriptLines); // a copy
+
         try {
             // needed since we might have added new jars to the classpath
             TypeSystemDescriptionFactory.forceTypeDescriptorsScan();
@@ -98,13 +114,7 @@ public class UimaPipeline {
         } catch (ResourceInitializationException e) {
             throw new RuntimeException(e);// should not happen
         }
-    }
-
-    public void add(AnalysisEngineDescription aDesc) {
-        if (engines != null)
-            throw new IllegalArgumentException(
-                    "cannot add more engines after first call to process()");
-        aeds.add(aDesc);
+        initScript();
     }
 
     public void addOutputAnnotation(String typeName, String... properties) {
@@ -114,7 +124,7 @@ public class UimaPipeline {
     /** Initializes Engines and CAS */
     public void initialize() throws UIMAException {
         // initialize Engines
-        if (engines == null) {
+        if (engines == null) { // not initialized yet
             engines = createEngines(aeds
                     .toArray(new AnalysisEngineDescription[aeds.size()]));
         }
@@ -124,11 +134,8 @@ public class UimaPipeline {
             xcs.setPrettyPrint(true);
         }
 
-        // initialize CAS
-        // for (TypeDescription td : tsd.getTypes()) {
+        // for (TypeDescription td : tsd.getTypes())
         // LOG.debug("type: {}", td);
-        // }
-        // jCas = JCasFactory.createJCas(tsd);
 
         AnalysisEngine noOpEngine = AnalysisEngineFactory.createEngine(
                 NoOpAnnotator.class, tsd);
@@ -167,6 +174,7 @@ public class UimaPipeline {
             StringWriter sw = new StringWriter();
             xcs.serializeJson(cas, sw);
             return sw.toString();
+
         } catch (Exception e) {
             throw e;
         } finally {
@@ -185,20 +193,92 @@ public class UimaPipeline {
         return pipelineId;
     }
 
-    public void addRutaEngine(List<String> scriptLines, String pipelineId)
-            throws ResourceInitializationException, IOException,
-            ValidationException {
+    @SuppressWarnings("unchecked")
+    private void initScript() throws ResourceInitializationException,
+            IOException, ValidationException {
 
+        // load engines
+        List<String> engineDescriptions = list();
+        for (int i = 0; i < scriptLines.size(); i++) {
+
+            String scriptLine = scriptLines.get(i);
+
+            if (scriptLine.startsWith("ENGINE ")) {
+                // TODO refactor and abstract
+                String pengineId = scriptLine.trim()
+                        .substring("ENGINE ".length()).replaceAll(";", "");
+
+                boolean found = false;
+                for (EngineDef engineDef : engineDefs) {
+                    if (engineDef.getId().equals(pengineId)) {
+
+                        found = true;
+                        String engineDescription = engineDef
+                                .getIdForDescriptor("___");
+
+                        // instantiate class
+                        Class<? extends AnalysisComponent> classz;
+                        try {
+                            classz = (Class<? extends AnalysisComponent>) Class
+                                    .forName(engineDef.getClassz());
+                        } catch (ClassNotFoundException e) {
+                            throw new ValidationException(
+                                    "could not find class "
+                                            + engineDef.getClassz(), e);
+                        }
+                        // create ae and write xml descriptor
+                        AnalysisEngineDescription aed = AnalysisEngineFactory
+                                .createEngineDescription(classz,
+                                        engineDef.getFlatParams());
+                        try {
+                            File tmpEngine = new File(
+                                    FileBased.RUTA_ENGINE_CACHE_PATH
+                                            + engineDef
+                                                    .getIdForDescriptor("___")
+                                            + ".xml");
+                            tmpEngine.getParentFile().mkdirs();
+                            FileOutputStream fos = new FileOutputStream(
+                                    tmpEngine);
+                            aed.toXML(fos);
+                        } catch (SAXException e) {
+                            throw new RuntimeException(
+                                    "could not write descriptor of "
+                                            + pengineId, e); // should not
+                                                             // happen
+                        }
+                        engineDescriptions.add(engineDescription);
+                        scriptLines.set(i, "Document{-> EXEC("
+                                + engineDescription + ")}; // " + scriptLine);
+                    }
+                }
+                if (!found) {
+                    throw new ValidationException(pengineId + "not found");
+                }
+            }
+        }
+
+        // ensure PACKAGE is present in script
         String script = StringUtils.join(scriptLines, "\n").trim();
         String nameSpace;
         if (!script.startsWith("PACKAGE")) {
             nameSpace = "org.sherlok.ruta";
-            script = "PACKAGE " + nameSpace + ";\n\n" + script;
+            script = "PACKAGE " + nameSpace + ";\n" + script;
         } else {
             nameSpace = script.substring(0, script.indexOf(";"))
-                    .replaceAll("PACKAGE", "").trim();
+                    .replaceFirst("PACKAGE", "").trim();
         }
 
+        // add engines to script
+        if (!engineDescriptions.isEmpty()) {
+            String scriptTmp = script.split("\n")[0] + "\n\n";
+            String rest = "\n" + script.substring(script.indexOf("\n"));
+            for (String engineDescription : engineDescriptions) {
+                scriptTmp += "ENGINE " + engineDescription + ";\n";
+            }
+            script = scriptTmp + rest;
+        }
+
+        // add types
         for (TypeDTO t : RutaHelper.parseDeclaredTypes(script)) {
             // fix type and supertype names (add namespace)
             String typeName = nameSpace + "." + t.typeName;
@@ -215,9 +295,8 @@ public class UimaPipeline {
             }
         }
 
-        // write Ruta script to file
-        // ruta does not like dots
-        String scriptName = pipelineId.replace(".", "_");
+        // write Ruta script to tmp file
+        String scriptName = pipelineId.replace(".", "_");// ruta not like dots
         File scriptFile = new File(FileBased.RUTA_PIPELINE_CACHE_PATH
                 + scriptName + SCRIPT_FILE_EXTENSION);
         scriptFile.getParentFile().mkdirs();
@@ -225,7 +304,9 @@ public class UimaPipeline {
 
         aeds.add(createEngineDescription(RutaEngine.class, //
                 PARAM_SCRIPT_PATHS, scriptFile.getParent(), //
-                RutaEngine.PARAM_RESOURCE_PATHS, FileBased.RUTA_RESOURCES_PATH, //
+                PARAM_RESOURCE_PATHS, FileBased.RUTA_RESOURCES_PATH, //
+                PARAM_DESCRIPTOR_PATHS, FileBased.RUTA_ENGINE_CACHE_PATH,//
+                RutaEngine.PARAM_ADDITIONAL_ENGINES, engineDescriptions,//
                 PARAM_MAIN_SCRIPT, scriptName));
     }
 

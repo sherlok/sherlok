@@ -35,10 +35,12 @@ import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 /**
  * Single entry point to interact with JSON config files for {@link TypesDef}s,
@@ -60,6 +62,8 @@ public class FileBased {
             + "ruta/";
     protected static final String RUTA_PIPELINE_CACHE_PATH = RUTA_RESOURCES_PATH
             + ".pipelines/";
+    protected static final String RUTA_ENGINE_CACHE_PATH = RUTA_RESOURCES_PATH
+            + ".engines/";
 
     private static final ObjectMapper MAPPER = new ObjectMapper(
             new JsonFactory());
@@ -115,7 +119,7 @@ public class FileBased {
     }
 
     @SuppressWarnings("unused")
-    // TODO use me!
+    // TODO write types
     private static void writeType(TypesDef t) throws JsonGenerationException,
             JsonMappingException, IOException, ValidationException {
         try {
@@ -155,6 +159,26 @@ public class FileBased {
     public static <T> T read(File f, Class<T> clazz) throws ValidationException {
         try {
             return MAPPER.readValue(new FileInputStream(f), clazz);
+        } catch (UnrecognizedPropertyException upe) {
+            String msg = "Unrecognized field \"" + upe.getPropertyName()
+                    + "\" in file '" + f.getName() + "',  "
+                    + upe.getMessageSuffix();
+            throw new ValidationException(msg, upe);
+        } catch (JsonMappingException jme) {
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("cannot read ");
+            jme.getPathReference(sb);
+            sb.append(" in " + f.getName() + ": ");
+            sb.append(" " + jme.getOriginalMessage());
+
+            throw new ValidationException(sb.toString().replaceAll(
+                    "org\\.sherlok\\.mappings\\.\\w+Def\\[", "["), jme);
+        } catch (JsonParseException jpe) {
+            throw new ValidationException("Could not read "
+                    + clazz.getSimpleName() + " '"
+                    + f.getName().replaceAll("Def$", "") + "', "
+                    + jpe.getMessage());
         } catch (Exception e) {
             throw new ValidationException(e);
         }

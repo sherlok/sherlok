@@ -68,7 +68,7 @@ public class AnnotationApiIntegrationTest {
                 .get(API_URL + "/opennlp.ners.en").then().log().everything()
                 .contentType(JSON).statusCode(STATUS_OK)
                 .body(containsString(TEST_TEXT))//
-                .body("@cas_feature_structures.538.value", equalTo("person"));
+                .body("@cas_feature_structures.1009.value", equalTo("person"));
     }
 
     @Test
@@ -77,13 +77,13 @@ public class AnnotationApiIntegrationTest {
                 .post(API_URL + "/opennlp.ners.en").then().log().everything()
                 .contentType(JSON).statusCode(STATUS_OK)
                 .body(containsString(TEST_TEXT))//
-                .body("@cas_feature_structures.538.value", equalTo("person"));
+                .body("@cas_feature_structures.1009.value", equalTo("person"));
         // same POST to check multiple calls
         given().param("text", TEST_TEXT).when()
                 .post(API_URL + "/opennlp.ners.en").then().log().everything()
                 .contentType(JSON).statusCode(STATUS_OK)
                 .body(containsString(TEST_TEXT))//
-                .body("@cas_feature_structures.538.value", equalTo("person"));
+                .body("@cas_feature_structures.1009.value", equalTo("person"));
     }
 
     @Test

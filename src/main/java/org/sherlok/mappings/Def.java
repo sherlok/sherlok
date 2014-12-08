@@ -15,7 +15,7 @@
  */
 package org.sherlok.mappings;
 
-import static org.sherlok.utils.CheckThat.checkNotNull;
+import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 
 import org.sherlok.utils.ValidationException;
@@ -69,9 +69,9 @@ public abstract class Def {
 
     public boolean validate(String msgName) throws ValidationException {
         try {
-            checkNotNull(name, "name should not be null");
+            validateNotNull(name, "name should not be null");
             checkOnlyAlphanumDot(name);
-            checkNotNull(version, "version should not be null");
+            validateNotNull(version, "version should not be null");
             checkOnlyAlphanumDot(version);
             // TODO more validation
         } catch (Throwable e) {

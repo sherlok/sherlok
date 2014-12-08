@@ -8,6 +8,5 @@
     "language" : "en",
     "modelVariant": "location"
   },
-  "script" : null,
   "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder"
 }

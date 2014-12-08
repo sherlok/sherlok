@@ -30,10 +30,10 @@ public class ControllerTest {
 
         PipelineDef pd = controller.getPipelineDef("opennlp.ners.en:1.6.2");
         assertEquals(false, pd.isLoadOnStartup());
-        assertEquals(4, pd.getEngines().size());
-        assertEquals("opennlp.segmenter.en:1.6.2", pd.getEngines().get(0).getId());
+        assertEquals(4, pd.getEnginesFromScript().size());
+        assertEquals("ENGINE opennlp.segmenter.en:1.6.2;", pd.getScriptLines()
+                .get(0));
 
-        
         EngineDef ed = controller.getEngineDef("opennlp.segmenter.en:1.6.2");
         assertEquals(1, ed.getParameters().size());
         assertEquals("en", ed.getParameter("language"));
@@ -42,6 +42,6 @@ public class ControllerTest {
         assertEquals("de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity",
                 td.getClassz());
 
-        // TODO more validation        
+        // TODO more validation
     }
 }

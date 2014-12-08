@@ -38,6 +38,14 @@ public class Create {
         return list;
     }
 
+    public static <E> ArrayList<E> list(Iterable<E> it) {
+        ArrayList<E> list = new ArrayList<E>();
+        for (E e : it) {
+            list.add(e);
+        }
+        return list;
+    }
+
     public static <E> HashSet<E> set() {
         return new HashSet<E>();
     }

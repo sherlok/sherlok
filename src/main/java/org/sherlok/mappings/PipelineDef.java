@@ -15,9 +15,7 @@
  */
 package org.sherlok.mappings;
 
-import static com.google.common.base.Joiner.on;
-import static org.sherlok.utils.CheckThat.checkArgument;
-import static org.sherlok.utils.CheckThat.checkValidId;
+import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.list;
 
 import java.util.List;
@@ -25,6 +23,7 @@ import java.util.List;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A pipeline describes the steps to perform a text mining analysis. This
@@ -49,67 +48,13 @@ public class PipelineDef extends Def {
     boolean loadOnStartup = false;
 
     /** a list of engine definitions */
-    private List<PipelineEngine> engines = list();
+    @JsonProperty("script")
+    private List<String> scriptLines = list();
     /** Controls the output of this pipeline */
     private PipelineOutput output = new PipelineOutput();
 
     /** tests */
     private List<PipelineTest> tests = list();
-
-    /** An engine definition */
-    public static class PipelineEngine {
-        private String id;
-        private List<String> script;
-
-        public PipelineEngine() {
-        }
-
-        public PipelineEngine(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public List<String> getScript() {
-            return script;
-        }
-
-        public void setScript(List<String> script) {
-            this.script = script;
-        }
-
-        /**
-         * @return whether this is a Ruta engine; false if it is a UIMAfit
-         *         engine
-         */
-        @JsonIgnore
-        public boolean isRuta() {
-            return getScript() != null && getScript().size() > 0;
-        }
-
-        @Override
-        public String toString() {
-            if (id != null)
-                return id;
-            else
-                return on(",").join(script);
-        }
-
-        public void validate() throws ValidationException {
-            checkArgument(id != null || script != null,
-                    "Either id or script should be provided for engine '"
-                            + this + "'.");
-            if (id != null) {
-                checkValidId(id);
-            }
-        }
-    }
 
     /** Output definition: annots and payload */
     public static class PipelineOutput {
@@ -192,17 +137,17 @@ public class PipelineDef extends Def {
         return this;
     }
 
-    public List<PipelineEngine> getEngines() {
-        return engines;
+    public List<String> getScriptLines() {
+        return scriptLines;
     }
 
-    public PipelineDef setEngines(List<PipelineEngine> engines) {
-        this.engines = engines;
+    public PipelineDef setScriptLines(List<String> scriptLines) {
+        this.scriptLines = scriptLines;
         return this;
     }
 
-    public PipelineDef addEngine(PipelineEngine engine) {
-        this.engines.add(engine);
+    public PipelineDef addScriptLine(String scriptLine) {
+        this.scriptLines.add(scriptLine);
         return this;
     }
 
@@ -243,16 +188,30 @@ public class PipelineDef extends Def {
     public boolean validate(String pipelineObject) throws ValidationException {
         super.validate(pipelineObject);
         try {
-            checkArgument(domain.indexOf("..") == -1,
+            validateArgument(domain.indexOf("..") == -1,
                     "'domain' can not contain double dots: '" + domain + "'");
-            for (PipelineEngine engine : engines) {
-                engine.validate();
-            }
             // TODO more validation
         } catch (Throwable e) {
             throw new ValidationException("" + pipelineObject + ": "
                     + e.getMessage());
         }
         return true;
+    }
+
+    @JsonIgnore
+    public List<String> getEnginesFromScript() {
+        return getEnginesFromScript(getScriptLines());
+    }
+
+    public static List<String> getEnginesFromScript(List<String> scriptLines) {
+        List<String> engineIds = list();
+        for (String scriptLine : scriptLines) {
+            if (scriptLine.startsWith("ENGINE ")) {
+                String pengineId = scriptLine.trim()
+                        .substring("ENGINE ".length()).replaceAll(";", "");
+                engineIds.add(pengineId);
+            }
+        }
+        return engineIds;
     }
 }

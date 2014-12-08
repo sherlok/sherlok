@@ -19,6 +19,7 @@ import static com.jayway.restassured.RestAssured.get;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.when;
 import static com.jayway.restassured.http.ContentType.JSON;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.*;
 import static org.sherlok.SherlokServer.DEFAULT_IP;
 import static org.sherlok.SherlokServer.PIPELINES;
@@ -32,7 +33,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.mappings.PipelineDef.PipelineEngine;
 
 import spark.StopServer;
 
@@ -80,20 +80,23 @@ public class PipelineApiIntegrationTest {
 
     @Test
     public void test020GetPipeline() {
-        get(API_URL + "/opennlp.ners.en/1.6.2").then().log().everything()
-                .contentType(JSON).statusCode(STATUS_OK)//
-                .body("name", equalTo("opennlp.ners.en"))//
-                .body("version", equalTo("1.6.2"))//
-                .body("loadOnStartup", equalTo(false))//
-                .body("engines[0].id", equalTo("opennlp.segmenter.en:1.6.2"))//
-                .body("engines[0].script", equalTo(null));
+        get(API_URL + "/opennlp.ners.en/1.6.2")
+                .then()
+                .log()
+                .everything()
+                .contentType(JSON)
+                .statusCode(STATUS_OK)
+                .body("name", equalTo("opennlp.ners.en"))
+                .body("version", equalTo("1.6.2"))
+                .body("loadOnStartup", equalTo(false))
+                .body("script[0]", equalTo("ENGINE opennlp.segmenter.en:1.6.2;"));
     }
 
     @Test
     /** Let's put a new test pipeline*/
     public void test030PutPipeline() throws JsonProcessingException {
-        PipelineDef e = new PipelineDef().setDomain("test").addEngine(
-                new PipelineEngine("sample.engine:1"));
+        PipelineDef e = new PipelineDef().setDomain("test").addScriptLine(
+                "ENGINE sample.engine:1");
         e.setName("test");
         e.setVersion("1");
         String testPipelineDef = FileBased.writeAsString(e);
@@ -126,9 +129,7 @@ public class PipelineApiIntegrationTest {
                 .contentType(JSON).statusCode(STATUS_OK)//
                 .body("name", equalTo("test"))//
                 .body("version", equalTo("1"))//
-                .body("engines[0].id", equalTo("sample.engine:1"))//
-                .body("engines[0].script", equalTo(null))//
-        ;
+                .body("script[0]", equalTo("ENGINE sample.engine:1"));
     }
 
     @Test

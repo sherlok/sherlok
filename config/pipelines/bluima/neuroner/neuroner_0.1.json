@@ -3,7 +3,6 @@
   "version" : "0.1",
   "domain" : "bluima/neuroner",
   "description" : "named entity recognizer for neuronal cells, based on UIMA Ruta rules",
-  "engines" : [ {
     "script" : ["PACKAGE neuroner;",
 "",
 "",
@@ -77,8 +76,7 @@
 "NeuronProperty (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)}(NeuronWithProperties|Neuron);",
 "NeuronProperty (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)}(NeuronWithProperties|Neuron);",
 "",
-""]
-  } ],
+"" ],
   "output" : {
     "annotations" : [ "neuroner.Neuron",
 "neuroner.NeuronProperty",

@@ -26,7 +26,6 @@ import java.util.Set;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.mappings.PipelineDef.PipelineEngine;
 import org.sherlok.mappings.TypesDef;
 import org.sherlok.mappings.TypesDef.TypeDef;
 import org.sherlok.utils.ValidationException;
@@ -95,10 +94,10 @@ public class Controller {
             pd.validate(pd.toString());
 
             // all engines must be found
-            for (PipelineEngine pe : pd.getEngines()) {
-                if (pe.getId() != null && !engineDefs.containsKey(pe.getId())) {
+            for (String pengineId : pd.getEnginesFromScript()) {
+                if (!engineDefs.containsKey(pengineId)) {
                     throw new ValidationException("no engine def found for '"
-                            + pe + "' in pipeline '" + pe + "'");
+                            + pengineId + "' in pipeline '" + pd + "'");
                 }
             }
             // no duplicate pipeline ids

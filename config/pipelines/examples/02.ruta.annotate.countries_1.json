@@ -5,10 +5,11 @@
   "language" : "en",
   "domain" : "examples",
   "loadOnStartup" : false,
-  "engines" : [ {
-    "id" : null,
-    "script" : [ "WORDLIST CountriesList = 'countries.txt';", "DECLARE Country;", "Document{-> MARKFAST(Country, CountriesList)};" ]
-  } ],
+  "script" : [
+    "WORDLIST CountriesList = 'countries.txt';",
+    "DECLARE Country;",
+    "Document{-> MARKFAST(Country, CountriesList)};"
+  ],
   "output" : {
     "annotations" : [ "Country" ],
     "payloads" : [ ]

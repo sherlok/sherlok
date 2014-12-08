@@ -15,9 +15,10 @@
  */
 package org.sherlok;
 
+import static java.lang.System.currentTimeMillis;
 import static org.sherlok.mappings.Def.createId;
-import static org.sherlok.utils.CheckThat.checkArgument;
-import static org.sherlok.utils.CheckThat.checkNotNull;
+import static org.sherlok.utils.CheckThat.validateArgument;
+import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.slf4j.LoggerFactory.getLogger;
 import static spark.Spark.delete;
@@ -83,20 +84,37 @@ public class SherlokServer {
         String version = req.queryParams("version");
         String text = req.queryParams("text");
         try {
-            checkNotNull(pipelineName,
+            validateNotNull(pipelineName,
                     "'pipeline' req parameter should not be null");
             checkOnlyAlphanumDot(pipelineName);
-            checkNotNull(text, "'text' req parameter should not be null");
-            checkArgument(text.length() > 0,
+            validateNotNull(text, "'text' req parameter should not be null");
+            validateArgument(text.length() > 0,
                     "'text' req parameter should not be empty");
         } catch (ValidationException ve) {
             return invalid("annotate text  '" + text + "'", ve, resp);
         }
         // annotate
         try {
-            resp.type("application/json");
-            return (pipelineLoader.resolvePipeline(pipelineName, version)
-                    .annotate(text));
+            resp.type(JSON);
+
+            long start = currentTimeMillis();
+            UimaPipeline pipeline = pipelineLoader.resolvePipeline(
+                    pipelineName, version);
+            long resolved = currentTimeMillis(), //
+            resolve = resolved - start;
+            String json = pipeline.annotate(text);
+            long annotate = currentTimeMillis() - resolved;
+
+            // remove last '}' of json, append some stats
+            StringBuilder sb = new StringBuilder(json.substring(0,
+                    json.length() - 1));
+            sb.append(",\n  \"stats\" : {\n" //
+                    + "    \"pipeline_resolution\": " + resolve
+                    + ",\n"
+                    + "    \"annotation\": " + annotate + "\n  }\n}");
+
+            return sb.toString();
+
         } catch (ValidationException ve) {
             return invalid("annotate text  '" + text + "'", ve, resp);
         } catch (Exception e) {
@@ -182,7 +200,7 @@ public class SherlokServer {
                 }
             }
         });
-        put(new Route("/" + PIPELINES, "application/json") { // PUT
+        put(new Route("/" + PIPELINES, JSON) { // PUT
             @Override
             public Object handle(Request req, Response resp) {
                 try {
@@ -250,7 +268,7 @@ public class SherlokServer {
                 }
             }
         });
-        put(new Route("/" + ENGINES, "application/json") { // PUT
+        put(new Route("/" + ENGINES, JSON) { // PUT
             @Override
             public Object handle(Request req, Response resp) {
                 try {
@@ -315,7 +333,7 @@ public class SherlokServer {
                 }
             }
         });
-        put(new Route("/" + BUNDLES, "application/json") { // PUT
+        put(new Route("/" + BUNDLES, JSON) { // PUT
             @Override
             public Object handle(Request req, Response resp) {
                 try {
@@ -352,19 +370,19 @@ public class SherlokServer {
             throws ValidationException {
 
         File external = new File(pluginFolder);
-        checkArgument(external.exists(),
+        validateArgument(external.exists(),
                 "Folder for static files '" + pluginFolder + "' (resolves to '"
                         + external.getAbsolutePath() + "') does not exist");
         for (File plugin : external.listFiles()) {
             if (plugin.isDirectory()) {
-                checkArgument(
+                validateArgument(
                         plugin.getName().startsWith("_"),
                         "Plugin '"
                                 + plugin.getName()
                                 + "' must start with an underscore (to avoid collision with the REST API)");
             } else {
                 if (!PUBLIC_WHITELIST.contains(plugin.getName())) {
-                    checkArgument(
+                    validateArgument(
                             plugin.getName().startsWith("_"),
                             "File  '"
                                     + plugin.getName()
@@ -378,8 +396,8 @@ public class SherlokServer {
 
     private static String check(String name, String version)
             throws ValidationException {
-        checkNotNull(name, "'name' should not be null");
-        checkNotNull(version, "'version' should not be null");
+        validateNotNull(name, "'name' should not be null");
+        validateNotNull(version, "'version' should not be null");
         checkOnlyAlphanumDot(name);
         checkOnlyAlphanumDot(version);
         return createId(name, version);

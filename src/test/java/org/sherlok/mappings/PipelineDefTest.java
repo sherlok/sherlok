@@ -16,19 +16,19 @@
 package org.sherlok.mappings;
 
 import static java.lang.System.currentTimeMillis;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
 import org.junit.Test;
 import org.sherlok.FileBased;
-import org.sherlok.mappings.PipelineDef.PipelineEngine;
 
 public class PipelineDefTest {
 
     public static PipelineDef getOpennlp_ners() {
         PipelineDef p = new PipelineDef().setDomain("dkpro")
-                .addEngine(new PipelineEngine("OpenNlpEnSegmenter:1.6.2"))
+                .addScriptLine("ENGINE opennlp.segmenter.en:1.6.2")
+                .addScriptLine("ENGINE opennlp.pos.en:1.6.2")
                 .addOutputAnnotation("dkpro.NamedEntity");
         p.setName("OpenNlpEnSegmenter");
         p.setVersion("1.6.2");

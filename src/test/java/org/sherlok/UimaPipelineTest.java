@@ -79,9 +79,9 @@ public class UimaPipelineTest {
                 .getJSONObject("@cas_feature_structures");
         JSONArray names = annotations.names();
         assertEquals(8, names.length());
-        Object country = annotations.get("558");
+        Object country = annotations.get("678");
         assertEquals(
-                "{\"sofa\":1,\"Governor\":25,\"Dependent\":17,\"@type\":\"Dependency\",\"DependencyType\":\"det\",\"end\":3}",
+                "{\"sofa\":1,\"Governor\":137,\"Dependent\":129,\"@type\":\"Dependency\",\"DependencyType\":\"det\",\"end\":3}",
                 country.toString());
     }
 }

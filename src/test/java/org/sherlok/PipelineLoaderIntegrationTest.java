@@ -66,7 +66,7 @@ public class PipelineLoaderIntegrationTest {
                 .getJSONObject("@cas_feature_structures");
         JSONArray names = annotations.names();
         assertEquals(5, names.length());
-        Object firstPerson = annotations.get("538");
+        Object firstPerson = annotations.get("1009");
         assertEquals(
                 "{\"sofa\":1,\"@type\":\"NamedEntity\",\"value\":\"person\",\"end\":11}",
                 firstPerson.toString());

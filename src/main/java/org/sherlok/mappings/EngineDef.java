@@ -49,8 +49,6 @@ public class EngineDef extends Def {
     private String bundleId;
     /** UIMA parameters. Overwrites default parameters */
     private Map<String, Object> parameters = map();
-    /** Or you can just specify a Ruta script */
-    private List<String> script;
 
     // get/set
 
@@ -99,15 +97,6 @@ public class EngineDef extends Def {
         return this.parameters.get(key);
     }
 
-    public List<String> getScript() {
-        return script;
-    }
-
-    public EngineDef setScript(List<String> script) {
-        this.script = script;
-        return this;
-    }
-
     public boolean validate(String engineObject) throws ValidationException {
         super.validate(engineObject);
         try {
@@ -130,9 +119,8 @@ public class EngineDef extends Def {
         return flatParams.toArray(new Object[flatParams.size()]);
     }
 
-    /** @return whether this is a Ruta engine; false if it is a UIMAfit engine */
-    @JsonIgnore
-    public boolean isRuta() {
-        return getScript() != null && getScript().size() > 0;
+    public String getIdForDescriptor(String separator) {
+        return getName().replaceAll("[^A-Za-z0-9]", "_") + separator
+                + getVersion().replaceAll("[^A-Za-z0-9]", "_");
     }
 }

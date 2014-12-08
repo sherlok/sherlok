@@ -34,17 +34,23 @@ public class CheckThat {
         }
     }
 
-    public static void checkValidId(String id) throws ValidationException {
+    /** @return true if 'id' contains a single column */
+    public static void validateId(String id) throws ValidationException {
         if (id.indexOf(SEPARATOR) == -1) {
             throw new ValidationException(id + " must contain a column (':')");
 
         } else if (id.split(SEPARATOR).length != 2) {
             throw new ValidationException("'" + id
                     + "' must contain a single column (':')");
+        } else {
+            String[] splits = id.split(SEPARATOR);
+            checkOnlyAlphanumDot(splits[0]);
+            checkOnlyAlphanumDot(splits[1]);
         }
+
     }
 
-    public static <T> T checkNotNull(T reference, String errorMessage)
+    public static <T> T validateNotNull(T reference, String errorMessage)
             throws ValidationException {
         if (reference == null) {
             throw new ValidationException(errorMessage);
@@ -52,11 +58,10 @@ public class CheckThat {
         return reference;
     }
 
-    public static void checkArgument(boolean expression, String errorMessage)
+    public static void validateArgument(boolean expression, String errorMessage)
             throws ValidationException {
         if (!expression) {
             throw new ValidationException(errorMessage);
         }
     }
-
 }

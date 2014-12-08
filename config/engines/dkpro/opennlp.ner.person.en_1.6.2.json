@@ -8,6 +8,5 @@
     "language" : "en",
     "modelVariant": "person"
   },
-  "script" : null,
   "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder"
 }
