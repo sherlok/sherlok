@@ -1,9 +1,8 @@
-/* Ruta fields */
-md-input-group#ruta_script > textarea, md-input-group.test_area > textarea {
-    width: 100%;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
+
+/* more compact */
+md-input-group, .md-input-group {
+    margin: 0px 0px 0px 0px;
+    padding-bottom: 0px;
 }
 
 /* wide input field, e.g. for pipeline name */
@@ -24,24 +23,14 @@ md-item-content.thin div.md-tile-content {
     padding: 5px;
     padding-left: 10px;
 }
+
 /* active pipe in list is dunkler */
 md-item-content.pipe_open_true div.md-tile-content {
     background-color: #3f51b5;
     color: white;
 }
 
-
-
-div.engine-border {
-    background-color: #fff176;/*#ffeb3b;*/
-    padding: 12px;
-}
-div.script-border {
-    background-color: #c5e1a5; /*#8bc34a;*/
-}
-md-input-group#ruta_script{
-    margin: 0px;
-}
+/* test area */
 md-input-group.test_area, .test_out {
     padding-left: 16px;
 }
@@ -56,6 +45,14 @@ div.test_out label {
 div.test_out  {
     padding-bottom: 8px;
 }
+/* 100% width text textarea */
+md-input-group > textarea {
+    width: 100%;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 /* Welcome text */
 #welcome{
     margin: 80px;

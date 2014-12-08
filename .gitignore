@@ -1,6 +1,7 @@
 # Sherlok
 local_repo
 config/ruta/.pipelines/*
+config/ruta/.engines/*
 
 
 # Maven          #

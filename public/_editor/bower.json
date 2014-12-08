@@ -9,7 +9,8 @@
     "jquery": "~2.1.1",
     "angular-cookies": "~1.3.2",
     "angular-resource": "~1.3.2",
-    "angular-sanitize": "~1.3.2"
+    "angular-sanitize": "~1.3.2",
+    "angular-ui-codemirror": "~0.2.1"
   },
   "resolutions": {
     "angular": "~1.3.2"

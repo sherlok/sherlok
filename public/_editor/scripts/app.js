@@ -1,9 +1,11 @@
+//'use strict';
 var app = angular.module('sherlok_editor', [
   'ngSanitize',
   'ngCookies',
   'ngResource',
   'ngMaterial',
   'ngRoute',
+  'ui.codemirror',
  // 'http-post-fix'
   ])
   .filter('joinBy', function () {
@@ -42,6 +44,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
       $scope.activePipe = undefined;
     } else {
       $scope.activePipe = item;
+      $scope.activePipe.scriptString = $scope.activePipe.script.join('\n');
       $scope.activeEngine = undefined;
     }
   };
@@ -78,6 +81,9 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
 
   $scope.savePipe = function() {
     console.log($scope.activePipe);
+
+    $scope.activePipe.script = $scope.activePipe.scriptString.split('\n');
+
     $http.put('/pipelines', $scope.activePipe).success(function (data) {
       toast($mdToast, 'pipeline \''+$scope.activePipe.name+'\' saved!');
       // refresh and set activePipe
@@ -94,10 +100,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     })
   };
 
-  // RUTA ENGINE
-  $scope.openRutaEngine = function(id){
-    console.log(id);
-  };
+  // TESTS
   $scope.runAllTests = function(){
     var ap = $scope.activePipe;
     for (var i = ap.tests.length - 1; i >= 0; i--) {
@@ -111,44 +114,6 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     });
   }
 
-  // ADD ENGINE (toggling)
-  $scope.toggleAddEngine = function(){
-    $scope.isToggle = true;
-  }
-  $scope.toggledAddEngine = function(){
-    return $scope.isToggle === true;
-  }
-  $scope.addScript = function(id){
-
-    return $scope.isToggle === true;
-  }
-
-  // ENGINE
-  $scope.openEngine = function(_engineId){
-    console.log(_engineId);
-    if ($scope.isEngineOpen(_engineId)){ // close activeEngine
-      $scope.activeEngine = undefined;
-    } else {
-      $scope.activeEngine = _engineId;
-    }
-  };
-
-  $scope.isEngineOpen = function(item){
-    return $scope.activeEngine === item;
-  };
-
-  $scope.isRuta = function(_engine){
-    return _engine.script != null;
-  };
-
-  $scope.hasActiveEngineEngineOpen = function() {
-    return $scope.activeEngine !== undefined;
-  };
-
-  $scope.closeEngine = function() {
-    $scope.activeEngine = undefined;
-  };
-
   // ENGINES
   loadEngines = function(){
     $http.get('/engines').success(function (data) {
@@ -161,6 +126,12 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     })
   }
   loadEngines();
+
+  // RUTA EDITOR
+  $scope.editorOptions = {
+        lineNumbers: true,
+        mode: 'ruta',
+  };
 
 });
 

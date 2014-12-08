@@ -4,7 +4,8 @@
     -moz-border-left-colors: none;
     -moz-border-right-colors: none;
     -moz-border-top-colors: none;
-    border-color: transparent transparent #bbb;
+    border-color: gray;
+    background-color: lightgray;
     border-image: none;
     border-radius: 3px;
     border-style: solid solid dotted;

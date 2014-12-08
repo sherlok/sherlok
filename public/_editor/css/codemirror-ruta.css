@@ -1,0 +1,16 @@
+div.CodeMirror {
+    height: auto;
+    min-height: 100px;
+}
+
+.CodeMirror-code pre {
+  font-size: 15px;
+  font-family: 'Inconsolata', 'courier';
+}
+
+.cm-s-default .cm-comment     {color: #3f7f5f;}
+.cm-s-default .cm-string      {color: #2b10ff;}
+.cm-s-default .cm-basictype   {color: gray;}
+.cm-s-default .cm-declare     {color: #850b0d;  font-weight: bolder;}
+.cm-s-default .cm-conditions  {color: #268000;  font-weight: bolder;}
+.cm-s-default .cm-actions     {color: #2d2d96;  font-weight: bolder;}

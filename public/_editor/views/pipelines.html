@@ -1,10 +1,10 @@
 <div layout="row">
 
-  <!-- AVAILABLE PIPELINES -->
-  <div>
+  <!-- PIPELINE LIST -->
+  <div flex=20>
     <md-toolbar theme="indigo">
       <h2 class="md-toolbar-tools">
-        <span>Available Pipelines</span>
+        <span>Pipelines</span>
         <span flex></span>
         <md-button ng-click="newPipe()" aria-label="new pipeline">New</md-button>
       </h2>
@@ -16,7 +16,7 @@
             <div class="md-tile-content">
               <h3>{{pipeline.name}}</h3>
               <h4>version {{pipeline.version}}</h4>
-              <p>{{pipeline.description | limitTo : 50}}</p>
+              <p>{{pipeline.description | limitTo : 40}}</p>
             </div>
           </md-item-content>
           <md-divider ng-if="!$last"></md-divider>
@@ -53,59 +53,29 @@
           </md-input-group>
         </div>
 
-        <!-- PIPELINE ENGINES -->
+        <!-- SCRIPT -->
         <div>
           <md-toolbar class="thin" md-theme="indigo">
             <h2 class="md-toolbar-tools">
-              <span>Pipeline Elements</span>
+              <span>Script</span>
               <span flex></span>
-              <md-button ng-click="toggleAddEngine()" aria-label="add engine">add</md-button>
             </h2>
           </md-toolbar>
           <md-content>
-            <md-list "overflow:scroll">
-              <div ng-repeat="pipeEngine in activePipe.engines">
-                <!-- add buttons-->
-                <div ng-switch="toggledAddEngine()">
-                  <div ng-switch-when="true">
-                    <md-button class="md-raised md-primary" md-theme="yellow" ng-click="addEngine($index)" aria-label="add engine">Add Engine</md-button>
-                    <md-button class="md-raised md-primary" md-theme="light-green" ng-click="addScript($index)" aria-label="add script">Add Script</md-button>
-                  </div>
-                </div>
-                <div ng-switch="isRuta(pipeEngine)">
-                  <!-- Ruta engine -->
-                  <div ng-switch-when="true" class="script-border">
-                    <md-input-group id="ruta_script" ng-click="openRutaEngine($index)">
-                      <textarea rows="{{pipeEngine.script.length + 1}}" cols="80"
-                        aria-disabled="false">{{pipeEngine.script | joinBy:'\n'}}</textarea>
-                    </md-input-group>
-                  </div>
-                  <!-- uimaFIT engine -->
-                  <div ng-switch-when="false" class="engine-border">
-                    <div ng-click="openEngine(pipeEngine)">{{pipeEngine.id}}</div>
-                  </div>
-                </div>
-                <md-divider md-theme="darkgrey" ng-if="!$last"></md-divider>
-              </div>
-              <!-- add buttons-->
-              <div ng-switch="toggledAddEngine()">
-                <div ng-switch-when="true">
-                  <md-button class="md-raised md-primary" md-theme="yellow" ng-click="addEngine($index)" aria-label="add engine">Add Engine</md-button>
-                  <md-button class="md-raised md-primary" md-theme="light-green" ng-click="addScript($index)" aria-label="add script">Add Script</md-button>
-                </div>
-              </div>
-            </md-list>
+            <ui-codemirror ui-codemirror-opts="editorOptions"
+              ng-model="activePipe.scriptString">
+            </ui-codemirror>
           </md-content>
         </div>
 
         <!-- TESTS -->
         <div>
           <md-toolbar class="thin" md-theme="indigo">
-            <h3 class="md-toolbar-tools">
+            <h2 class="md-toolbar-tools">
               <span>Tests</span>
               <span flex></span>
               <md-button ng-click="runAllTests()">run all tests</md-button>
-            </h3>
+            </h2>
           </md-toolbar>
           <div ng-repeat="test in activePipe.tests">
             <!-- <md-subheader class="md-primary">Test {{$index + 1}}</md-subheader> -->
