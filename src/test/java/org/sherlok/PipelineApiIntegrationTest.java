@@ -75,7 +75,7 @@ public class PipelineApiIntegrationTest {
                 .statusCode(STATUS_OK)
                 .content(containsString("opennlp.ners.en"))
                 .content(
-                        containsString("\"annotations\" : [ \"dkpro.NamedEntity\" ],"));
+                        containsString("\"description\" : \"annotates English persons and locations using OpenNLP models\","));
     }
 
     @Test
@@ -89,7 +89,8 @@ public class PipelineApiIntegrationTest {
                 .body("name", equalTo("opennlp.ners.en"))
                 .body("version", equalTo("1.6.2"))
                 .body("loadOnStartup", equalTo(false))
-                .body("script[0]", equalTo("ENGINE opennlp.segmenter.en:1.6.2;"));
+                .body("script[0]",
+                        equalTo("ENGINE opennlp.segmenter.en:1.6.2;"));
     }
 
     @Test

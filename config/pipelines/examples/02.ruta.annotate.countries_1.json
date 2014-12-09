@@ -1,24 +1,20 @@
 {
-  "name" : "02.ruta.annotate.countries",
-  "version" : "1",
   "description" : "Example that annotates countries as an Country",
-  "language" : "en",
   "domain" : "examples",
+  "language" : "en",
   "loadOnStartup" : false,
-  "script" : [
-    "WORDLIST CountriesList = 'countries.txt';",
-    "DECLARE Country;",
-    "Document{-> MARKFAST(Country, CountriesList)};"
-  ],
+  "name" : "02.ruta.annotate.countries",
   "output" : {
     "annotations" : [ "Country" ],
     "payloads" : [ ]
   },
+  "script" : [ "WORDLIST CountriesList = 'countries.txt';", "DECLARE Country;", "Document{-> MARKFAST(Country, CountriesList)};" ],
   "tests" : [ {
     "in" : "Switzerland is close to Italy, the land of pasta and Michelangelo. Paris is in France. And Madrid in Spain.",
     "out" : "<Country>Switzerland</Country>"
   }, {
     "in" : "China's GDP has taken over the United States.",
     "out" : ""
-  } ]
+  } ],
+  "version" : "1"
 }

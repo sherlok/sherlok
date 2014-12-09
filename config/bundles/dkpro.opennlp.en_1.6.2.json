@@ -1,19 +1,24 @@
 {
-  "name" : "dkpro.opennlp.en",
-  "version" : "1.6.2",
-  "description" : "all opennlp engines and models for English",
   "dependencies" : [ {
+    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.6.2"
   }, {
+    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-asl:1.6.2"
   }, {
+    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-person:20130624.1"
   }, {
+    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-organization:20100907.0"
   }, {
+    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-location:20100907.0"
   } ],
+  "description" : "all opennlp engines and models for English",
+  "name" : "dkpro.opennlp.en",
   "repositories" : {
     "dkpro" : "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"
-  }
+  },
+  "version" : "1.6.2"
 }

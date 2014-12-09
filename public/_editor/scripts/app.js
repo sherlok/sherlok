@@ -83,6 +83,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     console.log($scope.activePipe);
 
     $scope.activePipe.script = $scope.activePipe.scriptString.split('\n');
+    delete $scope.activePipe.scriptString;
 
     $http.put('/pipelines', $scope.activePipe).success(function (data) {
       toast($mdToast, 'pipeline \''+$scope.activePipe.name+'\' saved!');

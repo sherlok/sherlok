@@ -1,14 +1,14 @@
 {
-  "name" : "opennlp.maltparser.en",
-  "version" : "1.6.2",
-  "domain" : "dkpro",
   "description" : "Parses syntactic tree",
-  "script" : [
-     "ENGINE opennlp.segmenter.en:1.6.2;",
-     "ENGINE opennlp.pos.en:1.6.2;",
-     "ENGINE opennlp.maltparser.en:1.6.2;"
-   ],
+  "domain" : "dkpro",
+  "language" : "en",
+  "loadOnStartup" : false,
+  "name" : "opennlp.maltparser.en",
   "output" : {
-    "annotations" : [ "dkpro.Dependency" ]
-  }
+    "annotations" : [ "dkpro.Dependency" ],
+    "payloads" : [ ]
+  },
+  "script" : [ "ENGINE opennlp.segmenter.en:1.6.2;", "ENGINE opennlp.pos.en:1.6.2;", "ENGINE opennlp.maltparser.en:1.6.2;" ],
+  "tests" : [ ],
+  "version" : "1.6.2"
 }

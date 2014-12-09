@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.sherlok.mappings.BundleDef;
+import org.sherlok.mappings.Def;
 import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.TypesDef;
@@ -38,6 +39,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
@@ -68,7 +70,8 @@ public class FileBased {
     private static final ObjectMapper MAPPER = new ObjectMapper(
             new JsonFactory());
     static {
-        MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+        MAPPER.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        MAPPER.enable(SerializationFeature.INDENT_OUTPUT); // TODO does not work
     }
 
     public static BundleDef putBundle(String bundleStr)
@@ -252,5 +255,18 @@ public class FileBased {
             throw new ValidationException("Cannot delete pipeline '"
                     + pipelineId + "', since it does not exist");
         return defFile.delete();
+    }
+
+    /** Util to read and rewrite all {@link Def}s */
+    public static void main(String[] args) throws ValidationException {
+
+        Controller controller = new Controller().load();
+
+        for (BundleDef b : controller.listBundles())
+            writeBundle(b);
+        for (EngineDef e : controller.listEngines())
+            writeEngine(e);
+        for (PipelineDef p : controller.listPipelines())
+            writePipeline(p);
     }
 }

@@ -1,11 +1,11 @@
 {
-  "name" : "opennlp.pos.en",
-  "version" : "1.6.2",
-  "domain" : "dkpro",
-  "description" : null,
   "bundle_id" : "dkpro.opennlp.en:1.6.2",
+  "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger",
+  "description" : null,
+  "domain" : "dkpro",
+  "name" : "opennlp.pos.en",
   "parameters" : {
     "language" : "en"
   },
-  "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger"
+  "version" : "1.6.2"
 }

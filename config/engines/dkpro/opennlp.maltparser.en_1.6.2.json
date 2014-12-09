@@ -1,12 +1,12 @@
 {
-  "name" : "opennlp.maltparser.en",
-  "version" : "1.6.2",
-  "domain" : "dkpro",
-  "description" : null,
   "bundle_id" : "dkpro.maltparser.en:1.6.2",
+  "class" : "de.tudarmstadt.ukp.dkpro.core.maltparser.MaltParser",
+  "description" : null,
+  "domain" : "dkpro",
+  "name" : "opennlp.maltparser.en",
   "parameters" : {
     "language" : "en",
-    "modelVariant": "linear"
+    "modelVariant" : "linear"
   },
-  "class" : "de.tudarmstadt.ukp.dkpro.core.maltparser.MaltParser"
+  "version" : "1.6.2"
 }
