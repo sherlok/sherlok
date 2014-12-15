@@ -11,7 +11,7 @@
     </md-toolbar>
     <md-content>
       <md-list "overflow:scroll">
-        <md-item ng-repeat="pipeline in pipelines">
+        <md-item ng-repeat="pipeline in pipelines | orderBy:'name'">
           <md-item-content class="thin pipe_open_{{isPipeOpen(pipeline)}}" ng-click="openPipe(pipeline)">
             <div class="md-tile-content">
               <h3>{{pipeline.name}}</h3>
@@ -49,7 +49,7 @@
           <md-input-group tabindex="-1" ng-model="activePipe.description" label="Description" class="ng-isolate-scope md-default-theme md-input-has-value ng-valid" aria-invalid="false">
             <label for="p_desc" class="ng-binding">Description</label>
             <textarea rows="2" cols="60" id="p_desc" aria-disabled="false"
-              class="ng-valid ng-touched">{{activePipe.description}}</textarea>
+              ng-model="activePipe.description"></textarea>
           </md-input-group>
         </div>
 
@@ -74,7 +74,8 @@
             <h2 class="md-toolbar-tools">
               <span>Tests</span>
               <span flex></span>
-              <md-button ng-click="runAllTests()">run all tests</md-button>
+              <md-button ng-click="runAllTests()" aria-label="run tests">run all</md-button>
+              <md-button ng-click="savePipe();runAllTests()" aria-label="save and run tests">save & run all</md-button>
             </h2>
           </md-toolbar>
           <div ng-repeat="test in activePipe.tests">

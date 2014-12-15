@@ -85,15 +85,19 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     $scope.activePipe.script = $scope.activePipe.scriptString.split('\n');
     delete $scope.activePipe.scriptString;
 
+    // FIXME /pipelines?testonly=true
     $http.put('/pipelines', $scope.activePipe).success(function (data) {
       toast($mdToast, 'pipeline \''+$scope.activePipe.name+'\' saved!');
       // refresh and set activePipe
       var name = $scope.activePipe.name;
       var version = $scope.activePipe.version;
       loadPipelines();
-      for (p in $scope.pipelines){
+      for (pid in $scope.pipelines){
+        p = $scope.pipelines[pid];
         if (p.name == name && p.version == version){
           $scope.activePipe = p;
+          $scope.activePipe.scriptString = $scope.activePipe.script.join('\n');
+          $scope.activeEngine = undefined;
         }
       }
     }).error(function (data, status) {
@@ -107,6 +111,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     for (var i = ap.tests.length - 1; i >= 0; i--) {
       runTest($scope.activePipe, i);
     };
+    toast($mdToast, ap.tests.length + ' tests successfully completed');
   };
   runTest = function(ap, id){
     var test = ap.tests[id];
@@ -133,7 +138,6 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
         lineNumbers: true,
         mode: 'ruta',
   };
-
 });
 
 

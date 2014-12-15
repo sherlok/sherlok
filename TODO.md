@@ -1,12 +1,27 @@
 # TODOs
 
+
+
+* P2 spinning wheel while running tests
+
+
+* P3 p not highlighted anymore when save
+
+
+# DONE
+
+* P3 order of pipelines in right col
+
+
+# TO IMPLEMENT
+
 Sentiment:
 
 * Stanford DL: http://nlp.stanford.edu/sentiment/code.html
 * Lingpipe: http://alias-i.com/lingpipe/demos/tutorial/sentiment/read-me.html
 * AlchemyAPI: http://grepcode.com/file/repo1.maven.org/maven2/org.apache.uima/AlchemyAPIAnnotator/2.3.1/org/apache/uima/alchemy/digester/sentiment/SentimentAnalysisDigesterProvider.java
 * GATE: https://gate.ac.uk/sentiment/
-
+* Cyc http://dev.cyc.com/cyc-api/ https://github.com/cycorp
 
 Medex: https://code.google.com/p/medex-uima/
 
