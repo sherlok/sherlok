@@ -61,7 +61,7 @@ public class EngineApiIntegrationTest {
     }
 
     @AfterClass
-    public static void afterClass() {
+    public static void afterClass() throws Exception {
         StopServer.stop();
     }
 

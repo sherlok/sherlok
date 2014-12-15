@@ -15,9 +15,8 @@
  */
 package org.sherlok.utils;
 
-
 /**
- * Whenever something is not valid. The error message should provide meaningful
+ * Whenever some input is not valid. The error message should provide meaningful
  * about 1) what object type was not valid 2) what object id and 3) what exactly
  * was not valid.
  * 
@@ -43,6 +42,11 @@ public class ValidationException extends Exception {
 
         public String getErrorMessage() {
             return errorMessage;
+        }
+
+        @Override
+        public String toString() {
+            return errorMessage.toString();
         }
     }
 

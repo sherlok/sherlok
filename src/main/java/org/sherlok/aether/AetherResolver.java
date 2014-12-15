@@ -40,11 +40,13 @@ import org.slf4j.Logger;
 
 /**
  * A helper to boot the repository system and a repository system session.
+ * 
+ * @author renaud@apache.org
  */
 public class AetherResolver {
     private static final Logger LOG = getLogger(AetherResolver.class);
 
-    /** Where to store the local artifacts */
+    /** Directory where to store the local artifacts */
     public static final String LOCAL_REPO_PATH = "local_repo";
 
     public static RepositorySystem newRepositorySystem() {

@@ -64,7 +64,7 @@ public class BundleApiIntegrationTest {
     }
 
     @AfterClass
-    public static void afterClass() {
+    public static void afterClass() throws Exception {
         StopServer.stop();
     }
 

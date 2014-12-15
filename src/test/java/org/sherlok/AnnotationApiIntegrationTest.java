@@ -21,6 +21,7 @@ import static com.jayway.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.sherlok.PipelineLoaderIntegrationTest.TEST_TEXT;
+import static org.sherlok.SherlokServer.ANNOTATE;
 import static org.sherlok.SherlokServer.DEFAULT_IP;
 import static org.sherlok.SherlokServer.STATUS_INVALID;
 import static org.sherlok.SherlokServer.STATUS_OK;
@@ -40,14 +41,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * Integration tests for annotation REST API. This runs in a separate Spark
  * server on another port. However, ATM it share the same config, so stuff
  * created should be deleted after a test.
- * 
+ *
  * @author renaud@apache.org
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AnnotationApiIntegrationTest {
 
     static final int TEST_PORT = 9605;
-    static final String API_URL = "http://localhost:" + TEST_PORT + "/annotate";
+    static final String API_URL = "http://localhost:" + TEST_PORT + "/"
+            + ANNOTATE;
 
     @Rule
     public MethodNameLoggerWatcher mdlw = new MethodNameLoggerWatcher();
@@ -58,7 +60,7 @@ public class AnnotationApiIntegrationTest {
     }
 
     @AfterClass
-    public static void afterClass() {
+    public static void afterClass() throws Exception {
         StopServer.stop();
     }
 
@@ -68,7 +70,7 @@ public class AnnotationApiIntegrationTest {
                 .get(API_URL + "/opennlp.ners.en").then().log().everything()
                 .contentType(JSON).statusCode(STATUS_OK)
                 .body(containsString(TEST_TEXT))//
-                .body("@cas_feature_structures.1009.value", equalTo("person"));
+                .body("annotations.1009.value", equalTo("person"));
     }
 
     @Test
@@ -77,13 +79,13 @@ public class AnnotationApiIntegrationTest {
                 .post(API_URL + "/opennlp.ners.en").then().log().everything()
                 .contentType(JSON).statusCode(STATUS_OK)
                 .body(containsString(TEST_TEXT))//
-                .body("@cas_feature_structures.1009.value", equalTo("person"));
+                .body("annotations.1009.value", equalTo("person"));
         // same POST to check multiple calls
         given().param("text", TEST_TEXT).when()
                 .post(API_URL + "/opennlp.ners.en").then().log().everything()
                 .contentType(JSON).statusCode(STATUS_OK)
                 .body(containsString(TEST_TEXT))//
-                .body("@cas_feature_structures.1009.value", equalTo("person"));
+                .body("annotations.1009.value", equalTo("person"));
     }
 
     @Test

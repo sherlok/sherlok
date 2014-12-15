@@ -29,6 +29,11 @@ import java.util.regex.Pattern;
 import org.apache.uima.cas.CAS;
 import org.sherlok.utils.ValidationException;
 
+/**
+ * Helper to parse Ruta script type declarations.
+ * 
+ * @author renaud@apache.org
+ */
 public class RutaHelper {
 
     final static String IDENTIFIER = "[a-zA-Z]\\w*";
@@ -45,19 +50,24 @@ public class RutaHelper {
     FeatureDeclaration  -> ( (AnnotationType | "STRING" | "INT" | "FLOAT"
                        "DOUBLE" | "BOOLEAN") Identifier) )+
      */
+    /**
+     * @param rutaScript
+     *            a Ruta script to parse
+     * @return a set of annotation types
+     */
     public static Set<TypeDTO> parseDeclaredTypes(String rutaScript)
             throws ValidationException {
-        // insertion order is important & avoids duplicate TypeDTOs
+        // LHS since insertion order is important & avoids duplicate TypeDTOs
         LinkedHashSet<TypeDTO> types = new LinkedHashSet<TypeDTO>();
 
         // Remove comments; they start with "//" and always go to end of line.
-        StringBuilder cleanScriptB = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (String line : rutaScript.split("\n")) {
-            cleanScriptB.append(line.replaceAll("//.*$", " ") + "\n");
+            sb.append(line.replaceAll("//.*$", " ") + "\n");
         }
-        String cleanScript = cleanScriptB.toString();
+        String cleanScript = sb.toString();
 
-        // Normalize whitespace and remove new lines
+        // Remove new lines and normalize whitespace
         cleanScript = cleanScript.replaceAll("\\r?\\n", " ");
         cleanScript = cleanScript.replaceAll(" +", " ");
 
@@ -70,12 +80,12 @@ public class RutaHelper {
                     String superType = CAS.TYPE_NAME_ANNOTATION;
                     try {
                         superType = m.group("superType").trim();
-                    } catch (Exception e) {// nope
+                    } catch (Exception e) {// ok, since might be absent
                     }
 
                     List<TypeFeatureDTO> features = list();
                     try {
-                        // remove parenthesis and trim
+                        // remove parenthesis, normalize whitespace and trim
                         String featuresStr = m.group("features").trim()
                                 .replaceAll("[\\(\\)]", "")
                                 .replaceAll(" +", " ").trim();
@@ -89,20 +99,22 @@ public class RutaHelper {
                             features.add(new TypeFeatureDTO(split[1].trim(),
                                     "", split[0].trim()));
                         }
-                    } catch (NullPointerException e) {
-                        // not catching (happens if m.group() not found).
+                    } catch (NullPointerException e) {// not catching
+                        // happens if m.group() not found when no features
                     }
 
-                    String id = m.group("id");
-                    types.add(new TypeDTO(id, "", superType, features));
+                    String typeName = m.group("id");
+                    types.add(new TypeDTO(typeName, "", superType, features));
 
-                    try { // additional inline declarations
-                        String inlineIds = m.group("inlineids");
-                        for (String iid : inlineIds.substring(2).split(", ")) {
+                    try { // additional inline declarations of types
+                        String inlineTypeName = m.group("inlineids");
+                        for (String iid : inlineTypeName.substring(2).split(
+                                ", ")) {
                             types.add(new TypeDTO(iid.trim(), "", superType,
                                     features));
                         }
-                    } catch (Exception e) {// nope
+                    } catch (Exception e) {// not catching
+                        // happens if no additional inline declarations
                     }
                 }
             }
@@ -110,6 +122,7 @@ public class RutaHelper {
         return types;
     }
 
+    /** DTO for UIMA annotation type */
     public static class TypeDTO {
         public final String typeName, description, supertypeName;
         private List<TypeFeatureDTO> typeFeatures = list();
@@ -149,6 +162,7 @@ public class RutaHelper {
         }
     }
 
+    /** DTO for UIMA annotation type feature */
     public static class TypeFeatureDTO {
         public final String featureName, description, rangeTypeName;
 
@@ -164,5 +178,4 @@ public class RutaHelper {
             return featureName + ":" + rangeTypeName;
         }
     }
-
 }

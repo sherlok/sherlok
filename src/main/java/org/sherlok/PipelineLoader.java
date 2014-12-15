@@ -66,8 +66,12 @@ import org.sherlok.utils.Strings;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
+import freemarker.template.TemplateException;
+
 /**
- * Resolves the transitive dependencies of an artifact.
+ * Resolves, loads and caches {@link UimaPipeline}s.
+ * 
+ * @author renaud@apache.org
  */
 public class PipelineLoader {
     private static final Logger LOG = getLogger(PipelineLoader.class);
@@ -80,19 +84,25 @@ public class PipelineLoader {
     }
 
     /**
-     * This is synchronized, so that no two threads can access it during
+     * Checks if such a {@link PipelineDef} exists, and returns the
+     * corresponding {@link UimaPipeline} (if it is in cache) or else
+     * instantiates it. <br/>
+     * Instantiation involves resolving the pipeline engines and the engines
+     * bundles, then loading the bundles Maven artifacts into the classpath. <br/>
+     * This method is synchronized, so that no two threads can access it during
      * initialization. TODO release the lock earlier
      * 
      * @param pipelineName
      * @param version
-     *            or ('null' or null) to try to fallback on the 'highest'
-     *            version
+     *            the version id, or 'null' / {@link null} to try to fallback on
+     *            the 'highest' version (see
+     *            {@link Strings#compareNatural(String, String)}
      * @return the {@link UimaPipeline}
      */
     public synchronized UimaPipeline resolvePipeline(String pipelineName,
             String version) throws ValidationException {
 
-        // 0. resolve (fallback) version=null
+        // 0. resolve version (fallback) if version=null
         if (version == null || version.equals("null")) {
             String highestVersion = "0000000000000000000000000000000";
             for (String pId : controller.listPipelineDefNames()) {
@@ -106,103 +116,108 @@ public class PipelineLoader {
             version = highestVersion;
         }
 
-        // 1. get pipeline from cache of components
+        // 1. get pipeline from cache if available
         String pipelineId = createId(pipelineName, version);
-
         if (uimaPipelinesCache.containsKey(pipelineId)) {
             return uimaPipelinesCache.get(pipelineId);
 
         } else {
-            // 2. else, load it
-            // 2.1 read pipeline def
+            // 2. else, load it from pipeline def
             PipelineDef pipelineDef = controller.getPipelineDef(pipelineId);
             validateNotNull(pipelineDef, "could not find Pipeline with Id '"
                     + pipelineId + "'");
-
-            // 2.3 resolve engines (and their bundles)
-            List<EngineDef> engineDefs = list();
-            Set<BundleDef> bundleDefs = set();
-            Map<String, String> repositoriesDefs = map();
-
-            for (String pengineId : pipelineDef.getEnginesFromScript()) {
-
-                EngineDef engineDef = controller.getEngineDef(pengineId);
-                validateNotNull(engineDef, "could not find " + pengineId);
-                engineDefs.add(engineDef);
-                BundleDef bundleDef = controller.getBundleDef(engineDef
-                        .getBundleId());
-                validateNotNull(bundleDef,
-                        "could not find bundle '" + engineDef.getBundleId()
-                                + "' that is required by engine '" + engineDef
-                                + "'");
-                bundleDefs.add(bundleDef);
-                for (Entry<String, String> id_url : bundleDef.getRepositories()
-                        .entrySet()) {
-                    repositoriesDefs.put(id_url.getKey(), id_url.getValue());
-                }
-            }
-
-            try {
-                // 2.4 create fake POM from bundles and copy it
-                String fakePom = MavenPom.writePom(bundleDefs, pipelineName,
-                        version);
-
-                // 2.4 solve dependecies
-                solveDeps(fakePom, repositoriesDefs);
-
-            } catch (ArtifactResolutionException e) {
-                throw new ValidationException("could not resolve artifact: "
-                        + e.getMessage(), e);
-            } catch (DependencyCollectionException e) {
-                throw new ValidationException("could not collect depenency: "
-                        + e.getMessage(), e);
-            } catch (Exception e) {
-                throw new RuntimeException(e);// should not happen
-            }
-
-            // 3 create UIMA pipeline and add components
-            UimaPipeline uimaPipeline;
-            try {
-                uimaPipeline = new UimaPipeline(pipelineId,
-                        pipelineDef.getLanguage(), engineDefs,
-                        pipelineDef.getScriptLines());
-            } catch (ResourceInitializationException | IOException e) {
-                throw new ValidationException(
-                        "could not initialize UIMA pipeline: " + e.getMessage(),
-                        e);
-            }
-
-            // 3.2 set annotations to UIMA pipeline output
-            for (String typeShortName : pipelineDef.getOutput()
-                    .getAnnotations()) {
-                TypeDef typeDef = controller.getTypeDef(typeShortName);
-                typeDef.validate(uimaPipeline.getTypeSystemDescription());
-                validateNotNull(typeDef, "could not find bundle '" + typeShortName
-                        + "' that is required by pipeline '" + pipelineId + "'");
-                uimaPipeline.addOutputAnnotation(
-                        typeDef.getClassz(),
-                        typeDef.getProperties().toArray(
-                                new String[typeDef.getProperties().size()]));
-            }
-
-            // 3.3 initialize UIMA pipeline and cache it
-            try {
-                uimaPipeline.initialize();
-            } catch (UIMAException e) {
-                throw new ValidationException(
-                        "could not initialize UIMA pipeline '" + uimaPipeline
-                                + "': " + e.getMessage(), e);
-            }
+            
+            
+            UimaPipeline uimaPipeline = load(pipelineDef);
             uimaPipelinesCache.put(pipelineId, uimaPipeline);
-
             return uimaPipeline;
         }
     }
 
-    private void solveDeps(String fakePom, Map<String, String> repositoriesDefs)
-            throws ArtifactResolutionException, DependencyCollectionException,
-            IOException {
+     UimaPipeline load(PipelineDef pipelineDef) throws ValidationException {
+        
+         // 3. resolve engines (and their bundles)
+        List<EngineDef> engineDefs = list();
+        Set<BundleDef> bundleDefs = set();
+        Map<String, String> repositoriesDefs = map();
+        for (String pengineId : pipelineDef.getEnginesFromScript()) {
+            EngineDef engineDef = controller.getEngineDef(pengineId);
+            validateNotNull(engineDef, "could not find " + pengineId);
+            engineDefs.add(engineDef);
+            BundleDef bundleDef = controller.getBundleDef(engineDef
+                    .getBundleId());
+            validateNotNull(bundleDef, "could not find bundle '"
+                    + engineDef.getBundleId()
+                    + "' that is required by engine '" + engineDef + "'");
+            bundleDefs.add(bundleDef);
+            for (Entry<String, String> id_url : bundleDef.getRepositories()
+                    .entrySet()) {
+                repositoriesDefs.put(id_url.getKey(), id_url.getValue());
+            }
+        }
 
+        // 4. solve library dependencies
+        try {
+            solveDependencies(bundleDefs, pipelineDef.getName(), pipelineDef.getVersion(),
+                    repositoriesDefs);
+        } catch (ArtifactResolutionException e) {
+            throw new ValidationException("could not resolve artifact: "
+                    + e.getMessage(), e);
+        } catch (DependencyCollectionException e) {
+            throw new ValidationException("could not collect dependency: "
+                    + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException(e); // should not happen
+        }
+
+        // 5. create UimaPipeline and add components
+        UimaPipeline uimaPipeline;
+        try {
+            uimaPipeline = new UimaPipeline(pipelineDef.getId(),
+                    pipelineDef.getLanguage(), engineDefs,
+                    pipelineDef.getScriptLines());
+        } catch (ResourceInitializationException | IOException e) {
+            throw new ValidationException(
+                    "could not initialize UIMA pipeline: " + e.getMessage(),
+                    e);
+        }
+
+        // 6. set annotations to UimaPipeline output
+        for (String typeShortName : pipelineDef.getOutput()
+                .getAnnotations()) {
+            TypeDef typeDef = controller.getTypeDef(typeShortName);
+            typeDef.validate(uimaPipeline.getTypeSystemDescription());
+            validateNotNull(typeDef, "could not find bundle '"
+                    + typeShortName + "' that is required by pipeline '"
+                    + pipelineDef.getId() + "'");
+            uimaPipeline.addOutputAnnotation(
+                    typeDef.getClassz(),
+                    typeDef.getProperties().toArray(
+                            new String[typeDef.getProperties().size()]));
+        }
+
+        // 7. initialize UIMA pipeline and cache it
+        try {
+            uimaPipeline.initialize();
+        } catch (UIMAException e) {
+            throw new ValidationException(
+                    "could not initialize UIMA pipeline '" + uimaPipeline
+                            + "': " + e.getMessage(), e);
+        }
+        return uimaPipeline;
+    }
+
+    /** */
+    private void solveDependencies(Set<BundleDef> bundleDefs,
+            String pipelineName, String version,
+            Map<String, String> repositoriesDefs) throws IOException,
+            TemplateException, ArtifactResolutionException,
+            DependencyCollectionException, IOException {
+
+        // create fake POM from bundles and copy it
+        String fakePom = MavenPom.writePom(bundleDefs, pipelineName, version);
+
+        // solve dependecies
         RepositorySystem system = AetherResolver.newRepositorySystem();
         RepositorySystemSession session = AetherResolver
                 .newRepositorySystemSession(system);

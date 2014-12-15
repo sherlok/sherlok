@@ -23,7 +23,8 @@ package spark;
  */
 public class StopServer {
 
-    public static void stop() {
+    public static void stop() throws InterruptedException {
         Spark.stop();
+        Thread.sleep(300);
     }
 }

@@ -115,7 +115,7 @@ public class TypesDef {
 
         @Override
         public String toString() {
-            return shortName + "[" + classz + "]";
+            return getShortName() + "[" + classz + "]";
         }
 
         public void validate(TypeSystemDescription tsd)
@@ -124,8 +124,13 @@ public class TypesDef {
                     + toString() + "' should not end with a dot");
             validateArgument(!classz.endsWith(".class"), "'Class name' of '"
                     + toString() + "' should not end with .class");
-            validateArgument(tsd.getType(classz) != null, "'class' of '"
-                    + shortName + "' should be present in the typesystem.");
+            /*- FIXME leave that for Ruta?
+            validateArgument(
+                    tsd.getType(classz) != null,
+                    "Could not find annotation '"
+                            + getShortName()
+                            + "' in the typesystem. Make sure it is properly defined."); 
+             */
         }
     }
 

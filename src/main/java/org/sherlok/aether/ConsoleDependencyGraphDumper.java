@@ -21,7 +21,11 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
 import org.slf4j.Logger;
 
-/** A dependency visitor that logs the graph. */
+/**
+ * A dependency visitor that logs the graph.
+ * 
+ * @author renaud@apache.org
+ */
 public class ConsoleDependencyGraphDumper implements DependencyVisitor {
     private static final Logger LOG = getLogger(ConsoleDependencyGraphDumper.class);
 

@@ -15,11 +15,12 @@
  */
 package org.sherlok;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.currentTimeMillis;
 import static org.sherlok.mappings.Def.createId;
+import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
-import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.slf4j.LoggerFactory.getLogger;
 import static spark.Spark.delete;
 import static spark.Spark.externalStaticFileLocation;
@@ -46,6 +47,7 @@ import spark.Route;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * REST-endpoint for Sherlok
@@ -55,20 +57,26 @@ import com.beust.jcommander.Parameter;
 public class SherlokServer {
     private static Logger LOG = getLogger(SherlokServer.class);
 
-    private static final String PUBLIC = "public";
+    /** Route for annotating */
+    static final String ANNOTATE = "annotate";
+    /** Route and path for pipelines */
+    static final String PIPELINES = "pipelines";
+    /** Route and path for engines */
+    static final String ENGINES = "engines";
+    /** Route and path for bundles */
+    static final String BUNDLES = "bundles";
+    /** Route and path for types */
+    static final String TYPES = "types";
 
-    // http://www.kammerl.de/ascii/AsciiSignature.php font 'thin'
+    // LOGO http://www.kammerl.de/ascii/AsciiSignature.php font 'thin'
     private static final String LOGO = "\n,---.|              |         |    \n`---.|---.,---.,---.|    ,---.|__/ \n    ||   ||---'|    |    |   ||  \\ \n`---'`   '`---'`    `---'`---'`   `\n\n";
     private static final String VERSION = "Sherlok Server          version 0.1\n";
     static {
         System.out.println(LOGO + VERSION);
     }
 
-    static final String PIPELINES = "pipelines";
-    static final String ENGINES = "engines";
-    static final String BUNDLES = "bundles";
-    static final String TYPES = "types";
-
+    /** Path to public folder */
+    private static final String PUBLIC = "public";
     /** Files allowed in {@link #PUBLIC} folder (to avoid collision with API) */
     private static final List<String> PUBLIC_WHITELIST = //
     Create.list(".DS_Store", "index.html");
@@ -78,77 +86,38 @@ public class SherlokServer {
     public static final int STATUS_SERVER_ERROR = 500;
     public static final String JSON = "application/json";
 
-    protected static Object annotateRequest(Request req, Response resp,
-            PipelineLoader pipelineLoader) {
-        String pipelineName = req.params(":pipelineName");
-        String version = req.queryParams("version");
-        String text = req.queryParams("text");
-        try {
-            validateNotNull(pipelineName,
-                    "'pipeline' req parameter should not be null");
-            checkOnlyAlphanumDot(pipelineName);
-            validateNotNull(text, "'text' req parameter should not be null");
-            validateArgument(text.length() > 0,
-                    "'text' req parameter should not be empty");
-        } catch (ValidationException ve) {
-            return invalid("annotate text  '" + text + "'", ve, resp);
-        }
-        // annotate
-        try {
-            resp.type(JSON);
+    public static final String TEST_TEXT = "Using this calibration procedure, we find that mature granule cells (doublecortin-) contain approximately 40 microm, and newborn granule cells (doublecortin+) contain 0-20 microm calbindin-D28k. U.S. employers added the largest number of workers in nearly three years in October and wages increased, which could bring the Federal Reserve closer to raising interest rates. Nonfarm payrolls surged by 321,000 last month, the most since January of 2012, the Labor Department said on Friday. The unemployment rate held steady at a six-year low of 5.8 percent. Data for September and October were revised to show 44,000 more jobs created than previously reported. Economists polled by Reuters had forecast payrolls increasing by only 230,000 last month. November marked the 10th straight month that job growth has exceeded 200,000, the longest stretch since 1994, and further confirmed the economy is weathering slowdowns in China and the euro zone, as well as a recession in Japan.";
 
-            long start = currentTimeMillis();
-            UimaPipeline pipeline = pipelineLoader.resolvePipeline(
-                    pipelineName, version);
-            long resolved = currentTimeMillis(), //
-            resolve = resolved - start;
-            String json = pipeline.annotate(text);
-            long annotate = currentTimeMillis() - resolved;
-
-            // remove last '}' of json, append some stats
-            StringBuilder sb = new StringBuilder(json.substring(0,
-                    json.length() - 1));
-            sb.append(",\n  \"stats\" : {\n" //
-                    + "    \"pipeline_resolution\": " + resolve
-                    + ",\n"
-                    + "    \"annotation\": " + annotate + "\n  }\n}");
-
-            return sb.toString();
-
-        } catch (ValidationException ve) {
-            return invalid("annotate text  '" + text + "'", ve, resp);
-        } catch (Exception e) {
-            return error("annotate text '" + text + "'", e, resp);
-        }
-    }
-
+    /** Called at server startup. Registers all {@link Route}s */
     static void init(int port, String ip) throws ValidationException {
 
         final Controller controller = new Controller().load();
         final PipelineLoader pipelineLoader = new PipelineLoader(controller);
+
         // config
         setPort(port);
         setIpAddress(ip);
-
-        // Static files. E.g. public/css/style.css is made available as
+        // Static files. E.g. public/css/style.css available as
         // http://{host}:{port}/css/style.css
         externalStaticFileLocation(PUBLIC);
-        validatePlugins(PUBLIC);
+        validatePluginsNames(PUBLIC);
 
         // ROUTES: ANNOTATE
         // ////////////////////////////////////////////////////////////////////////////
-        get(new Route("/annotate/:pipelineName", "application/json") {
+        get(new Route("/" + ANNOTATE + "/:pipelineName", JSON) {
             @Override
             public Object handle(Request req, Response resp) {
                 return annotateRequest(req, resp, pipelineLoader);
             }
         });
-        post(new Route("/annotate/:pipelineName", "application/json") {
+        // same, but POST
+        post(new Route("/" + ANNOTATE + "/:pipelineName", JSON) {
             @Override
             public Object handle(Request req, Response resp) {
                 return annotateRequest(req, resp, pipelineLoader);
             }
         });
+
         // ROUTES: UTILS
         // ////////////////////////////////////////////////////////////////////////////
         get(new Route("/reload") {
@@ -204,10 +173,26 @@ public class SherlokServer {
             @Override
             public Object handle(Request req, Response resp) {
                 try {
-                    String newId = controller.putPipeline(req.body());
-                    pipelineLoader.removeFromCache(newId);
-                    resp.status(STATUS_OK);
-                    return newId;
+                    boolean testOnly = parseBoolean(req.queryParams("testonly"));
+                    if (testOnly) {
+                        // load
+                        PipelineDef parsedPipeline = FileBased
+                                .parsePipeline(req.body());
+                        UimaPipeline uimaPipeline = pipelineLoader
+                                .load(parsedPipeline);
+                        // test
+                        String test = TEST_TEXT;
+                        if (!parsedPipeline.getTests().isEmpty()) {
+                            test = parsedPipeline.getTests().get(0).getIn();
+                        }
+                        uimaPipeline.annotate(test);
+                        return "OK";
+                    } else {
+                        String newId = controller.putPipeline(req.body());
+                        pipelineLoader.removeFromCache(newId);
+                        resp.status(STATUS_OK);
+                        return newId;
+                    }
                 } catch (ValidationException ve) {
                     return invalid("PUT pipeline '" + req.body() + "'", ve,
                             resp);
@@ -357,7 +342,12 @@ public class SherlokServer {
                     controller.deleteBundleDef(id);
                     return "";
                 } catch (ValidationException ve) {
-                    return invalid("DELETE bundle '" + name + "'", ve, resp);
+                    Object r = invalid("DELETE bundle '" + name + "'", ve, resp);
+                    try {
+                        return FileBased.writeAsString(r);
+                    } catch (JsonProcessingException e) {
+                        return r;
+                    }
                 } catch (Exception e) {
                     return error("DELETE '" + name, e, resp);
                 }
@@ -365,8 +355,65 @@ public class SherlokServer {
         });
     }
 
+    protected static Object annotateRequest(Request req, Response resp,
+            PipelineLoader pipelineLoader) {
+        String pipelineName = req.params(":pipelineName");
+        String version = req.queryParams("version");
+        String text = req.queryParams("text");
+        try {
+            validateNotNull(pipelineName,
+                    "'pipeline' req parameter should not be null");
+            checkOnlyAlphanumDot(pipelineName);
+            validateNotNull(text, "'text' req parameter should not be null");
+            validateArgument(text.length() > 0,
+                    "'text' req parameter should not be empty");
+        } catch (ValidationException ve) {
+            Object inv = invalid("annotate text  '" + text + "'", ve, resp);
+            try {
+                return FileBased.writeAsString(inv);
+            } catch (JsonProcessingException e) {
+                return inv;
+            }
+        }
+
+        // annotate
+        try {
+            resp.type(JSON);
+
+            long start = currentTimeMillis();
+            UimaPipeline pipeline = pipelineLoader.resolvePipeline(
+                    pipelineName, version);
+            long resolved = currentTimeMillis(), //
+            resolve = resolved - start;
+            String json = pipeline.annotate(text);
+            long annotate = currentTimeMillis() - resolved;
+
+            json = json.replace("@cas_feature_structures", "annotations");
+
+            // remove last '}' of json, append some stats
+            StringBuilder sb = new StringBuilder(json.substring(0,
+                    json.length() - 1));
+            sb.append(",\n  \"stats\" : {\n" //
+                    + "    \"pipeline_resolution\": " + resolve
+                    + ",\n"
+                    + "    \"annotation\": " + annotate + "\n  }\n}");
+
+            return sb.toString();
+
+        } catch (ValidationException ve) {
+            Object inv = invalid("annotate text  '" + text + "'", ve, resp);
+            try {
+                return FileBased.writeAsString(inv);
+            } catch (JsonProcessingException e) {
+                return inv;
+            }
+        } catch (Exception e) {
+            return error("annotate text '" + text + "'", e, resp);
+        }
+    }
+
     /** Ensures that no file or directory in pluginFolder can collide with API */
-    private static void validatePlugins(String pluginFolder)
+    private static void validatePluginsNames(String pluginFolder)
             throws ValidationException {
 
         File external = new File(pluginFolder);
@@ -403,6 +450,7 @@ public class SherlokServer {
         return createId(name, version);
     }
 
+    /** Set {@link Response} as invalid. */
     private static Object invalid(String errorMsg, ValidationException ve,
             Response resp) {
         LOG.info("could not " + errorMsg + " " + ve.getMessage(), ve);
@@ -411,13 +459,14 @@ public class SherlokServer {
         return ve.toJson();
     }
 
+    /** Set {@link Response} as erroneous. */
     private static Object error(String errorMsg, Exception e, Response resp) {
         LOG.error("could not " + errorMsg, e);
         resp.status(STATUS_SERVER_ERROR);
         return e;
     }
 
-    /** Transformer that returns a JSON resp */
+    /** Transformer {@link Route} that returns a JSON response. */
     public static abstract class JsonRoute extends ResponseTransformerRoute {
 
         protected JsonRoute(String path) {
@@ -453,7 +502,8 @@ public class SherlokServer {
     public static final int DEFAULT_PORT = 9600;
     public static final String DEFAULT_IP = "0.0.0.0";
 
-    static class Arg {
+    /** Configuration arguments from command line */
+    static class CliArguments {
         @Parameter(names = "-port", description = "Which port to use.")
         int port = DEFAULT_PORT;
         @Parameter(names = "-address", description = "Which ip address to use.")
@@ -461,8 +511,8 @@ public class SherlokServer {
     }
 
     public static void main(String[] args) throws Exception {
-        Arg arg = new Arg();
-        new JCommander(arg, args);
-        init(arg.port, arg.address);
+        CliArguments argParser = new CliArguments();
+        new JCommander(argParser, args);
+        init(argParser.port, argParser.address);
     }
 }

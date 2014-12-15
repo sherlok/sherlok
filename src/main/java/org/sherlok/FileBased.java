@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.sherlok.mappings.BundleDef;
-import org.sherlok.mappings.Def;
 import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.TypesDef;
@@ -96,11 +95,16 @@ public class FileBased {
         }
     }
 
+    /** Used e.g. to test a pipeline without writing it out */
+    public static PipelineDef parsePipeline(String pipelineStr)
+            throws JsonParseException, JsonMappingException, IOException {
+        return MAPPER.readValue(pipelineStr, PipelineDef.class);
+    }
+
     public static PipelineDef putPipeline(String pipelineStr)
             throws ValidationException {
         try {
-            PipelineDef pipelineDef = MAPPER.readValue(pipelineStr,
-                    PipelineDef.class);
+            PipelineDef pipelineDef = parsePipeline(pipelineStr);
             writePipeline(pipelineDef);
             return pipelineDef;
         } catch (Exception e) {
@@ -258,6 +262,7 @@ public class FileBased {
     }
 
     /** Util to read and rewrite all {@link Def}s */
+    /*-
     public static void main(String[] args) throws ValidationException {
 
         Controller controller = new Controller().load();
@@ -268,5 +273,5 @@ public class FileBased {
             writeEngine(e);
         for (PipelineDef p : controller.listPipelines())
             writePipeline(p);
-    }
+    }*/
 }

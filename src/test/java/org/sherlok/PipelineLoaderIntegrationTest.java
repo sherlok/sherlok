@@ -61,7 +61,6 @@ public class PipelineLoaderIntegrationTest {
         LOG.debug(result);
 
         JSONObject jsonObject = new JSONObject(result);
-        // JSONObject context = jsonObject.getJSONObject("@context");
         JSONObject annotations = jsonObject
                 .getJSONObject("@cas_feature_structures");
         JSONArray names = annotations.names();

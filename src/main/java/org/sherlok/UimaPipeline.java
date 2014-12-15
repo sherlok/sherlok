@@ -25,9 +25,11 @@ import static org.apache.uima.util.FileUtils.saveString2File;
 import static org.sherlok.utils.Create.list;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.List;
 
@@ -36,6 +38,7 @@ import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_component.AnalysisComponent;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.impl.FilteringTypeSystem;
@@ -57,7 +60,6 @@ import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 /**
- * 
  * Manages a UIMA pipeline (configuration, and then use/annotation). Lifecycle:<br>
  * <ol>
  * <li>add deps on classpath (to have TypeSystems scannable)</li>
@@ -76,8 +78,12 @@ public class UimaPipeline {
     private String pipelineId;
     private String language;
 
+    private List<String> scriptLines;
+    private List<EngineDef> engineDefs;
+
     private List<AnalysisEngineDescription> aeds = list();
-    private AnalysisEngine[] engines = null;
+    private AnalysisEngine[] aes = null;
+
     /** Filters the JSON output */
     private FilteringTypeSystem filter = new FilteringTypeSystem();
     /** Keeps track of the {@link Type}s added in every Ruta script */
@@ -87,16 +93,12 @@ public class UimaPipeline {
 
     private CasPool casPool;
 
-    private List<String> scriptLines;
-    private List<EngineDef> engineDefs;
-
     /**
      * @param pipelineId
+     * @param language
+     *            , important e.g. for DKpro components.
      * @param engineDefs
-     * @param list
-     * @param engineDefs
-     * @param lang
-     *            language, important e.g. for DKpro components.
+     * @param scriptLines
      */
     public UimaPipeline(String pipelineId, String language,
             List<EngineDef> engineDefs, List<String> scriptLines)
@@ -122,12 +124,33 @@ public class UimaPipeline {
     }
 
     /** Initializes Engines and CAS */
-    public void initialize() throws UIMAException {
-        // initialize Engines
-        if (engines == null) { // not initialized yet
-            engines = createEngines(aeds
-                    .toArray(new AnalysisEngineDescription[aeds.size()]));
+    public void initialize() throws UIMAException, ValidationException {
+
+        // redirect stdout to catch Ruta script errors
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream origOut = System.out;
+        System.setOut(new PrintStream(baos));
+
+        try {
+            // initialize Engines
+            if (aes == null) { // not initialized yet
+                aes = createEngines(aeds
+                        .toArray(new AnalysisEngineDescription[aeds.size()]));
+            }
+        } finally { // so that we restore Sysout in any case
+
+            // catching Ruta script errors
+            String maybeError = baos.toString();
+            for (String line : maybeError.split("\n")) {
+                if (line.startsWith("Error in line")) {
+                    throw new ValidationException(line);
+                }
+            }
+            System.setOut(origOut);
+            if (maybeError.length() > 0)
+                LOG.info(maybeError);
         }
+
         // initialize JSON writer (incl. filter)
         if (xcs == null) {
             xcs = new XmiCasSerializer(filter);
@@ -159,22 +182,32 @@ public class UimaPipeline {
      * @param text
      *            the text to annotate
      */
-    public String annotate(String text) throws UIMAException, SAXException {
+    public String annotate(String text) throws UIMAException, SAXException,
+            ValidationException {
 
         CAS cas = null;
         try {
-            cas = casPool.getCas(0);
-            // cas.reset() is done by casPool
+            cas = casPool.getCas(0);// cas.reset done by casPool
+            // for (TypeDescription td : tsd.getTypes())
+            // LOG.debug("type: {} <<<< {}", td.getName(),
+            // td.getSupertypeName());
 
             cas.setDocumentText(text);
             cas.setDocumentLanguage(language);
 
-            SimplePipeline.runPipeline(cas, engines);
+            SimplePipeline.runPipeline(cas, aes);
 
             StringWriter sw = new StringWriter();
             xcs.serializeJson(cas, sw);
             return sw.toString();
 
+        } catch (AnalysisEngineProcessException aepe) {
+            Throwable cause = aepe.getCause();
+            if (cause instanceof IllegalArgumentException) {
+                throw new ValidationException(cause.getMessage());
+            } else {
+                throw aepe;
+            }
         } catch (Exception e) {
             throw e;
         } finally {
@@ -183,7 +216,7 @@ public class UimaPipeline {
     }
 
     public void close() {
-        for (AnalysisEngine engine : engines) {
+        for (AnalysisEngine engine : aes) {
             engine.destroy();
         }
     }
@@ -286,7 +319,7 @@ public class UimaPipeline {
             if (supertypeName.indexOf('.') == -1) {
                 supertypeName = nameSpace + "." + supertypeName;
             }
-            LOG.debug("adding type {}::{}", typeName, supertypeName);
+            // LOG.debug("adding type {}::{}", typeName, supertypeName);
 
             TypeDescription typeD = tsd.addType(typeName, t.description,
                     supertypeName);
