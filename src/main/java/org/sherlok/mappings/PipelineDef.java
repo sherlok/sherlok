@@ -27,18 +27,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A pipeline describes the steps to perform a text mining analysis. This
- * analysis consists of a list of steps to be performed on text (e.g. split
- * words, remove determinants, annotate locations, ...).
+ * analysis consists of a script that defines a list of steps to be performed on
+ * text (e.g. split words, remove determinants, annotate locations, ...).
  * 
  * @author renaud@apache.org
  */
 public class PipelineDef extends Def {
 
-    /** which language this pipeline works for (ISO code) */
+    /** Which language this pipeline works for (ISO code). Defaults to 'en' */
     private String language = "en",
     /**
      * Useful to group pipelines together. Letters, numbers, slashes and
-     * underscore only
+     * underscore only. Defaults to empty.
      */
     domain = "";
     /**
@@ -47,16 +47,16 @@ public class PipelineDef extends Def {
      */
     boolean loadOnStartup = false;
 
-    /** a list of engine definitions */
+    /** The list of engine definitions */
     @JsonProperty("script")
     private List<String> scriptLines = list();
     /** Controls the output of this pipeline */
     private PipelineOutput output = new PipelineOutput();
 
-    /** tests */
+    /** Embedded (integration) tests */
     private List<PipelineTest> tests = list();
 
-    /** Output definition: annots and payload */
+    /** Output definition (output annotations and payload) */
     public static class PipelineOutput {
         List<String> annotations = list();
         List<String> payloads = list();
@@ -108,7 +108,7 @@ public class PipelineDef extends Def {
         }
     }
 
-    // get/set
+    // Get/Set ////////////////////////////////////////////////////////////////
 
     public String getLanguage() {
         return language;
@@ -183,14 +183,22 @@ public class PipelineDef extends Def {
         this.tests.add(test);
     }
 
-    // utils
+    // Utilities //////////////////////////////////////////////////////////////
 
     public boolean validate(String pipelineObject) throws ValidationException {
         super.validate(pipelineObject);
         try {
+            validateArgument(language != null, "'language' can not be null");
+            validateArgument(language.length() > 0,
+                    "'language' can not be empty");
             validateArgument(domain.indexOf("..") == -1,
                     "'domain' can not contain double dots: '" + domain + "'");
-            // TODO more validation
+            if (tests.isEmpty()) {
+                LOG.warn("no tests for pipeline '{}'", getId());
+            }
+            if (output.getAnnotations().isEmpty()) {
+                LOG.warn("no output annotations for pipeline '{}'", getId());
+            }
         } catch (Throwable e) {
             throw new ValidationException("" + pipelineObject + ": "
                     + e.getMessage());

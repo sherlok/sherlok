@@ -62,13 +62,16 @@ import org.apache.uima.util.CasPool;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
 import org.sherlok.mappings.EngineDef;
+import org.sherlok.mappings.PipelineDef;
 import org.sherlok.utils.ConfigurationFieldParser;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 /**
- * Manages a UIMA pipeline (configuration, and then use/annotation). Lifecycle:<br>
+ * Manages a UIMA pipeline (configuration, and then use/annotation), based on a
+ * {@link PipelineDef}.<br>
+ * Lifecycle:<br>
  * <ol>
  * <li>add deps on classpath (to have TypeSystems scannable)</li>
  * <li>create UimaPipeline with script and engines</li>
@@ -297,9 +300,11 @@ public class UimaPipeline {
                                             parameterName)) {
                                         List<String> list = engineDef
                                                 .getParameter(parameterName);
-                                        Object o = ConfigurationFieldParser.getDefaultValue(
-                                                f, list.toArray(new String[list
-                                                        .size()]));
+                                        Object o = ConfigurationFieldParser
+                                                .getDefaultValue(
+                                                        f,
+                                                        list.toArray(new String[list
+                                                                .size()]));
                                         convertedParameters.put(parameterName,
                                                 o);
                                     }

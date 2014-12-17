@@ -15,8 +15,9 @@
  */
 package org.sherlok.mappings;
 
+import static org.sherlok.utils.AetherResolver.SHERLOK_REPO_ID;
+import static org.sherlok.utils.AetherResolver.SHERLOK_REPO_URL;
 import static org.sherlok.utils.Create.list;
-import static org.sherlok.utils.Create.set;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
@@ -24,13 +25,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.sherlok.aether.AetherResolver;
 import org.sherlok.mappings.BundleDef.BundleDependency;
+import org.sherlok.utils.AetherResolver;
 import org.slf4j.Logger;
 
 import freemarker.template.Configuration;
@@ -42,6 +44,11 @@ public class MavenPom {
 
     public static class RepoDefDTO {
         public String id, url;
+
+        public RepoDefDTO(String id, String url) {
+            this.id = id;
+            this.url = url;
+        }
 
         public String getId() {
             return id;
@@ -95,13 +102,18 @@ public class MavenPom {
         }
         data.put("deps", deps);
 
-        Set<RepoDefDTO> repoDefs = set();
+        // order matters, so that sherlok github repo can be inserted first
+        Set<RepoDefDTO> repoDefs = new LinkedHashSet<RepoDefDTO>();
+        // add sherlok repository first
+        RepoDefDTO rds = new RepoDefDTO(SHERLOK_REPO_ID, SHERLOK_REPO_URL);
+        if (repoDefs.add(rds))
+            LOG.trace("adding sherlok repo id '{}', url '{}' to pom", rds.id,
+                    rds.url);
         for (BundleDef bundleDef : bundleDefs) {
             for (Entry<String, String> id_url : bundleDef.getRepositories()
                     .entrySet()) {
-                RepoDefDTO rd = new RepoDefDTO();
-                rd.id = id_url.getKey();
-                rd.url = id_url.getValue();
+                RepoDefDTO rd = new RepoDefDTO(id_url.getKey(),
+                        id_url.getValue());
                 if (repoDefs.add(rd))
                     LOG.trace("adding repo id '{}', url '{}' to pom", rd.id,
                             rd.url);

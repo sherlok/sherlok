@@ -17,8 +17,10 @@ package org.sherlok.mappings;
 
 import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.sherlok.utils.ValidationException;
+import org.slf4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -28,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author renaud@apache.org
  */
 public abstract class Def {
+    protected static final Logger LOG = getLogger(Def.class);
 
     public static final String SEPARATOR = ":";
 

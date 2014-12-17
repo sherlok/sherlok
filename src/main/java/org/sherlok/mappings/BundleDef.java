@@ -49,9 +49,9 @@ public class BundleDef extends Def {
             /** corresponds to a released maven artifact */
             mvn, //
             /** any accessible git repository that contains a Maven project */
-            git, // TODO git protocol not implemented
+            git, // TODO xLATER git protocol not implemented
             /** corresponds to a local or remote jar */
-            jar // TODO jar protocol not implemented
+            jar // TODO xLATER jar protocol not implemented
         }
 
         private DependencyType type = DependencyType.mvn;

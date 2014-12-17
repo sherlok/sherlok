@@ -31,10 +31,9 @@ public class UimaPipelineTest {
 
         UimaPipeline pipeline = new PipelineLoader(new Controller().load())
                 .resolvePipeline("01.ruta.annotate.dog", null);
-        String result = (pipeline.annotate("dog"));
+        String result = pipeline.annotate("dog");
         LOG.debug(result);
 
-        // TODO better matching
         JSONObject jsonObject = new JSONObject(result);
         JSONObject annotations = jsonObject
                 .getJSONObject("@cas_feature_structures");
@@ -54,7 +53,6 @@ public class UimaPipelineTest {
         String result = (pipeline.annotate("Switzerland"));
         LOG.debug(result);
 
-        // TODO better matching
         JSONObject jsonObject = new JSONObject(result);
         JSONObject annotations = jsonObject
                 .getJSONObject("@cas_feature_structures");
@@ -73,7 +71,6 @@ public class UimaPipelineTest {
         String result = (pipeline.annotate("The dog walks on the lake."));
         LOG.debug(result);
 
-        // TODO better matching
         JSONObject jsonObject = new JSONObject(result);
         JSONObject annotations = jsonObject
                 .getJSONObject("@cas_feature_structures");

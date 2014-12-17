@@ -71,7 +71,8 @@ public class FileBased {
             new JsonFactory());
     static {
         MAPPER.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        MAPPER.enable(SerializationFeature.INDENT_OUTPUT); // TODO does not work
+        // TODO indent json output does not work
+        MAPPER.enable(SerializationFeature.INDENT_OUTPUT); 
         MAPPER.enable(DeserializationFeature. ACCEPT_SINGLE_VALUE_AS_ARRAY);
     }
 

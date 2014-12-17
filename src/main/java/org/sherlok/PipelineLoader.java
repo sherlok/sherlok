@@ -56,13 +56,12 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
-import org.sherlok.aether.AetherResolver;
-import org.sherlok.aether.ConsoleDependencyGraphDumper;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.MavenPom;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.TypesDef.TypeDef;
+import org.sherlok.utils.AetherResolver;
 import org.sherlok.utils.Strings;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
@@ -237,7 +236,8 @@ public class PipelineLoader {
         CollectResult collectResult = system.collectDependencies(session,
                 collectRequest);
 
-        collectResult.getRoot().accept(new ConsoleDependencyGraphDumper());
+        collectResult.getRoot().accept(
+                new AetherResolver.ConsoleDependencyGraphDumper());
 
         PreorderNodeListGenerator p = new PreorderNodeListGenerator();
         collectResult.getRoot().accept(p);
@@ -246,7 +246,7 @@ public class PipelineLoader {
         List<Dependency> dependencies = p.getDependencies(true);
         if (nrEngines > 0) {
             // TODO better validation of pom
-            validateArgument(dependencies.size() > 1, 
+            validateArgument(dependencies.size() > 1,
                     "There must have been an error resolving dependencies");
         }
         for (Dependency dependency : p.getDependencies(true)) {

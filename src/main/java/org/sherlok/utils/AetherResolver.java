@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sherlok.aether;
+package org.sherlok.utils;
 
 import static org.sherlok.utils.Create.list;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -29,6 +29,8 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.DependencyVisitor;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -48,6 +50,11 @@ public class AetherResolver {
 
     /** Directory where to store the local artifacts */
     public static final String LOCAL_REPO_PATH = "local_repo";
+
+    /** Maven repo hosted on Github to cache most common artifacts */
+    public static final String SHERLOK_REPO_ID = "sherlok_deps";
+    /** Maven repo hosted on Github to cache most common artifacts */
+    public static final String SHERLOK_REPO_URL = "https://raw.githubusercontent.com/renaud/sherlok_mavenrepo/master/";
 
     public static RepositorySystem newRepositorySystem() {
         DefaultServiceLocator locator = MavenRepositorySystemUtils
@@ -99,9 +106,8 @@ public class AetherResolver {
                     localRepo.toURI().toURL().toString()).build());
         }
         // Sherlok repo
-        repos.add(new RemoteRepository.Builder("sherlok_deps", "default",
-                "https://raw.githubusercontent.com/renaud/sherlok_mavenrepo/master/")
-                .build());
+        repos.add(new RemoteRepository.Builder(SHERLOK_REPO_ID, "default",
+                SHERLOK_REPO_URL).build());
         // Maven central
         repos.add(new RemoteRepository.Builder("central", "default",
                 "http://central.maven.org/maven2/").build());
@@ -111,5 +117,27 @@ public class AetherResolver {
                     id_url.getValue()).build());
         }
         return repos;
+    }
+
+    /** A dependency visitor that logs the graph */
+    public static class ConsoleDependencyGraphDumper implements
+            DependencyVisitor {
+
+        private String currentIndent = "";
+
+        public boolean visitEnter(DependencyNode node) {
+            LOG.debug(currentIndent + node);
+            if (currentIndent.length() <= 0) {
+                currentIndent = "+- ";
+            } else {
+                currentIndent = "|  " + currentIndent;
+            }
+            return true;
+        }
+
+        public boolean visitLeave(DependencyNode node) {
+            currentIndent = currentIndent.substring(3, currentIndent.length());
+            return true;
+        }
     }
 }
