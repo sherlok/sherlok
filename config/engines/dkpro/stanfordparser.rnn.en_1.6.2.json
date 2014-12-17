@@ -1,0 +1,12 @@
+{
+  "bundle_id" : "dkpro.stanfordparser.rnn.en:1.6.2",
+  "class" : "de.tudarmstadt.ukp.dkpro.core.maltparser.MaltParser",
+  "description" : null,
+  "domain" : "dkpro",
+  "name" : "stanfordparser.en",
+  "parameters" : {
+    "language" : "en",
+    "modelVariant" : "linear"
+  },
+  "version" : "1.6.2"
+}

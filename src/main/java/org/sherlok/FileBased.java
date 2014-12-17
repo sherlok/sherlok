@@ -37,6 +37,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,6 +72,7 @@ public class FileBased {
     static {
         MAPPER.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         MAPPER.enable(SerializationFeature.INDENT_OUTPUT); // TODO does not work
+        MAPPER.enable(DeserializationFeature. ACCEPT_SINGLE_VALUE_AS_ARRAY);
     }
 
     public static BundleDef putBundle(String bundleStr)

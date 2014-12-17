@@ -1,0 +1,10 @@
+{
+  "name" : "PennTree",
+  "types" : [ {
+    "class" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.PennTree",
+    "color" : null,
+    "description" : "The Penn Treebank-style phrase structure string",
+    "properties" : [ "PennTree", "TransformationNames"],
+    "shortName" : "penntree.PennTree"
+  } ]
+}

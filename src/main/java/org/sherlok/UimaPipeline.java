@@ -23,6 +23,7 @@ import static org.apache.uima.ruta.engine.RutaEngine.PARAM_SCRIPT_PATHS;
 import static org.apache.uima.ruta.engine.RutaEngine.SCRIPT_FILE_EXTENSION;
 import static org.apache.uima.util.FileUtils.saveString2File;
 import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.ByteArrayOutputStream;
@@ -31,7 +32,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.UIMAException;
@@ -40,13 +44,16 @@ import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.impl.FilteringTypeSystem;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.fit.component.NoOpAnnotator;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeDescription;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
@@ -55,6 +62,7 @@ import org.apache.uima.util.CasPool;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
 import org.sherlok.mappings.EngineDef;
+import org.sherlok.utils.ConfigurationFieldParser;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
@@ -197,6 +205,17 @@ public class UimaPipeline {
 
             SimplePipeline.runPipeline(cas, aes);
 
+            if (LOG.isTraceEnabled()) {
+                FSIterator<Annotation> it = cas.getJCas().getAnnotationIndex()
+                        .iterator();
+                while (it.hasNext()) {
+                    Annotation a = it.next();
+                    StringBuffer sb = new StringBuffer();
+                    a.prettyPrint(2, 2, sb, false);
+                    LOG.trace("''{}'' {}", a.getCoveredText(), sb.toString());
+                }
+            }
+
             StringWriter sw = new StringWriter();
             xcs.serializeJson(cas, sw);
             return sw.toString();
@@ -259,10 +278,47 @@ public class UimaPipeline {
                                     "could not find class "
                                             + engineDef.getClassz(), e);
                         }
+
+                        // convert fields strings to primitives
+                        Map<String, Object> convertedParameters = map();
+                        for (Entry<String, List<String>> en : engineDef
+                                .getParameters().entrySet()) {
+                            convertedParameters.put(en.getKey(), en.getValue());
+                        }
+                        for (Field f : classz.getDeclaredFields()) {
+                            java.lang.annotation.Annotation[] annots2 = f
+                                    .getDeclaredAnnotations();
+                            for (java.lang.annotation.Annotation a : annots2) {
+                                if (a instanceof ConfigurationParameter) {
+
+                                    String parameterName = ((ConfigurationParameter) a)
+                                            .name();
+                                    if (engineDef.getParameters().containsKey(
+                                            parameterName)) {
+                                        List<String> list = engineDef
+                                                .getParameter(parameterName);
+                                        Object o = ConfigurationFieldParser.getDefaultValue(
+                                                f, list.toArray(new String[list
+                                                        .size()]));
+                                        convertedParameters.put(parameterName,
+                                                o);
+                                    }
+                                }
+                            }
+                        }
+                        List<Object> flatParams = list();
+                        for (Entry<String, Object> en : convertedParameters
+                                .entrySet()) {
+                            flatParams.add(en.getKey());
+                            flatParams.add(en.getValue());
+                        }
+                        Object[] flatParamsArray = flatParams
+                                .toArray(new Object[flatParams.size()]);
+
                         // create ae and write xml descriptor
                         AnalysisEngineDescription aed = AnalysisEngineFactory
                                 .createEngineDescription(classz,
-                                        engineDef.getFlatParams());
+                                        flatParamsArray);
                         try {
                             File tmpEngine = new File(
                                     FileBased.RUTA_ENGINE_CACHE_PATH

@@ -1,0 +1,18 @@
+{
+  "description" : "Parses syntactic tree",
+  "domain" : "dkpro",
+  "language" : "en",
+  "loadOnStartup" : false,
+  "name" : "berkeleyparser.en",
+  "output" : {
+    "annotations" : [ "penntree.PennTree", "constituent.Constituent", "constituent.S", "constituent.ROOT", "constituent.NP", "constituent.VP", "constituent.PP", "constituent.ADJP", "constituent.SBAR", "constituent.SINV", "constituent.UCP", "constituent.NAC", "constituent.ADVP", "constituent.FRAG", "constituent.QP", "constituent.NX", "constituent.WHPP", "constituent.SBARQ", "constituent.WHNP", "constituent.SQ", "constituent.RRC", "constituent.CONJP", "constituent.INTJ", "constituent.WHADVP", "constituent.WHADJP", "constituent.PRT", "constituent.LST", "constituent.PRP", "constituent.X", "constituent.PRN" ],
+    "payloads" : [ ]
+  },
+  "script" : [
+    "ENGINE opennlp.segmenter.en:1.6.2;",
+    "ENGINE opennlp.pos.en:1.6.2;",
+    "ENGINE berkeleyparser.en:1.6.2;"
+  ],
+  "tests" : [ {"in": "The blue house of my childhood was bought: what a pity!" } ],
+  "version" : "1.6.2"
+}

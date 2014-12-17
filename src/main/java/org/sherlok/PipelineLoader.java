@@ -18,6 +18,7 @@ package org.sherlok;
 import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
+import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
@@ -113,12 +114,16 @@ public class PipelineLoader {
                     }
                 }
             }
+            LOG.trace(
+                    "resolved pipeline version to '{}' (was previousely '{}')",
+                    highestVersion, version);
             version = highestVersion;
         }
 
         // 1. get pipeline from cache if available
         String pipelineId = createId(pipelineName, version);
         if (uimaPipelinesCache.containsKey(pipelineId)) {
+            LOG.trace("pipeline '{}' found in cache", pipelineId);
             return uimaPipelinesCache.get(pipelineId);
 
         } else {
@@ -126,17 +131,16 @@ public class PipelineLoader {
             PipelineDef pipelineDef = controller.getPipelineDef(pipelineId);
             validateNotNull(pipelineDef, "could not find Pipeline with Id '"
                     + pipelineId + "'");
-            
-            
+
             UimaPipeline uimaPipeline = load(pipelineDef);
             uimaPipelinesCache.put(pipelineId, uimaPipeline);
             return uimaPipeline;
         }
     }
 
-     UimaPipeline load(PipelineDef pipelineDef) throws ValidationException {
-        
-         // 3. resolve engines (and their bundles)
+    UimaPipeline load(PipelineDef pipelineDef) throws ValidationException {
+
+        // 3. resolve engines (and their bundles)
         List<EngineDef> engineDefs = list();
         Set<BundleDef> bundleDefs = set();
         Map<String, String> repositoriesDefs = map();
@@ -146,9 +150,12 @@ public class PipelineLoader {
             engineDefs.add(engineDef);
             BundleDef bundleDef = controller.getBundleDef(engineDef
                     .getBundleId());
-            validateNotNull(bundleDef, "could not find bundle '"
-                    + engineDef.getBundleId()
-                    + "' that is required by engine '" + engineDef + "'");
+            LOG.trace("adding engineDef '{}' with bundleDef '{}'", engineDef,
+                    bundleDef);
+            validateNotNull(bundleDef,
+                    "could not find bundle '" + engineDef.getBundleId()
+                            + "' that is required by engine '" + engineDef
+                            + "'");
             bundleDefs.add(bundleDef);
             for (Entry<String, String> id_url : bundleDef.getRepositories()
                     .entrySet()) {
@@ -158,11 +165,11 @@ public class PipelineLoader {
 
         // 4. solve library dependencies
         try {
-            solveDependencies(bundleDefs, pipelineDef.getName(), pipelineDef.getVersion(),
-                    repositoriesDefs);
+            solveDependencies(bundleDefs, pipelineDef.getName(),
+                    pipelineDef.getVersion(), repositoriesDefs,
+                    engineDefs.size());
         } catch (ArtifactResolutionException e) {
-            throw new ValidationException("could not resolve artifact: "
-                    + e.getMessage(), e);
+            throw new ValidationException(e.getMessage(), e);
         } catch (DependencyCollectionException e) {
             throw new ValidationException("could not collect dependency: "
                     + e.getMessage(), e);
@@ -178,18 +185,16 @@ public class PipelineLoader {
                     pipelineDef.getScriptLines());
         } catch (ResourceInitializationException | IOException e) {
             throw new ValidationException(
-                    "could not initialize UIMA pipeline: " + e.getMessage(),
-                    e);
+                    "could not initialize UIMA pipeline: " + e.getMessage(), e);
         }
 
         // 6. set annotations to UimaPipeline output
-        for (String typeShortName : pipelineDef.getOutput()
-                .getAnnotations()) {
+        for (String typeShortName : pipelineDef.getOutput().getAnnotations()) {
             TypeDef typeDef = controller.getTypeDef(typeShortName);
             typeDef.validate(uimaPipeline.getTypeSystemDescription());
-            validateNotNull(typeDef, "could not find bundle '"
-                    + typeShortName + "' that is required by pipeline '"
-                    + pipelineDef.getId() + "'");
+            validateNotNull(typeDef, "could not find bundle '" + typeShortName
+                    + "' that is required by pipeline '" + pipelineDef.getId()
+                    + "'");
             uimaPipeline.addOutputAnnotation(
                     typeDef.getClassz(),
                     typeDef.getProperties().toArray(
@@ -207,12 +212,11 @@ public class PipelineLoader {
         return uimaPipeline;
     }
 
-    /** */
     private void solveDependencies(Set<BundleDef> bundleDefs,
             String pipelineName, String version,
-            Map<String, String> repositoriesDefs) throws IOException,
-            TemplateException, ArtifactResolutionException,
-            DependencyCollectionException, IOException {
+            Map<String, String> repositoriesDefs, int nrEngines)
+            throws IOException, TemplateException, ArtifactResolutionException,
+            DependencyCollectionException, IOException, ValidationException {
 
         // create fake POM from bundles and copy it
         String fakePom = MavenPom.writePom(bundleDefs, pipelineName, version);
@@ -223,6 +227,7 @@ public class PipelineLoader {
                 .newRepositorySystemSession(system);
 
         Artifact rootArtifact = new DefaultArtifact(fakePom);
+        LOG.trace("* rootArtifact: '{}'", rootArtifact);
 
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(new Dependency(rootArtifact, ""));
@@ -238,6 +243,12 @@ public class PipelineLoader {
         collectResult.getRoot().accept(p);
         List<RemoteRepository> repos = AetherResolver.newRepositories(system,
                 session, repositoriesDefs);
+        List<Dependency> dependencies = p.getDependencies(true);
+        if (nrEngines > 0) {
+            // TODO better validation of pom
+            validateArgument(dependencies.size() > 1, 
+                    "There must have been an error resolving dependencies");
+        }
         for (Dependency dependency : p.getDependencies(true)) {
 
             Artifact artifact = dependency.getArtifact();
@@ -253,6 +264,11 @@ public class PipelineLoader {
             // add this jar to the classpath (if it has not been added before)
             if (!isAlreadyOnClasspath(artifact.getFile())) {
                 ClassPathHack.addFile(artifact.getFile());
+                LOG.trace("* resolved artifact '{}', added to classpath: '{}'",
+                        artifact, artifact.getFile().getAbsolutePath());
+            } else {
+                LOG.trace("* resolved artifact '{}', already on classpath",
+                        artifact);
             }
         }
     }
@@ -263,7 +279,7 @@ public class PipelineLoader {
             return false;
 
         } else {
-            LOG.trace("jar: " + jar.getName());
+            // LOG.trace("jar: " + jar.getName());
             double exists = 0, new_ = 0;
             for (String className : getClasses(jar)) {
                 try {
@@ -271,7 +287,7 @@ public class PipelineLoader {
                     exists++;
                 } catch (Throwable e) {
                     new_++;
-                    LOG.trace("new::" + className);
+                    // LOG.trace("new::" + className);
                 }
                 if (exists + new_ > 20) {
                     break;

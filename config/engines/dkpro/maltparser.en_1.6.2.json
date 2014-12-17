@@ -3,7 +3,7 @@
   "class" : "de.tudarmstadt.ukp.dkpro.core.maltparser.MaltParser",
   "description" : null,
   "domain" : "dkpro",
-  "name" : "opennlp.maltparser.en",
+  "name" : "maltparser.en",
   "parameters" : {
     "language" : "en",
     "modelVariant" : "linear"

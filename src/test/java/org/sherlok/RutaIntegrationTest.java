@@ -24,15 +24,11 @@ import static org.sherlok.SherlokServer.DEFAULT_IP;
 import static org.sherlok.SherlokServer.STATUS_OK;
 
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.sherlok.mappings.PipelineDef;
 
 import spark.StopServer;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Integration tests for neuroner.
@@ -43,8 +39,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class RutaIntegrationTest {
 
     static final int TEST_PORT = 9609;
-    static final String API_URL = "http://localhost:" + TEST_PORT + "/"
-            + ANNOTATE;
+    static final String API_URL = "http://localhost:" + TEST_PORT + "/";
     public static final String TEST_TEXT = "Layer V and layer iii large pyramidal neurons. slowly adapting stretch receptor neuron";
 
     @Rule
@@ -68,9 +63,10 @@ public class RutaIntegrationTest {
 
             beforeClass();
 
-            given().param("text", TEST_TEXT).when().get(API_URL + "/neuroner")
-                    .then().log().everything().contentType(JSON)
-                    .statusCode(STATUS_OK).body(containsString(TEST_TEXT))
+            given().param("text", TEST_TEXT).when()
+                    .get(API_URL + ANNOTATE + "/neuroner").then().log()
+                    .everything().contentType(JSON).statusCode(STATUS_OK)
+                    .body(containsString(TEST_TEXT))
                     .body("annotations.283.@type", equalTo("Layer"));
             /*-
             "283": {
@@ -83,31 +79,4 @@ public class RutaIntegrationTest {
             afterClass();
         }
     }
-
-    @Test
-    @Ignore //FIXME
-    /** Let's put a new faulty script */
-    public void test020PutFaultyScript() throws JsonProcessingException {
-        PipelineDef e = new PipelineDef().setDomain("test").addScriptLine(
-                "DEFINEaaa Dog;");
-        e.setName(RutaIntegrationTest.class.getSimpleName() + "_test");
-        e.setVersion("1");
-        String testPipelineDef = FileBased.writeAsString(e);
-
-        given().content(testPipelineDef)//
-                .when().put(API_URL)//
-                .then().log().everything().statusCode(STATUS_OK);
-    }
-
-//    @Test
-//    public void test020_Exception() throws Exception {
-//
-//        beforeClass();
-//
-//        given().param("text", TEST_TEXT).when().get(API_URL + "/neuroner")
-//                .then().log().everything().contentType(JSON)
-//                .statusCode(STATUS_OK).body(containsString(TEST_TEXT))
-//                .body("annotations.283.@type", equalTo("Layer"));
-//
-//    }
 }

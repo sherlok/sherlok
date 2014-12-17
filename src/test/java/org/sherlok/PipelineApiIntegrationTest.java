@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.*;
 import static org.sherlok.SherlokServer.DEFAULT_IP;
 import static org.sherlok.SherlokServer.PIPELINES;
 import static org.sherlok.SherlokServer.STATUS_INVALID;
+import static org.sherlok.SherlokServer.STATUS_MISSING;
 import static org.sherlok.SherlokServer.STATUS_OK;
 
 import org.junit.AfterClass;
@@ -104,6 +105,45 @@ public class PipelineApiIntegrationTest {
         given().content(testPipelineDef)//
                 .when().put(API_URL)//
                 .then().log().everything().statusCode(STATUS_OK);
+    }
+
+    @Test
+    /** Let's put a new test pipeline for TEST_ONLY */
+    public void test031PutPipelineTestOnly() throws JsonProcessingException {
+
+        String name = PipelineApiIntegrationTest.class.getSimpleName()
+                + "_test";
+        PipelineDef pd = new PipelineDef().setDomain("test").addScriptLine(
+                "DECLARE Dog;");
+        pd.setName(name);
+        pd.setVersion("1");
+        String pdJson = FileBased.writeAsString(pd);
+
+        given().content(pdJson).when()
+                .put(API_URL + "?" + SherlokServer.TEST_ONLY + "=true")//
+                .then().log().everything().statusCode(STATUS_OK);
+
+        // pipeline should not be here, since PUT was TEST_ONLY
+        get(API_URL + PIPELINES + "/" + name + "/" + 1).then().log()
+                .everything().statusCode(STATUS_MISSING);
+    }
+
+    @Test
+    /** Let's put a FAULTY test pipeline for test */
+    public void test032PutFaultyPipelineTestOnly()
+            throws JsonProcessingException {
+
+        String name = PipelineApiIntegrationTest.class.getSimpleName()
+                + "_test_faulty";
+        PipelineDef pd = new PipelineDef().setDomain("test").addScriptLine(
+                "DECL_wrong_ARE Dog;");
+        pd.setName(name);
+        pd.setVersion("1");
+        String pdJson = FileBased.writeAsString(pd);
+
+        given().content(pdJson).when()
+                .put(API_URL + "?" + SherlokServer.TEST_ONLY + "=true")//
+                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test

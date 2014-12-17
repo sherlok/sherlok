@@ -15,12 +15,16 @@
  */
 package org.sherlok.mappings;
 
+import static java.util.regex.Pattern.compile;
+import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import org.apache.maven.model.validation.DefaultModelValidator;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -37,8 +41,9 @@ public class BundleDef extends Def {
     /** additional maven repositories */
     private Map<String, String> repositories = map();
 
-    /** A dependency to some external UIMA code. */
+    /** A Maven dependency to some external UIMA code. */
     public static class BundleDependency {
+
         /** Dependencies can only have these formats */
         public enum DependencyType {
             /** corresponds to a released maven artifact */
@@ -50,7 +55,8 @@ public class BundleDef extends Def {
         }
 
         private DependencyType type = DependencyType.mvn;
-        String value;
+        /** Format: {group id}:{artifact id}:{version} */
+        private String value;
 
         public BundleDependency() {
         }
@@ -90,6 +96,47 @@ public class BundleDef extends Def {
         public String getVersion() {
             return value.split(SEPARATOR)[2];
         }
+
+        @JsonIgnore
+        public int hashCode() {
+            return value.hashCode();
+        }
+
+        @JsonIgnore
+        public boolean equals(Object obj) {
+            if (obj instanceof BundleDependency
+                    && ((BundleDependency) obj).value.equals(value)) {
+                return true;
+            }
+            return false;
+        }
+
+        @JsonIgnore
+        public String toString() {
+            return value + " (" + type + ")";
+        };
+
+        /** @see {@link DefaultModelValidator} */
+        private static final Pattern VALIDATE_ID = compile("[A-Za-z0-9_\\-.]+");
+
+        @JsonIgnore
+        public void validate() throws ValidationException {
+            validateArgument(
+                    VALIDATE_ID.matcher(getGroupId()).matches(),
+                    "invalid group id '" + getGroupId() + "' for bundle "
+                            + this + ", allowed characters are "
+                            + VALIDATE_ID.toString());
+            validateArgument(
+                    VALIDATE_ID.matcher(getArtifactId()).matches(),
+                    "invalid artifact id '" + getArtifactId() + "' for bundle "
+                            + this + ", allowed characters are "
+                            + VALIDATE_ID.toString());
+            validateArgument(
+                    VALIDATE_ID.matcher(getVersion()).matches(),
+                    "invalid version id '" + getVersion() + "' for bundle "
+                            + this + ", allowed characters are "
+                            + VALIDATE_ID.toString());
+        }
     }
 
     // get/set
@@ -125,7 +172,9 @@ public class BundleDef extends Def {
     public boolean validate(String bundleObject) throws ValidationException {
         super.validate(bundleObject);
         try {
-            // TODO more validation
+            for (BundleDependency bd : getDependencies()) {
+                bd.validate();
+            }
         } catch (Throwable e) {
             throw new ValidationException("" + bundleObject + ": "
                     + e.getMessage());

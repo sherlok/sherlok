@@ -100,6 +100,6 @@ public abstract class Def {
 
     @Override
     public String toString() {
-        return name + ":" + version;
+        return getId();
     }
 }

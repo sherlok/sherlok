@@ -69,7 +69,7 @@ public class UimaPipelineTest {
     public void testMaltParser() throws Exception {
 
         UimaPipeline pipeline = new PipelineLoader(new Controller().load())
-                .resolvePipeline("opennlp.maltparser.en", null);
+                .resolvePipeline("maltparser.en", null);
         String result = (pipeline.annotate("The dog walks on the lake."));
         LOG.debug(result);
 

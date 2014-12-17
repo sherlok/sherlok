@@ -1,0 +1,13 @@
+{
+  "bundle_id" : "dkpro.berkeleyparser.en:1.6.2",
+  "class" : "de.tudarmstadt.ukp.dkpro.core.berkeleyparser.BerkeleyParser",
+  "description" : null,
+  "domain" : "dkpro",
+  "name" : "berkeleyparser.en",
+  "parameters" : {
+    "language" : "en",
+    "modelVariant" : "sm6",
+    "writePennTree" : "true"
+  },
+  "version" : "1.6.2"
+}

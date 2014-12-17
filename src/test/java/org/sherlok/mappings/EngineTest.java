@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.junit.Test;
 import org.sherlok.FileBased;
+import org.sherlok.utils.Create;
 
 public class EngineTest {
 
@@ -31,7 +32,7 @@ public class EngineTest {
                 .setClassz(
                         "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter")
                 .setBundleId("dkpro_opennlp_en:1.6.2")
-                .addParameter("language", "en");
+                .addParameter("language", Create.list( "en"));
         e.setName("OpenNlpEnSegmenter");
         e.setVersion("1.6.2");
 

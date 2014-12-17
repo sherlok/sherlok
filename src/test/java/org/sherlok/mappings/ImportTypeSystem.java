@@ -19,21 +19,32 @@ import org.sherlok.utils.ValidationException;
 import org.xml.sax.SAXException;
 
 /**
- * Imports UIMA {@link TypeSystemDescription} into Sherlok's {@link TypesDef}
+ * Utility to convert a UIMA {@link TypeSystemDescription} xml into Sherlok's
+ * {@link TypesDef} json.
  * 
- * @author richarde
+ * @author renaud@apache.org
  */
 public class ImportTypeSystem {
 
-    private static void createTypeSystemFromDescriptor(String tsDescriptorPath,
-            String typesDefPath, String prefix) throws InvalidXMLException,
-            IOException, ResourceInitializationException, SAXException,
-            ValidationException {
+    /**
+     * @param tsDescriptorInputFile
+     *            UIMA xml typesystem file
+     * @param typesDefOuputFile
+     *            Sherlok json TypeDef file
+     * @param prefix
+     *            prefix for shortName, e.g. 'dkpro.' in 'dkpro.Entity'
+     */
+    @SuppressWarnings("unused")
+    private static void createTypeSystemFromDescriptor(
+            String tsDescriptorInputFile, String typesDefOuputFile,
+            String prefix) throws InvalidXMLException, IOException,
+            ResourceInitializationException, SAXException, ValidationException {
 
         XMLParser xmlParser = UIMAFramework.getXMLParser();
 
         TypeSystemDescription tsd = xmlParser
-                .parseTypeSystemDescription(new XMLInputSource(tsDescriptorPath));
+                .parseTypeSystemDescription(new XMLInputSource(
+                        tsDescriptorInputFile));
 
         TypesDef td = new TypesDef();
         td.setName(tsd.getName());
@@ -54,14 +65,25 @@ public class ImportTypeSystem {
             }
         }
 
-        FileBased.write(new File(typesDefPath), td);
+        FileBased.write(new File(typesDefOuputFile), td);
     }
 
     public static void main(String[] args) throws Exception {
 
+        /*-
         createTypeSystemFromDescriptor(
                 "/Users/richarde/dev/bluebrain/git/neuroNER/descriptor/neuroner/NeuroNERTypeSystem.xml",
                 "config/types/bluima.neuroner.json", "neuroner.");
+        createTypeSystemFromDescriptor(
+                "/Users/richarde/.m2/repository/de/tudarmstadt/ukp/dkpro/core/de.tudarmstadt.ukp.dkpro.core.api.syntax-asl/1.6.2/de.tudarmstadt.ukp.dkpro.core.api.syntax-asl-1.6.2-sources/desc/type/Constituency.xml",
+                "config/types/dkpro.parser.constituent.json", "constituent.");
+        createTypeSystemFromDescriptor(
+                "/Users/richarde/.m2/repository/de/tudarmstadt/ukp/dkpro/core/de.tudarmstadt.ukp.dkpro.core.api.syntax-asl/1.6.2/de.tudarmstadt.ukp.dkpro.core.api.syntax-asl-1.6.2-sources/desc/type/Chunks.xml",
+                "config/types/dkpro.chunk.json", "chunk.");
+        createTypeSystemFromDescriptor(
+                "/Users/richarde/.m2/repository/de/tudarmstadt/ukp/dkpro/core/de.tudarmstadt.ukp.dkpro.core.api.syntax-asl/1.6.2/de.tudarmstadt.ukp.dkpro.core.api.syntax-asl-1.6.2-sources/desc/type/PennTree.xml",
+                "config/types/dkpro.penntree.json", "penntree.");
+         */
 
     }
 }

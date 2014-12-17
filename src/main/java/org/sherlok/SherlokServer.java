@@ -67,6 +67,13 @@ public class SherlokServer {
     static final String BUNDLES = "bundles";
     /** Route and path for types */
     static final String TYPES = "types";
+    static final String TEST_ONLY = "testonly";
+
+    public static final int STATUS_OK = 200;
+    public static final int STATUS_INVALID = 400;
+    public static final int STATUS_MISSING = 404;
+    public static final int STATUS_SERVER_ERROR = 500;
+    public static final String JSON = "application/json";
 
     // LOGO http://www.kammerl.de/ascii/AsciiSignature.php font 'thin'
     private static final String LOGO = "\n,---.|              |         |    \n`---.|---.,---.,---.|    ,---.|__/ \n    ||   ||---'|    |    |   ||  \\ \n`---'`   '`---'`    `---'`---'`   `\n\n";
@@ -80,11 +87,6 @@ public class SherlokServer {
     /** Files allowed in {@link #PUBLIC} folder (to avoid collision with API) */
     private static final List<String> PUBLIC_WHITELIST = //
     Create.list(".DS_Store", "index.html");
-
-    public static final int STATUS_OK = 200;
-    public static final int STATUS_INVALID = 400;
-    public static final int STATUS_SERVER_ERROR = 500;
-    public static final String JSON = "application/json";
 
     public static final String TEST_TEXT = "Using this calibration procedure, we find that mature granule cells (doublecortin-) contain approximately 40 microm, and newborn granule cells (doublecortin+) contain 0-20 microm calbindin-D28k. U.S. employers added the largest number of workers in nearly three years in October and wages increased, which could bring the Federal Reserve closer to raising interest rates. Nonfarm payrolls surged by 321,000 last month, the most since January of 2012, the Labor Department said on Friday. The unemployment rate held steady at a six-year low of 5.8 percent. Data for September and October were revised to show 44,000 more jobs created than previously reported. Economists polled by Reuters had forecast payrolls increasing by only 230,000 last month. November marked the 10th straight month that job growth has exceeded 200,000, the longest stretch since 1994, and further confirmed the economy is weathering slowdowns in China and the euro zone, as well as a recession in Japan.";
 
@@ -173,7 +175,7 @@ public class SherlokServer {
             @Override
             public Object handle(Request req, Response resp) {
                 try {
-                    boolean testOnly = parseBoolean(req.queryParams("testonly"));
+                    boolean testOnly = parseBoolean(req.queryParams(TEST_ONLY));
                     if (testOnly) {
                         // load
                         PipelineDef parsedPipeline = FileBased

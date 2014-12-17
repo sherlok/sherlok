@@ -85,7 +85,7 @@ public class EngineApiIntegrationTest {
                 .body("name", equalTo("opennlp.ner.person.en"))//
                 .body("version", equalTo("1.6.2"))//
                 .body("domain", equalTo("dkpro"))//
-                .body("parameters.modelVariant", equalTo("person"));
+                .body("parameters.modelVariant[0]", equalTo("person"));
     }
 
     @Test

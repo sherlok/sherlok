@@ -36,7 +36,7 @@ public class ControllerTest {
 
         EngineDef ed = controller.getEngineDef("opennlp.segmenter.en:1.6.2");
         assertEquals(1, ed.getParameters().size());
-        assertEquals("en", ed.getParameter("language"));
+        assertEquals("en", ed.getParameter("language").get(0));
 
         TypeDef td = controller.getTypeDef("dkpro.NamedEntity");
         assertEquals("de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity",

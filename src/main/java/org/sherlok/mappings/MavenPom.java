@@ -16,6 +16,8 @@
 package org.sherlok.mappings;
 
 import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.set;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,14 +31,16 @@ import java.util.Set;
 
 import org.sherlok.aether.AetherResolver;
 import org.sherlok.mappings.BundleDef.BundleDependency;
+import org.slf4j.Logger;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 public class MavenPom {
+    private static final Logger LOG = getLogger(MavenPom.class);
 
-    public static class RepoDef {
+    public static class RepoDefDTO {
         public String id, url;
 
         public String getId() {
@@ -46,8 +50,29 @@ public class MavenPom {
         public String getUrl() {
             return url;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof RepoDefDTO && ((RepoDefDTO) obj).id.equals(id)) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return id.hashCode();
+        }
     }
 
+    /**
+     * Generates and writes a Maven pom.xml in local_repo
+     * 
+     * @param bundleDefs
+     * @param pipelineName
+     * @param version
+     * @return pom id for aether
+     */
     public static String writePom(Set<BundleDef> bundleDefs,
             String pipelineName, String version) throws IOException,
             TemplateException {
@@ -70,14 +95,16 @@ public class MavenPom {
         }
         data.put("deps", deps);
 
-        List<RepoDef> repoDefs = list();
+        Set<RepoDefDTO> repoDefs = set();
         for (BundleDef bundleDef : bundleDefs) {
             for (Entry<String, String> id_url : bundleDef.getRepositories()
                     .entrySet()) {
-                RepoDef rd = new RepoDef();
+                RepoDefDTO rd = new RepoDefDTO();
                 rd.id = id_url.getKey();
                 rd.url = id_url.getValue();
-                repoDefs.add(rd);
+                if (repoDefs.add(rd))
+                    LOG.trace("adding repo id '{}', url '{}' to pom", rd.id,
+                            rd.url);
             }
         }
         data.put("repos", repoDefs);
@@ -87,11 +114,12 @@ public class MavenPom {
                 + pipelineName + "/" + version);
         dir.mkdirs();
 
-        Writer file = new FileWriter(new File(dir, pipelineName + "-" + version
-                + ".pom"));
-        template.process(data, file);
-        file.flush();
-        file.close();
+        File pomFile = new File(dir, pipelineName + "-" + version + ".pom");
+        Writer writer = new FileWriter(pomFile);
+        template.process(data, writer);
+        writer.flush();
+        writer.close();
+        LOG.trace("pomFile written to '{}'", pomFile.getAbsolutePath());
 
         return "org.sherlok:" + pipelineName + ":pom:" + version;
     }

@@ -15,17 +15,13 @@
  */
 package org.sherlok.mappings;
 
-import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.sherlok.utils.ValidationException;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -47,8 +43,8 @@ public class EngineDef extends Def {
     /** which {@link BundleDef}this engine comes from */
     @JsonProperty("bundle_id")
     private String bundleId;
-    /** UIMA parameters. Overwrites default parameters */
-    private Map<String, Object> parameters = map();
+    /** UIMA parameters. To overwrite default parameters */
+    private Map<String, List<String>> parameters = map();
 
     // get/set
 
@@ -79,21 +75,21 @@ public class EngineDef extends Def {
         return this;
     }
 
-    public Map<String, Object> getParameters() {
+    public Map<String, List<String>> getParameters() {
         return parameters;
     }
 
-    public EngineDef setParameters(Map<String, Object> parameters) {
+    public EngineDef setParameters(Map<String, List<String>> parameters) {
         this.parameters = parameters;
         return this;
     }
 
-    public EngineDef addParameter(String key, Object value) {
+    public EngineDef addParameter(String key, List<String> value) {
         this.parameters.put(key, value);
         return this;
     }
 
-    public Object getParameter(String key) {
+    public List<String> getParameter(String key) {
         return this.parameters.get(key);
     }
 
@@ -106,17 +102,6 @@ public class EngineDef extends Def {
                     + e.getMessage());
         }
         return true;
-    }
-
-    /** Flatten the params to be used by the {@link AnalysisEngineFactory} */
-    @JsonIgnore
-    public Object[] getFlatParams() {
-        List<Object> flatParams = list();
-        for (Entry<String, Object> en : getParameters().entrySet()) {
-            flatParams.add(en.getKey());
-            flatParams.add(en.getValue());
-        }
-        return flatParams.toArray(new Object[flatParams.size()]);
     }
 
     public String getIdForDescriptor(String separator) {

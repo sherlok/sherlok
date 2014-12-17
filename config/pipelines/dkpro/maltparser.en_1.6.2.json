@@ -3,12 +3,12 @@
   "domain" : "dkpro",
   "language" : "en",
   "loadOnStartup" : false,
-  "name" : "opennlp.maltparser.en",
+  "name" : "maltparser.en",
   "output" : {
     "annotations" : [ "dkpro.Dependency" ],
     "payloads" : [ ]
   },
-  "script" : [ "ENGINE opennlp.segmenter.en:1.6.2;", "ENGINE opennlp.pos.en:1.6.2;", "ENGINE opennlp.maltparser.en:1.6.2;" ],
+  "script" : [ "ENGINE opennlp.segmenter.en:1.6.2;", "ENGINE opennlp.pos.en:1.6.2;", "ENGINE maltparser.en:1.6.2;" ],
   "tests" : [ ],
   "version" : "1.6.2"
 }
