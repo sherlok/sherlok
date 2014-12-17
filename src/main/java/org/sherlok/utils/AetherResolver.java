@@ -93,14 +93,15 @@ public class AetherResolver {
         return session;
     }
 
+    // local repo (added as remote)
+    public static File localRepo = new File(System.getProperty("user.home")
+            + "/.m2/repository/");
+
     public static List<RemoteRepository> newRepositories(
             RepositorySystem system, RepositorySystemSession session,
             Map<String, String> otherRepos) throws MalformedURLException {
 
         List<RemoteRepository> repos = list();
-        // local repo (added as remote)
-        File localRepo = new File(System.getProperty("user.home")
-                + "/.m2/repository/");
         if (localRepo.exists()) {
             repos.add(new RemoteRepository.Builder("local_default", "default",
                     localRepo.toURI().toURL().toString()).build());
@@ -126,7 +127,7 @@ public class AetherResolver {
         private String currentIndent = "";
 
         public boolean visitEnter(DependencyNode node) {
-            LOG.debug(currentIndent + node);
+            LOG.trace(currentIndent + node);
             if (currentIndent.length() <= 0) {
                 currentIndent = "+- ";
             } else {

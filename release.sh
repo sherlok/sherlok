@@ -15,11 +15,16 @@
 # limitations under the License.
 #
 
+#################################
+#   Bash script to create a     #
+#   standalone Sherlok release  #
+#################################
 
 MAVEN="mvn -Dmaven.test.skip=true"
 
+# create release directory
 RELEASE=sherlok_`date +"%Y%m%d"`
-echo "Creating release in $RELEASE"
+echo "Creating release in $RELEASE\n"
 if [ -e "$RELEASE" ]; then
 	echo "Release '$RELEASE' already exists, exiting."; exit;
 fi
@@ -33,16 +38,16 @@ if [[ $rc != 0 ]] ; then
 fi
 mv target/appassembler/* "$RELEASE"/.
 
-# copy config and README
-cp README.md "$RELEASE"/.
+# copy config, public and README
+cp -R config "$RELEASE"/.
 cp -R public "$RELEASE"/.
+cp README.md "$RELEASE"/.
+# cleanup caches
+rm -rf "$RELEASE/config/ruta/.engines/*"
+rm -rf "$RELEASE/config/ruta/.pipelines/*"
 
-# FIXME remove when ok
-mkdir "$RELEASE"/local_repo
-mkdir "$RELEASE"/local_repo/sherlok
-mkdir "$RELEASE"/local_repo/sherlok/sherlok/
-mkdir "$RELEASE"/local_repo/sherlok/sherlok/1/
-cp sherlok-1.pom "$RELEASE"/local_repo/sherlok/sherlok/1/
+# add git revision
+git rev-parse HEAD > "$RELEASE/git_revision.txt"
 
 chmod 744 "$RELEASE"/bin/sherlok
 

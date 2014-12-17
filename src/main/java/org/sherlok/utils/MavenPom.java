@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sherlok.mappings;
+package org.sherlok.utils;
 
 import static org.sherlok.utils.AetherResolver.SHERLOK_REPO_ID;
 import static org.sherlok.utils.AetherResolver.SHERLOK_REPO_URL;
@@ -31,8 +31,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.BundleDef.BundleDependency;
-import org.sherlok.utils.AetherResolver;
 import org.slf4j.Logger;
 
 import freemarker.template.Configuration;
@@ -86,8 +86,9 @@ public class MavenPom {
 
         // Freemarker configuration object
         Configuration cfg = new Configuration();
+        cfg.setClassForTemplateLoading(MavenPom.class, "/");
 
-        Template template = cfg.getTemplate("src/main/resources/fakePom.ftl");
+        Template template = cfg.getTemplate("fakePom.ftl");
 
         // Bind variables
         Map<String, Object> data = new HashMap<String, Object>();

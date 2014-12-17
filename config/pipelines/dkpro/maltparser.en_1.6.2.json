@@ -9,6 +9,6 @@
     "payloads" : [ ]
   },
   "script" : [ "ENGINE opennlp.segmenter.en:1.6.2;", "ENGINE opennlp.pos.en:1.6.2;", "ENGINE maltparser.en:1.6.2;" ],
-  "tests" : [ ],
+  "tests" : [ {"in": "The blue house of my childhood was bought: what a pity!" } ],
   "version" : "1.6.2"
 }

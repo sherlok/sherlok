@@ -58,10 +58,10 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.EngineDef;
-import org.sherlok.mappings.MavenPom;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.TypesDef.TypeDef;
 import org.sherlok.utils.AetherResolver;
+import org.sherlok.utils.MavenPom;
 import org.sherlok.utils.Strings;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
@@ -260,6 +260,11 @@ public class PipelineLoader {
                     artifactRequest);
 
             artifact = artifactResult.getArtifact();
+
+            if (AetherResolver.localRepo.exists()
+                    && AetherResolver.localRepo.canWrite()) {
+                // TODO add to local repo
+            }
 
             // add this jar to the classpath (if it has not been added before)
             if (!isAlreadyOnClasspath(artifact.getFile())) {
