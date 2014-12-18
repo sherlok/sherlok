@@ -20,7 +20,8 @@
 #   standalone Sherlok release  #
 #################################
 
-MAVEN="mvn -Dmaven.test.skip=true"
+#MAVEN="mvn -Dmaven.test.skip=true"
+MAVEN="mvn clean test"
 
 # create release directory
 RELEASE=sherlok_`date +"%Y%m%d"`

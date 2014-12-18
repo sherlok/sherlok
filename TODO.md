@@ -1,6 +1,7 @@
 # TODOs
 
 
+* P1 should work offline, too
 
 * P2 spinning wheel while running tests
 
