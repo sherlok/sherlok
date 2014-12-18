@@ -16,6 +16,7 @@
 package org.sherlok.mappings;
 
 import static org.sherlok.utils.CheckThat.validateArgument;
+import static org.sherlok.utils.CheckThat.validateTypeIdentifier;
 import static org.sherlok.utils.Create.list;
 
 import java.util.List;
@@ -58,15 +59,30 @@ public class PipelineDef extends Def {
 
     /** Output definition (output annotations and payload) */
     public static class PipelineOutput {
-        List<String> annotations = list();
+
+        @JsonProperty("filter_annotations")
+        List<String> annotationFilters = list();
+        @JsonProperty("include_annotations")
+        List<String> annotationIncludes = list();
         List<String> payloads = list();
 
-        public List<String> getAnnotations() {
-            return annotations;
+        public List<String> getAnnotationFilters() {
+            return annotationFilters;
         }
 
-        public PipelineOutput setAnnotations(List<String> annotations) {
-            this.annotations = annotations;
+        public PipelineOutput setAnnotationFilters(
+                List<String> annotationFilters) {
+            this.annotationFilters = annotationFilters;
+            return this;
+        }
+
+        public List<String> getAnnotationIncludes() {
+            return annotationIncludes;
+        }
+
+        public PipelineOutput setAnnotationIncludes(
+                List<String> annotationIncludes) {
+            this.annotationIncludes = annotationIncludes;
             return this;
         }
 
@@ -160,11 +176,6 @@ public class PipelineDef extends Def {
         return this;
     }
 
-    public PipelineDef addOutputAnnotation(String annotation) {
-        this.output.annotations.add(annotation);
-        return this;
-    }
-
     public PipelineDef addOutputPayload(String payload) {
         this.output.payloads.add(payload);
         return this;
@@ -193,12 +204,31 @@ public class PipelineDef extends Def {
                     "'language' can not be empty");
             validateArgument(domain.indexOf("..") == -1,
                     "'domain' can not contain double dots: '" + domain + "'");
+
+            // output
+            validateArgument(
+                    !(!output.annotationFilters.isEmpty() && !output.annotationIncludes
+                            .isEmpty()),
+                    "either provide 'filter_annotations' or 'include_annotations', but not both for pipeline '"
+                            + getId() + "'");
+
+            String typeMsg = "It should be a list of valid identifiers, separated by dots, "
+                    + "and optionally ending with '.*' to match all subsequent types. "
+                    + "Identifiers must be composed of letters, numbers, the underscore"
+                    + " _ and the dollar sign $. Identifiers may only begin with a letter, "
+                    + "the underscore or a dollar sign.";
+            for (String type : output.annotationFilters) {
+                validateTypeIdentifier(type, "output annotation filter '"
+                        + type + "' is not valid." + typeMsg);
+            }
+            for (String type : output.annotationIncludes) {
+                validateTypeIdentifier(type, "output annotation includes '"
+                        + type + "' is not valid." + typeMsg);
+            }
             if (tests.isEmpty()) {
                 LOG.warn("no tests for pipeline '{}'", getId());
             }
-            if (output.getAnnotations().isEmpty()) {
-                LOG.warn("no output annotations for pipeline '{}'", getId());
-            }
+
         } catch (Throwable e) {
             throw new ValidationException("" + pipelineObject + ": "
                     + e.getMessage());

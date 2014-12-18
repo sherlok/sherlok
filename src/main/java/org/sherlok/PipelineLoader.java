@@ -15,6 +15,7 @@
  */
 package org.sherlok;
 
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
@@ -42,7 +43,6 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.uima.UIMAException;
-import org.apache.uima.resource.ResourceInitializationException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -59,7 +59,6 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.mappings.TypesDef.TypeDef;
 import org.sherlok.utils.AetherResolver;
 import org.sherlok.utils.MavenPom;
 import org.sherlok.utils.Strings;
@@ -181,33 +180,14 @@ public class PipelineLoader {
         try {
             uimaPipeline = new UimaPipeline(pipelineDef.getId(),
                     pipelineDef.getLanguage(), engineDefs,
-                    pipelineDef.getScriptLines());
-        } catch (ResourceInitializationException | IOException e) {
+                    pipelineDef.getScriptLines(), pipelineDef.getOutput()
+                            .getAnnotationIncludes(), pipelineDef.getOutput()
+                            .getAnnotationFilters());
+        } catch (IOException | UIMAException e) {
             throw new ValidationException(
                     "could not initialize UIMA pipeline: " + e.getMessage(), e);
         }
 
-        // 6. set annotations to UimaPipeline output
-        for (String typeShortName : pipelineDef.getOutput().getAnnotations()) {
-            TypeDef typeDef = controller.getTypeDef(typeShortName);
-            typeDef.validate(uimaPipeline.getTypeSystemDescription());
-            validateNotNull(typeDef, "could not find bundle '" + typeShortName
-                    + "' that is required by pipeline '" + pipelineDef.getId()
-                    + "'");
-            uimaPipeline.addOutputAnnotation(
-                    typeDef.getClassz(),
-                    typeDef.getProperties().toArray(
-                            new String[typeDef.getProperties().size()]));
-        }
-
-        // 7. initialize UIMA pipeline and cache it
-        try {
-            uimaPipeline.initialize();
-        } catch (UIMAException e) {
-            throw new ValidationException(
-                    "could not initialize UIMA pipeline '" + uimaPipeline
-                            + "': " + e.getMessage(), e);
-        }
         return uimaPipeline;
     }
 
@@ -263,7 +243,20 @@ public class PipelineLoader {
 
             if (AetherResolver.localRepo.exists()
                     && AetherResolver.localRepo.canWrite()) {
-                // TODO add to local repo
+                // FIXME test
+
+                File sherlokRepo = new File(AetherResolver.LOCAL_REPO_PATH);
+                String canonicalPath = artifact.getFile().getCanonicalPath();
+                String relative = canonicalPath.substring(sherlokRepo
+                        .getAbsolutePath().length(), canonicalPath.length());
+
+                File localRepoFile = new File(AetherResolver.localRepo,
+                        relative);
+                if (!localRepoFile.exists()) {
+                    LOG.trace("artifact '{}' added to local maven repo",
+                            artifact.getFile().getName());
+                    copyFile(artifact.getFile(), localRepoFile);
+                }
             }
 
             // add this jar to the classpath (if it has not been added before)

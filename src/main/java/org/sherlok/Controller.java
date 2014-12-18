@@ -26,35 +26,17 @@ import java.util.Set;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.mappings.TypesDef;
-import org.sherlok.mappings.TypesDef.TypeDef;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
 public class Controller {
     private static final Logger LOG = getLogger(Controller.class);
 
-    private Map<String, TypeDef> typeDefs;
     private Map<String, BundleDef> bundleDefs;
     private Map<String, EngineDef> engineDefs;
     private Map<String, PipelineDef> pipelineDefs;
 
     public Controller load() throws ValidationException {
-
-        // TYPES
-        typeDefs = map(); // reinit
-        for (TypesDef tdefs : FileBased.allTypesDefs()) {
-
-            for (TypeDef type : tdefs.getTypes()) {
-                String key = type.getShortName();
-                if (typeDefs.containsKey(key)) {
-                    throw new ValidationException("duplicate types: '" + key
-                            + "'");
-                } else {
-                    typeDefs.put(key, type);
-                }
-            }
-        }
 
         // BUNDLES
         bundleDefs = map(); // reinit
@@ -110,9 +92,9 @@ public class Controller {
         }
 
         LOG.debug(
-                "Done loading from Store: {} typeDefs, {} bundleDefs, {} engineDefs, {} pipelineDefs",
-                new Object[] { typeDefs.size(), bundleDefs.size(),
-                        engineDefs.size(), pipelineDefs.size() });
+                "Done loading from Store: {} bundleDefs, {} engineDefs, {} pipelineDefs",
+                new Object[] { bundleDefs.size(), engineDefs.size(),
+                        pipelineDefs.size() });
         return this;
     }
 
@@ -120,9 +102,6 @@ public class Controller {
     // access API, package visibility
 
     // LIST all /////////////////////////////////////////////////////////////
-    Collection<TypeDef> listTypes() {
-        return typeDefs.values();
-    }
 
     Collection<BundleDef> listBundles() {
         return bundleDefs.values();
@@ -141,10 +120,6 @@ public class Controller {
         return bundleDefs.keySet();
     }
 
-    Set<String> listTypeDefNames() {
-        return typeDefs.keySet();
-    }
-
     Set<String> listEngineDefNames() {
         return engineDefs.keySet();
     }
@@ -154,9 +129,6 @@ public class Controller {
     }
 
     // GET by name /////////////////////////////////////////////////////////
-    TypeDef getTypeDef(String typeShortName) {
-        return typeDefs.get(typeShortName);
-    }
 
     BundleDef getBundleDef(String bundleId) {
         return bundleDefs.get(bundleId);

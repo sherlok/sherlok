@@ -2,6 +2,7 @@ package org.sherlok;
 
 import static org.sherlok.utils.Create.list;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -16,9 +17,7 @@ public class RutaTests {
         List<EngineDef> engineDefs = list();
         List<String> scriptLines = list("DECLLLLARE wrong");
 
-        UimaPipeline uimaPipeline = new UimaPipeline("validateRutaScript",
-                "en", engineDefs, scriptLines);
-
-        uimaPipeline.initialize();
+        new UimaPipeline("validateRutaScript", "en", engineDefs, scriptLines,
+                new ArrayList<String>(), new ArrayList<String>());
     }
 }

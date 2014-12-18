@@ -5,8 +5,7 @@
   "loadOnStartup" : false,
   "name" : "02.ruta.annotate.countries",
   "output" : {
-    "annotations" : [ "Country" ],
-    "payloads" : [ ]
+    "include_annotations" : [ "org.sherlok.ruta.Country" ]
   },
   "script" : [ "WORDLIST CountriesList = 'countries.txt';", "DECLARE Country;", "Document{-> MARKFAST(Country, CountriesList)};" ],
   "tests" : [ {

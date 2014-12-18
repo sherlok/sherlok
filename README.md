@@ -6,11 +6,11 @@ _Distributed restful text mining._
 
 Sherlok is a flexible and powerful open source, distributed, real-time text-mining engine. Sherlok works as a RESTful annotation server based on [Apache UIMA](http://uima.apache.org/). For example, Sherlok can:
 
-* highlight persons and locations in text (using [DKPro OpenNLP](https://www.ukp.tu-darmstadt.de/research/current-projects/dkpro/)),
-* perform sentiment analysis using deep learning (using [Stanford Sentiment](http://nlp.stanford.edu/sentiment/)),
-* analyse the syntax of tweets (using [TweetNLP](http://www.ark.cs.cmu.edu/TweetNLP/)),
-* identify proteins and chemicals in biomedical texts (using [Bluima](https://github.com/BlueBrain/bluima)),
-* analyze clinical text and perform knowledge extraction (using [Apache cTAKES](http://ctakes.apache.org/index.html))
+- [x] highlight persons and locations in text (using [DKPro OpenNLP](https://www.ukp.tu-darmstadt.de/research/current-projects/dkpro/)),
+- [ ] perform sentiment analysis using deep learning (using [Stanford Sentiment](http://nlp.stanford.edu/sentiment/)),
+- [ ] analyse the syntax of tweets (using [TweetNLP](http://www.ark.cs.cmu.edu/TweetNLP/)),
+- [ ] identify proteins and chemicals in biomedical texts (using [Bluima](https://github.com/BlueBrain/bluima)),
+- [ ] analyze clinical text and perform knowledge extraction (using [Apache cTAKES](http://ctakes.apache.org/index.html))
 
 
 ### Getting Started

@@ -5,8 +5,7 @@
   "loadOnStartup" : false,
   "name" : "opennlp.ners.en",
   "output" : {
-    "annotations" : [ "dkpro.NamedEntity" ],
-    "payloads" : [ ]
+    "include_annotations" : [ "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity" ]
   },
   "script" : [ "ENGINE opennlp.segmenter.en:1.6.2;", "ENGINE opennlp.pos.en:1.6.2;", "ENGINE opennlp.ner.person.en:1.6.2;", "ENGINE opennlp.ner.location.en:1.6.2;" ],
   "tests" : [ {

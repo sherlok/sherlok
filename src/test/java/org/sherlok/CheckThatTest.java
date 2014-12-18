@@ -19,13 +19,14 @@ import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.sherlok.utils.CheckThat.validateId;
 
 import org.junit.Test;
+import org.sherlok.utils.CheckThat;
 import org.sherlok.utils.ValidationException;
 
-public class CheckThatTest  {
+public class CheckThatTest {
 
     @Test(expected = ValidationException.class)
     public void testStar() throws Exception {
-      checkOnlyAlphanumDot("*_");
+        checkOnlyAlphanumDot("*_");
     }
 
     @Test(expected = ValidationException.class)
@@ -56,5 +57,62 @@ public class CheckThatTest  {
     @Test(expected = ValidationException.class)
     public void testValidIdMissingColumn() throws Exception {
         validateId("a_bc_d");
+    }
+
+    @Test
+    public void testJavaIdentifier() throws Exception {
+        CheckThat.validateJavaIdentifier("C", "errr1");
+        CheckThat.validateJavaIdentifier("Cc", "errr2");
+        CheckThat.validateJavaIdentifier("b.C", "errr3");
+        CheckThat.validateJavaIdentifier("b.Cc", "errr4");
+        CheckThat.validateJavaIdentifier("aAa.b.Cc", "errr5");
+        CheckThat.validateJavaIdentifier("a.b.Cc", "errr6");
+
+        // after the initial character identifiers may use any combination of
+        // letters and digits, underscores or dollar signs
+        CheckThat.validateJavaIdentifier("a.b.C_c", "errr10");
+        CheckThat.validateJavaIdentifier("a.b.C$c", "errr11");
+        CheckThat.validateJavaIdentifier("a.b.C9", "errr12");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testJavaIdentifierFailDot() throws Exception {
+        CheckThat.validateJavaIdentifier(".C", "cannot start with a dot");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testJavaIdentifierFailDot2() throws Exception {
+        CheckThat.validateJavaIdentifier("C.", "cannot end with a dot");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testJavaIdentifierFailDotDot() throws Exception {
+        CheckThat.validateJavaIdentifier("b..C",
+                "cannot have two dots following each other");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testJavaIdentifierFailNumber() throws Exception {
+        CheckThat.validateJavaIdentifier("b.9C", "cannot start with a number");
+    }
+
+    @Test
+    public void testTypeIdentifier() throws Exception {
+        CheckThat.validateTypeIdentifier("Cc", "e1");
+        CheckThat.validateTypeIdentifier("b.C", "e2");
+        CheckThat.validateTypeIdentifier("aAa.b.Cc", "e3");
+        CheckThat.validateTypeIdentifier("Cc.*", "e4");
+        CheckThat.validateTypeIdentifier("aAa.b.Cc.*", "e5");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testTypeIdentifierFail() throws Exception {
+        CheckThat.validateJavaIdentifier("aAa.b.Cc.", "cannot end with dot");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testTypeIdentifierFail2() throws Exception {
+        CheckThat
+                .validateJavaIdentifier("aAa.b.Cc*", "cannot end with asterix");
     }
 }

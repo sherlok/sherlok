@@ -17,19 +17,26 @@ package org.sherlok.mappings;
 
 import static java.lang.System.currentTimeMillis;
 import static org.junit.Assert.assertEquals;
+import static org.sherlok.utils.Create.list;
 
 import java.io.File;
+import java.util.List;
 
 import org.junit.Test;
 import org.sherlok.FileBased;
+import org.sherlok.mappings.PipelineDef.PipelineOutput;
+import org.sherlok.utils.ValidationException;
 
 public class PipelineDefTest {
 
     public static PipelineDef getOpennlp_ners() {
-        PipelineDef p = new PipelineDef().setDomain("dkpro")
+        PipelineDef p = new PipelineDef()
+                .setDomain("dkpro")
                 .addScriptLine("ENGINE opennlp.segmenter.en:1.6.2")
                 .addScriptLine("ENGINE opennlp.pos.en:1.6.2")
-                .addOutputAnnotation("dkpro.NamedEntity");
+                .setOutput(
+                        new PipelineOutput().setAnnotationFilters(list(
+                                "org.Filter", "Me")));
         p.setName("OpenNlpEnSegmenter");
         p.setVersion("1.6.2");
         return p;
@@ -46,7 +53,21 @@ public class PipelineDefTest {
         p2.validate("");
         assertEquals(p.getName(), p2.getName());
         assertEquals(p.getVersion(), p2.getVersion());
-        assertEquals(p.getOutput().getAnnotations().size(), p2.getOutput()
-                .getAnnotations().size());
+
+        List<String> filters = p.getOutput().getAnnotationFilters();
+        assertEquals(2, filters.size());
+        assertEquals("org.Filter", filters.get(0));
     }
+
+    /** Should not have includes and filters at the same time */
+    @Test(expected = ValidationException.class)
+    public void testFilters() throws Exception {
+        PipelineDef p = new PipelineDef().setOutput(new PipelineOutput()
+                .setAnnotationFilters(list("filter")).setAnnotationIncludes(
+                        list("include")));
+        p.setName("n");
+        p.setVersion("v");
+        p.validate("");
+    }
+
 }

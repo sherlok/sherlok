@@ -5,8 +5,7 @@
   "loadOnStartup" : false,
   "name" : "01.ruta.annotate.dog",
   "output" : {
-    "annotations" : [ "Dog" ],
-    "payloads" : [ ]
+    "include_annotations" : [ "org.sherlok.ruta.Dog" ]
   },
   "script" : [ "DECLARE Dog;", "W{REGEXP(\"dog\") -> MARK(Dog)};" ],
   "tests" : [ {

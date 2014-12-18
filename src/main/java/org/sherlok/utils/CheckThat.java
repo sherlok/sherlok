@@ -15,6 +15,7 @@
  */
 package org.sherlok.utils;
 
+import static java.util.regex.Pattern.compile;
 import static org.sherlok.mappings.Def.SEPARATOR;
 
 import java.util.regex.Pattern;
@@ -61,6 +62,28 @@ public class CheckThat {
     public static void validateArgument(boolean expression, String errorMessage)
             throws ValidationException {
         if (!expression) {
+            throw new ValidationException(errorMessage);
+        }
+    }
+
+    private static final String JAVA_IDENTIFIER = "(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.)*\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*";
+    private static final Pattern VALID_JAVA_IDENTIFIER = compile(JAVA_IDENTIFIER);
+
+    public static void validateJavaIdentifier(String identifier,
+            String errorMessage) throws ValidationException {
+
+        if (!VALID_JAVA_IDENTIFIER.matcher(identifier).matches()) {
+            throw new ValidationException(errorMessage);
+        }
+    }
+
+    private static final Pattern VALID_TYPE_IDENTIFIER = compile(JAVA_IDENTIFIER
+            + "(\\.\\*)?");
+
+    public static void validateTypeIdentifier(String identifier,
+            String errorMessage) throws ValidationException {
+
+        if (!VALID_TYPE_IDENTIFIER.matcher(identifier).matches()) {
             throw new ValidationException(errorMessage);
         }
     }

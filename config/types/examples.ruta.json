@@ -1,7 +1,0 @@
-{
-  "types" : [ {
-    "class" : "org.sherlok.ruta.Dog"
-  }, {
-    "class" : "org.sherlok.ruta.Country"
-  } ]
-}

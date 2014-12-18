@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,6 +47,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Type;
+import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.impl.FilteringTypeSystem;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.fit.component.NoOpAnnotator;
@@ -74,9 +76,7 @@ import org.xml.sax.SAXException;
  * Lifecycle:<br>
  * <ol>
  * <li>add deps on classpath (to have TypeSystems scannable)</li>
- * <li>create UimaPipeline with script and engines</li>
- * <li>add output fields</li>
- * <li>initialize</li>
+ * <li>create UimaPipeline with script, engines, annotations , ...</li>
  * <li>annotate texts...</li>
  * <li>close</li>
  * </ol>
@@ -86,23 +86,17 @@ import org.xml.sax.SAXException;
 public class UimaPipeline {
     private static Logger LOG = getLogger(UimaPipeline.class);
 
-    private String pipelineId;
-    private String language;
-
-    private List<String> scriptLines;
-    private List<EngineDef> engineDefs;
+    private final String pipelineId;
+    private final String language;
 
     private List<AnalysisEngineDescription> aeds = list();
     private AnalysisEngine[] aes = null;
 
-    /** Filters the JSON output */
-    private FilteringTypeSystem filter = new FilteringTypeSystem();
     /** Keeps track of the {@link Type}s added in every Ruta script */
     private TypeSystemDescription tsd;
-
-    private XmiCasSerializer xcs;
-
     private CasPool casPool;
+    /** JSON serializer */
+    private XmiCasSerializer xcs;
 
     /**
      * @param pipelineId
@@ -110,33 +104,106 @@ public class UimaPipeline {
      *            , important e.g. for DKpro components.
      * @param engineDefs
      * @param scriptLines
+     *            the Ruta script
+     * @param annotationIncludes
+     * @param annotationFilters
      */
     public UimaPipeline(String pipelineId, String language,
-            List<EngineDef> engineDefs, List<String> scriptLines)
-            throws ResourceInitializationException, IOException,
-            ValidationException {
+            List<EngineDef> engineDefs, List<String> scriptLines,
+            List<String> annotationIncludes, List<String> annotationFilters)
+            throws IOException, ValidationException, UIMAException {
         this.pipelineId = pipelineId;
         this.language = language;
-        this.engineDefs = engineDefs;
-        this.scriptLines = list(scriptLines); // a copy
 
         try {
             // needed since we might have added new jars to the classpath
             TypeSystemDescriptionFactory.forceTypeDescriptorsScan();
             tsd = TypeSystemDescriptionFactory.createTypeSystemDescription();
         } catch (ResourceInitializationException e) {
-            throw new RuntimeException(e);// should not happen
+            throw new RuntimeException(e); // should not happen
         }
-        initScript();
+
+        initScript(list(scriptLines) /* a copy */, engineDefs);
+        initEngines();
+        initCasPool();
+        filterAnnots(annotationIncludes, annotationFilters);
     }
 
-    public void addOutputAnnotation(String typeName, String... properties) {
-        filter.includeType(typeName, properties);
+    /**
+     * Filters the JSON output, either with includes or filters. If no
+     * includes/filter is provided, it is just a copy of the 'normal'
+     * {@link TypeSystem}.
+     */
+    private void filterAnnots(List<String> includes, List<String> filters) {
+
+        CAS cas = casPool.getCas();
+        TypeSystem ts = cas.getTypeSystem();
+        TypeSystem filteredTs;
+
+        if (!includes.isEmpty()) {
+
+            filteredTs = new FilteringTypeSystem();
+            Iterator<Type> tit = ts.getTypeIterator();
+            while (tit.hasNext()) {
+                Type type = tit.next();
+
+                boolean shouldInclude = false;
+                for (String include : includes) {
+                    if (include.endsWith(".*")
+                            && type.getName().startsWith(
+                                    include.substring(0, include.length() - 2))) {
+                        shouldInclude = true;
+                        break;
+                    } else if (include.equals(type.getName())) {
+                        shouldInclude = true;
+                        break;
+                    }
+                }
+                if (shouldInclude) {
+                    LOG.trace("including type '{}'", type);
+                    ((FilteringTypeSystem) filteredTs).includeType(type);
+                }
+            }
+
+        } else if (!filters.isEmpty()) {
+
+            filteredTs = new FilteringTypeSystem();
+            Iterator<Type> tit = ts.getTypeIterator();
+            while (tit.hasNext()) {
+                Type type = tit.next();
+
+                boolean shouldFilter = false;
+                for (String filter : filters) {
+                    if (filter.endsWith(".*")
+                            && type.getName().startsWith(
+                                    filter.substring(0, filter.length() - 2))) {
+                        shouldFilter = true;
+                        break;
+                    } else if (filter.equals(type.getName())) {
+                        shouldFilter = true;
+                        break;
+                    }
+                }
+                if (!shouldFilter) {
+                    LOG.trace("including type '{}'", type);
+                    ((FilteringTypeSystem) filteredTs).includeType(type);
+                } else {
+                    LOG.trace("filtering type '{}'", type);
+                }
+            }
+
+        } else { // no filtering or includes --> use full ts
+            LOG.trace("including all type");
+            filteredTs = ts;
+        }
+        casPool.releaseCas(cas);
+
+        // initialize JSON writer with filter
+        xcs = new XmiCasSerializer(filteredTs);
+        xcs.setPrettyPrint(true);
     }
 
-    /** Initializes Engines and CAS */
-    public void initialize() throws UIMAException, ValidationException {
-
+    private void initEngines() throws UIMAException, ValidationException {
         // redirect stdout to catch Ruta script errors
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream origOut = System.out;
@@ -162,11 +229,9 @@ public class UimaPipeline {
                 LOG.info(maybeError);
         }
 
-        // initialize JSON writer (incl. filter)
-        if (xcs == null) {
-            xcs = new XmiCasSerializer(filter);
-            xcs.setPrettyPrint(true);
-        }
+    }
+
+    private void initCasPool() throws ResourceInitializationException {
 
         // for (TypeDescription td : tsd.getTypes())
         // LOG.debug("type: {}", td);
@@ -198,6 +263,7 @@ public class UimaPipeline {
 
         CAS cas = null;
         try {
+            // TODO how long to wait?
             cas = casPool.getCas(0);// cas.reset done by casPool
             // for (TypeDescription td : tsd.getTypes())
             // LOG.debug("type: {} <<<< {}", td.getName(),
@@ -249,8 +315,9 @@ public class UimaPipeline {
     }
 
     @SuppressWarnings("unchecked")
-    private void initScript() throws ResourceInitializationException,
-            IOException, ValidationException {
+    private void initScript(List<String> scriptLines, List<EngineDef> engineDefs)
+            throws ResourceInitializationException, IOException,
+            ValidationException {
 
         // load engines
         List<String> engineDescriptions = list();
@@ -402,9 +469,5 @@ public class UimaPipeline {
                 PARAM_DESCRIPTOR_PATHS, FileBased.RUTA_ENGINE_CACHE_PATH,//
                 RutaEngine.PARAM_ADDITIONAL_ENGINES, engineDescriptions,//
                 PARAM_MAIN_SCRIPT, scriptName));
-    }
-
-    public TypeSystemDescription getTypeSystemDescription() {
-        return tsd;
     }
 }

@@ -30,11 +30,9 @@ import java.util.List;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.mappings.TypesDef;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -72,8 +70,8 @@ public class FileBased {
     static {
         MAPPER.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         // TODO indent json output does not work
-        MAPPER.enable(SerializationFeature.INDENT_OUTPUT); 
-        MAPPER.enable(DeserializationFeature. ACCEPT_SINGLE_VALUE_AS_ARRAY);
+        MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
+        MAPPER.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     }
 
     public static BundleDef putBundle(String bundleStr)
@@ -128,19 +126,6 @@ public class FileBased {
         return MAPPER.writeValueAsString(obj);
     }
 
-    @SuppressWarnings("unused")
-    // TODO write types
-    private static void writeType(TypesDef t) throws JsonGenerationException,
-            JsonMappingException, IOException, ValidationException {
-        try {
-            File tFile = new File(TYPES_PATH + t.getName() + ".json");
-            tFile.getParentFile().mkdirs();
-            MAPPER.writeValue(tFile, t);
-        } catch (Exception e) {
-            throw new ValidationException(e);// TODO validate better
-        }
-    }
-
     private static void writeBundle(BundleDef def) throws ValidationException {
         def.validate(def.toString());
         File defFile = new File(BUNDLES_PATH + def.getName() + "_"
@@ -192,16 +177,6 @@ public class FileBased {
         } catch (Exception e) {
             throw new ValidationException(e);
         }
-    }
-
-    public static Collection<TypesDef> allTypesDefs()
-            throws ValidationException {
-        List<TypesDef> ret = list();
-        for (File tf : newArrayList(iterateFiles(new File(TYPES_PATH),
-                new String[] { "json" }, true))) {
-            ret.add(read(tf, TypesDef.class));
-        }
-        return ret;
     }
 
     public static Collection<BundleDef> allBundleDefs()

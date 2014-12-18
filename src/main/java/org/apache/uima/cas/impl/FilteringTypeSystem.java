@@ -15,6 +15,9 @@
  */
 package org.apache.uima.cas.impl; // needed because of methods visibility
 
+import org.apache.uima.cas.Feature;
+import org.apache.uima.cas.Type;
+import org.apache.uima.cas.admin.CASAdminException;
 import org.sherlok.UimaPipeline;
 
 /**
@@ -27,17 +30,22 @@ import org.sherlok.UimaPipeline;
 public class FilteringTypeSystem extends TypeSystemImpl {
 
     /**
-     * @param typeName
+     * @param type
      *            the type to include in the JSON output
-     * @param properties
-     *            the name of properties to include in the JSON output
      */
-    public void includeType(String typeName, String... properties) {
-        int type = super.addType(typeName, annotBaseTypeCode);
-        for (String property : properties) {
-            super.addFeature(property, type, annotBaseTypeCode);
+    public void includeType(Type type) {
+        int typeId = super.addType(type.getName(), annotBaseTypeCode);
+        for (Feature f : type.getFeatures()) {
+            try {
+                super.addFeature(f.getShortName(), typeId, annotBaseTypeCode);
+            } catch (CASAdminException cae) {
+                if (!cae.getArguments()[0].equals("sofa")) {
+                    throw new RuntimeException(cae);
+                }
+            }
         }
     }
+
     /*-
     // for debugging:
     public Type getType(String typeName) {
