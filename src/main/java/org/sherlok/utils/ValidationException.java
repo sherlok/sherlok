@@ -29,12 +29,12 @@ public class ValidationException extends Exception {
         super(message);
     }
 
-    public ValidationException(Exception e) {
-        super(e);
+    public ValidationException(Throwable t) {
+        super(t);
     }
 
-    public ValidationException(String msg, Exception e) {
-        super(msg, e);
+    public ValidationException(String msg, Throwable t) {
+        super(msg, t);
     }
 
     public static class ValidationErrorMessage {

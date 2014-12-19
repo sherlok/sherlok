@@ -15,6 +15,7 @@
  */
 package org.sherlok;
 
+import static com.google.common.io.Files.createTempDir;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.currentTimeMillis;
 import static org.sherlok.mappings.Def.createId;
@@ -32,6 +33,9 @@ import static spark.Spark.setPort;
 
 import java.io.File;
 import java.util.List;
+
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.Part;
 
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.EngineDef;
@@ -65,8 +69,12 @@ public class SherlokServer {
     static final String ENGINES = "engines";
     /** Route and path for bundles */
     static final String BUNDLES = "bundles";
-    /** Route and path for types */
-    static final String TYPES = "types";
+    /** Route and path for Ruta resources */
+    static final String RUTA_RESOURCES = "resources";
+    /** Location for the temporary uploaded files */
+    private static final MultipartConfigElement RUTA_RESOURCES_UPLOAD_CONFIG = new MultipartConfigElement(
+            createTempDir().getAbsolutePath());
+
     static final String TEST_ONLY = "testonly";
 
     public static final int STATUS_OK = 200;
@@ -352,6 +360,56 @@ public class SherlokServer {
                     }
                 } catch (Exception e) {
                     return error("DELETE '" + name, e, resp);
+                }
+            }
+        });
+
+        // ROUTES: RUTA RESOURCES
+        // ////////////////////////////////////////////////////////////////////////////
+        get(new JsonRoute("/" + RUTA_RESOURCES) { // LIST
+            @Override
+            public Object handle(Request req, Response resp) {
+                try {
+                    resp.type(JSON);
+                    return controller.listResources();
+                } catch (Exception e) {// this error should not happen
+                    return error("LIST resources", e, resp);
+                }
+            }
+        });
+        get(new Route("/" + RUTA_RESOURCES + "/:path") { // GET
+            @Override
+            public Object handle(Request req, Response resp) {
+                String path = req.params(":path");
+                try {
+                    File f = FileBased.getResource(path);
+                    resp.type("application/octet-stream");
+                    resp.header("Content-Disposition",
+                            "attachment; filename=\"" + f.getName() + "\"");
+                    return f;
+                } catch (ValidationException ve) {
+                    return invalid("GET resource '" + path + "'", ve, resp);
+                } catch (Exception e) {
+                    return error("GET resource '" + path + "'", e, resp);
+                }
+            }
+        });
+        put(new Route("/" + RUTA_RESOURCES + "/:path", JSON) { // PUT
+            @Override
+            public Object handle(Request req, Response resp) {
+                try {
+                    String path = req.params(":path");
+                    req.raw().setAttribute("org.eclipse.multipartConfig",
+                            RUTA_RESOURCES_UPLOAD_CONFIG);
+                    Part part = req.raw().getPart("file");
+                    FileBased.putResource(path, part);
+                    resp.status(STATUS_OK);
+                    return "OK";
+                } catch (ValidationException ve) {
+                    return invalid("PUT resource '" + req.body() + "'", ve,
+                            resp);
+                } catch (Exception e) {
+                    return error("PUT '" + req.body(), e, resp);
                 }
             }
         });

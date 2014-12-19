@@ -115,6 +115,10 @@ public class Controller {
         return pipelineDefs.values();
     }
 
+    Collection<String> listResources() throws ValidationException {
+        return FileBased.allResources();
+    }
+
     // LIST all names /////////////////////////////////////////////////////////
     Set<String> listBundleDefNames() {
         return bundleDefs.keySet();

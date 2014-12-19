@@ -19,14 +19,20 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
+import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.list;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.Part;
+
+import org.apache.commons.io.FileUtils;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.PipelineDef;
@@ -51,19 +57,20 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
  */
 public class FileBased {
 
-    public static final String CONFIG_DIR_PATH = "config/";
+    static final String CONFIG_DIR_PATH = "config/";
 
-    protected static final String TYPES_PATH = CONFIG_DIR_PATH + "types/";
-    protected static final String BUNDLES_PATH = CONFIG_DIR_PATH + "bundles/";
-    protected static final String ENGINES_PATH = CONFIG_DIR_PATH + "engines/";
-    protected static final String PIPELINES_PATH = CONFIG_DIR_PATH
-            + "pipelines/";
-    protected static final String RUTA_RESOURCES_PATH = CONFIG_DIR_PATH
-            + "ruta/";
-    protected static final String RUTA_PIPELINE_CACHE_PATH = RUTA_RESOURCES_PATH
+    static final String TYPES_PATH = CONFIG_DIR_PATH + "types/";
+    static final String BUNDLES_PATH = CONFIG_DIR_PATH + "bundles/";
+    static final String ENGINES_PATH = CONFIG_DIR_PATH + "engines/";
+    static final String PIPELINES_PATH = CONFIG_DIR_PATH + "pipelines/";
+    static final String RUTA_RESOURCES_PATH = CONFIG_DIR_PATH + "ruta/";
+    static final String RUTA_PIPELINE_CACHE_PATH = RUTA_RESOURCES_PATH
             + ".pipelines/";
-    protected static final String RUTA_ENGINE_CACHE_PATH = RUTA_RESOURCES_PATH
+    static final String RUTA_ENGINE_CACHE_PATH = RUTA_RESOURCES_PATH
             + ".engines/";
+
+    /** 50Mb, in bytes */
+    static final long MAX_UPLOAD_SIZE = 50 * 1000000l;
 
     private static final ObjectMapper MAPPER = new ObjectMapper(
             new JsonFactory());
@@ -110,6 +117,23 @@ public class FileBased {
             return pipelineDef;
         } catch (Exception e) {
             throw new ValidationException(e);// TODO validate better
+        }
+    }
+
+    public static void putResource(String path, Part part)
+            throws ValidationException {
+
+        validateArgument(!path.contains(".."), "path cannot contain '..'");
+        validateArgument(part.getSize() < MAX_UPLOAD_SIZE,
+                "file too large, max allowed " + MAX_UPLOAD_SIZE + " bytes");
+        validateArgument(part.getSize() > 0, "file is empty");
+
+        File outFile = new File(RUTA_RESOURCES_PATH, path);
+        outFile.getParentFile().mkdirs();
+        try {
+            FileUtils.copyInputStreamToFile(part.getInputStream(), outFile);
+        } catch (IOException e) {
+            new ValidationException("could not upload file to '" + path + "'");
         }
     }
 
@@ -209,6 +233,29 @@ public class FileBased {
         return ret;
     }
 
+    public static Collection<String> allResources() throws ValidationException {
+        try {
+            List<String> resources = list();
+            File dir = new File(RUTA_RESOURCES_PATH);
+            Iterator<File> fit = FileUtils.iterateFiles(dir, null, true);
+            while (fit.hasNext()) {
+                File f = fit.next();
+                if (!f.getName().startsWith(".")) {
+                    String relativePath = Paths.get(dir.getAbsolutePath())
+                            .relativize(Paths.get(f.getAbsolutePath()))
+                            .toString();
+                            //+ "/" + f.getName();
+                    if (!relativePath.startsWith(".")) {
+                        resources.add(relativePath);
+                    }
+                }
+            }
+            return resources;
+        } catch (Throwable e) { // you never know...
+            throw new ValidationException("could not list resources", e);
+        }
+    }
+
     public static boolean deleteBundle(String bundleId)
             throws ValidationException {
         File defFile = new File(BUNDLES_PATH + getName(bundleId) + "_"
@@ -237,6 +284,18 @@ public class FileBased {
             throw new ValidationException("Cannot delete pipeline '"
                     + pipelineId + "', since it does not exist");
         return defFile.delete();
+    }
+
+    public static void deleteResource(String path) throws ValidationException {
+        File file = new File(RUTA_RESOURCES_PATH, path);
+        validateArgument(file.exists(), "could not find file '" + path + "'");
+        validateArgument(file.delete(), "could not delete file '" + path + "'");
+    }
+
+    public static File getResource(String path) throws ValidationException {
+        File file = new File(RUTA_RESOURCES_PATH, path);
+        validateArgument(file.exists(), "could not find file '" + path + "'");
+        return file;
     }
 
     /** Util to read and rewrite all {@link Def}s */
