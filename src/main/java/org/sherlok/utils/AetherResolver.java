@@ -78,11 +78,11 @@ public class AetherResolver {
     }
 
     public static DefaultRepositorySystemSession newRepositorySystemSession(
-            RepositorySystem system) {
+            RepositorySystem system, String localRepoPath) {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils
                 .newSession();
 
-        LocalRepository localRepo = new LocalRepository(LOCAL_REPO_PATH);
+        LocalRepository localRepo = new LocalRepository(localRepoPath);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(
                 session, localRepo));
 

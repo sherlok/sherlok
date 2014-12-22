@@ -63,7 +63,7 @@ import org.apache.uima.ruta.engine.RutaEngine;
 import org.apache.uima.util.CasPool;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
-import org.sherlok.mappings.EngineDef;
+import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.utils.ConfigurationFieldParser;
 import org.sherlok.utils.ValidationException;

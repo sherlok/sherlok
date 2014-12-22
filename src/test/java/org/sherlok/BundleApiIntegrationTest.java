@@ -156,4 +156,54 @@ public class BundleApiIntegrationTest {
         get(API_URL + "/test/172")//
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
+    
+    ////
+    ////
+    ////
+   
+   
+
+    /*-
+    @Test
+    
+     Putting a faulty engine should fail 
+    public void test031PutFaultyEngine() throws JsonProcessingException {
+        given().content("blah")//
+                .when().put(API_URL)//
+                .then().log().everything().statusCode(STATUS_INVALID);
+    }
+
+    @Test
+     Putting a faulty engine should fail (id is missing) 
+    public void test032PutFaultyEngine() throws JsonProcessingException {
+        given().content("{  \"name\" : \"blabla\"}")//
+                .when().put(API_URL)//
+                .then().log().everything().statusCode(STATUS_INVALID);
+    }
+
+    @Test
+     .. and check that the new test engine is here 
+    public void test040GetTestEngine() {
+        get(API_URL + "/test/17")
+                .then()
+                .log()
+                .everything()
+                .contentType(JSON)
+                .statusCode(STATUS_OK)
+                .body("name", equalTo("test"))
+                .body("version", equalTo("17"))
+                .body("class",
+                        equalTo("de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter"))
+                .body("script", equalTo(null));
+    }
+
+    @Test
+     .. and check that a bogus engine is NOT here 
+    public void test041GetFaultyTestEngine() {
+        get(API_URL + "/test/1000000000198198")//
+                .then().log().everything().statusCode(STATUS_INVALID);
+    }
+
+   */
+
 }

@@ -16,6 +16,7 @@
 package org.sherlok.mappings;
 
 import static java.util.regex.Pattern.compile;
+import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
@@ -28,25 +29,37 @@ import org.apache.maven.model.validation.DefaultModelValidator;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Bundles group together a set of library dependencies.
+ * Engine sets group together a set of engines and their library dependencies.
  * 
  * @author renaud@apache.org
+ *
  */
+//TODO set field order of json with @Json annot
 public class BundleDef extends Def {
 
-    /** a list of all the dependencies of this bundle */
+    /**
+     * Useful to group engine sets together. Letters, numbers, slashes and
+     * underscore only
+     */
+    private String domain;
+
+    /** a list of all library dependencies */
     private List<BundleDependency> dependencies = list();
+
     /** additional maven repositories */
     private Map<String, String> repositories = map();
+
+    private List<EngineDef> engines = list();
 
     /** A Maven dependency to some external UIMA code. */
     public static class BundleDependency {
 
         /** Dependencies can only have these formats */
         public enum DependencyType {
-            /** corresponds to a released maven artifact */
+            /** Default value, corresponds to a released maven artifact */
             mvn, //
             /** any accessible git repository that contains a Maven project */
             git, // TODO xLATER git protocol not implemented
@@ -141,6 +154,115 @@ public class BundleDef extends Def {
 
     // get/set
 
+    public static class EngineDef {
+
+        /**
+         * an optional unique name for this bundle. Letters, numbers and
+         * underscore only
+         */
+        private String name,
+
+        /** (optional) */
+        description;
+
+        /** the Java UIMA class name of this engine */
+        @JsonProperty("class")
+        private String classz;
+
+        /** UIMA parameters. To overwrite default parameters */
+        private Map<String, List<String>> parameters = map();
+
+        /** TRANSITIVE (JsonIgnore), dynamically set by the bundle */
+        @JsonIgnore
+        private BundleDef bundle;
+
+        // get/set
+
+        public String getName() {
+            return name; // FIXME fallback
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getClassz() {
+            return classz;
+        }
+
+        public EngineDef setClassz(String classz) {
+            this.classz = classz;
+            return this;
+        }
+
+        public Map<String, List<String>> getParameters() {
+            return parameters;
+        }
+
+        public EngineDef setParameters(Map<String, List<String>> parameters) {
+            this.parameters = parameters;
+            return this;
+        }
+
+        public EngineDef addParameter(String key, List<String> value) {
+            this.parameters.put(key, value);
+            return this;
+        }
+
+        public List<String> getParameter(String key) {
+            return this.parameters.get(key);
+        }
+
+        public boolean validate(String msgName) throws ValidationException {
+            try {
+                if (name == null) {
+                    checkOnlyAlphanumDot(name);
+                }
+                // TODO more validation
+            } catch (Throwable e) {
+                throw new ValidationException("" + msgName + ": "
+                        + e.getMessage());
+            }
+            return true;
+        }
+
+        
+        public BundleDef getBundle() {
+            return bundle;
+        }
+
+        public EngineDef setBundle(BundleDef bundle) {
+            this.bundle = bundle;
+            return this;
+        }
+        /** needs bundle */ //TODO should JsonIgnore?
+        public String getId() {
+            return createId(name, bundle.getVersion());
+        }
+
+        public String getIdForDescriptor(String separator) {
+            return getName().replaceAll("[^A-Za-z0-9]", "_") + separator
+                    + bundle.getVersion().replaceAll("[^A-Za-z0-9]", "_");
+        }
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public BundleDef setDomain(String domain) {
+        this.domain = domain;
+        return this;
+    }
+
     public List<BundleDependency> getDependencies() {
         return dependencies;
     }
@@ -169,12 +291,29 @@ public class BundleDef extends Def {
         return this;
     }
 
+    public List<EngineDef> getEngines() {
+        return engines;
+    }
+
+    public BundleDef setEngines(List<EngineDef> engines) {
+        this.engines = engines;
+        return this;
+    }
+
+    public BundleDef addEngines(EngineDef engine) {
+        this.engines.add(engine);
+        return this;
+    }
+
     public boolean validate(String bundleObject) throws ValidationException {
         super.validate(bundleObject);
         try {
+            // TODO validateArgument(checkOnlyAlphanumDot(domain),
+            // "domain not valid: '"+domain+"'");
             for (BundleDependency bd : getDependencies()) {
                 bd.validate();
             }
+            // TODO validate engines
         } catch (Throwable e) {
             throw new ValidationException("" + bundleObject + ": "
                     + e.getMessage());

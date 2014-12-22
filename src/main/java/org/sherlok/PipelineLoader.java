@@ -19,6 +19,7 @@ import static org.apache.commons.io.FileUtils.copyFile;
 import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
+import static org.sherlok.utils.AetherResolver.LOCAL_REPO_PATH;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.list;
@@ -57,7 +58,7 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.sherlok.mappings.BundleDef;
-import org.sherlok.mappings.EngineDef;
+import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.utils.AetherResolver;
 import org.sherlok.utils.MavenPom;
@@ -141,31 +142,21 @@ public class PipelineLoader {
         // 3. resolve engines (and their bundles)
         List<EngineDef> engineDefs = list();
         Set<BundleDef> bundleDefs = set();
-        Map<String, String> repositoriesDefs = map();
         for (String pengineId : pipelineDef.getEnginesFromScript()) {
-            EngineDef engineDef = controller.getEngineDef(pengineId);
-            validateNotNull(engineDef, "could not find " + pengineId);
-            engineDefs.add(engineDef);
-            BundleDef bundleDef = controller.getBundleDef(engineDef
-                    .getBundleId());
-            LOG.trace("adding engineDef '{}' with bundleDef '{}'", engineDef,
-                    bundleDef);
-            validateNotNull(bundleDef,
-                    "could not find bundle '" + engineDef.getBundleId()
-                            + "' that is required by engine '" + engineDef
-                            + "'");
-            bundleDefs.add(bundleDef);
-            for (Entry<String, String> id_url : bundleDef.getRepositories()
-                    .entrySet()) {
-                repositoriesDefs.put(id_url.getKey(), id_url.getValue());
-            }
+            EngineDef en = controller.getEngineDef(pengineId);
+            validateNotNull(en, "could not find " + pengineId);
+            engineDefs.add(en);
+            BundleDef b = en.getBundle();
+            LOG.trace("adding engineDef '{}' with bundleDef '{}'", en, b);
+            validateNotNull(b, "could not find bundle '" + b
+                    + "' that is required by engine '" + en + "'");
+            bundleDefs.add(b);
         }
 
         // 4. solve library dependencies
         try {
             solveDependencies(bundleDefs, pipelineDef.getName(),
-                    pipelineDef.getVersion(), repositoriesDefs,
-                    engineDefs.size());
+                    pipelineDef.getVersion(), engineDefs.size());
         } catch (ArtifactResolutionException e) {
             throw new ValidationException(e.getMessage(), e);
         } catch (DependencyCollectionException e) {
@@ -191,9 +182,8 @@ public class PipelineLoader {
         return uimaPipeline;
     }
 
-    private void solveDependencies(Set<BundleDef> bundleDefs,
-            String pipelineName, String version,
-            Map<String, String> repositoriesDefs, int nrEngines)
+    static void solveDependencies(Set<BundleDef> bundleDefs,
+            String pipelineName, String version, int nrEngines)
             throws IOException, TemplateException, ArtifactResolutionException,
             DependencyCollectionException, IOException, ValidationException {
 
@@ -203,7 +193,7 @@ public class PipelineLoader {
         // solve dependecies
         RepositorySystem system = AetherResolver.newRepositorySystem();
         RepositorySystemSession session = AetherResolver
-                .newRepositorySystemSession(system);
+                .newRepositorySystemSession(system, LOCAL_REPO_PATH);
 
         Artifact rootArtifact = new DefaultArtifact(fakePom);
         LOG.trace("* rootArtifact: '{}'", rootArtifact);
@@ -221,6 +211,13 @@ public class PipelineLoader {
 
         PreorderNodeListGenerator p = new PreorderNodeListGenerator();
         collectResult.getRoot().accept(p);
+
+        Map<String, String> repositoriesDefs = map();
+        for (BundleDef b : bundleDefs) {
+            for (Entry<String, String> id_url : b.getRepositories().entrySet()) {
+                repositoriesDefs.put(id_url.getKey(), id_url.getValue());
+            }
+        }
         List<RemoteRepository> repos = AetherResolver.newRepositories(system,
                 session, repositoriesDefs);
         List<Dependency> dependencies = p.getDependencies(true);
@@ -271,7 +268,7 @@ public class PipelineLoader {
         }
     }
 
-    private boolean isAlreadyOnClasspath(File jar) throws IOException {
+    private static boolean isAlreadyOnClasspath(File jar) throws IOException {
 
         if (!FilenameUtils.getExtension(jar.getName()).equals("jar")) {
             return false;
@@ -299,7 +296,7 @@ public class PipelineLoader {
         }
     }
 
-    private List<String> getClasses(File jar) throws IOException {
+    public static List<String> getClasses(File jar) throws IOException {
 
         List<String> classNames = new ArrayList<String>();
         ZipInputStream zip = new ZipInputStream(new FileInputStream(jar));
@@ -324,7 +321,7 @@ public class PipelineLoader {
 
     /** reflection to bypass encapsulation */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static class ClassPathHack {
+    public static class ClassPathHack {
         private static final Class[] parameters = new Class[] { URL.class };
 
         public static void addFile(File f) throws IOException {

@@ -15,7 +15,6 @@
  */
 package org.sherlok;
 
-import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -24,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sherlok.mappings.BundleDef;
-import org.sherlok.mappings.EngineDef;
+import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
@@ -38,35 +37,31 @@ public class Controller {
 
     public Controller load() throws ValidationException {
 
-        // BUNDLES
+        // BUNDLES AND ENGINES
         bundleDefs = map(); // reinit
-        for (BundleDef bd : FileBased.allBundleDefs()) {
-            bd.validate(bd.toString());
-            String key = createId(bd.getName(), bd.getVersion());
+        engineDefs = map(); // reinit
+        for (BundleDef b : FileBased.allBundleDefs()) {
+            b.validate(b.toString());
+            String key = b.getId();
             if (bundleDefs.containsKey(key)) {
                 throw new ValidationException("duplicate bundle ids: '" + key
                         + "'");
             } else {
-                bundleDefs.put(key, bd);
-            }
-        }
-
-        // ENGINES
-        engineDefs = map(); // reinit
-        for (EngineDef ed : FileBased.allEngineDefs()) {
-            ed.validate(ed.toString());
-
-            // bundle must be found
-            if (!bundleDefs.containsKey(ed.getBundleId())) {
-                throw new ValidationException(
-                        "no bundle def found for engine '" + ed + "'");
-            }
-            // no duplicate engine ids
-            if (engineDefs.containsKey(ed.getId())) {
-                throw new ValidationException("duplicate engine ids: '" + ed
-                        + "'");
-            } else {
-                engineDefs.put(ed.getId(), ed);
+                // validate all engines
+                for (EngineDef en : b.getEngines()) {
+                    en.validate(en.toString());
+                    en.setBundle(b);
+                    // no duplicate engine ids
+                    if (engineDefs.containsKey(en.getId())) {
+                        throw new ValidationException("duplicate engine ids: '"
+                                + en + "'");
+                    }
+                }
+                // add bundle and all engines
+                for (EngineDef en : b.getEngines()) {
+                    engineDefs.put(en.getId(), en);
+                }
+                bundleDefs.put(key, b);
             }
         }
 
@@ -92,7 +87,7 @@ public class Controller {
         }
 
         LOG.debug(
-                "Done loading from Store: {} bundleDefs, {} engineDefs, {} pipelineDefs",
+                "Done loading from Store: {} bundles, {} engines, {} pipelines",
                 new Object[] { bundleDefs.size(), engineDefs.size(),
                         pipelineDefs.size() });
         return this;
@@ -105,10 +100,6 @@ public class Controller {
 
     Collection<BundleDef> listBundles() {
         return bundleDefs.values();
-    }
-
-    Collection<EngineDef> listEngines() {
-        return engineDefs.values();
     }
 
     Collection<PipelineDef> listPipelines() {
@@ -124,10 +115,6 @@ public class Controller {
         return bundleDefs.keySet();
     }
 
-    Set<String> listEngineDefNames() {
-        return engineDefs.keySet();
-    }
-
     Set<String> listPipelineDefNames() {
         return pipelineDefs.keySet();
     }
@@ -138,7 +125,7 @@ public class Controller {
         return bundleDefs.get(bundleId);
     }
 
-    EngineDef getEngineDef(String engineId) {
+    EngineDef getEngineDef(String engineId) { // FIXME delete?
         return engineDefs.get(engineId);
     }
 
@@ -151,12 +138,6 @@ public class Controller {
         BundleDef newBundle = FileBased.putBundle(bundleStr);
         bundleDefs.put(newBundle.getId(), newBundle);
         return newBundle.getId();
-    }
-
-    String putEngine(String engineStr) throws ValidationException {
-        EngineDef newEngine = FileBased.putEngine(engineStr);
-        engineDefs.put(newEngine.getId(), newEngine);
-        return newEngine.getId();
     }
 
     String putPipeline(String pipelineStr) throws ValidationException {
@@ -172,15 +153,6 @@ public class Controller {
         }
         FileBased.deleteBundle(bundleId);
         bundleDefs.remove(bundleId);
-    }
-
-    void deleteEngineDef(String engineId) throws ValidationException {
-        if (!engineDefs.containsKey(engineId)) {
-            throw new ValidationException("engine '" + engineId + "' not found");
-        }
-        String domain = engineDefs.get(engineId).getDomain();
-        FileBased.deleteEngine(engineId, domain);
-        engineDefs.remove(engineId);
     }
 
     void deletePipelineDef(String pipelineId) throws ValidationException {

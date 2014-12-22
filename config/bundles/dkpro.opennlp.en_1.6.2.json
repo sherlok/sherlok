@@ -1,4 +1,5 @@
 {
+  "domain" : "dkpro",
   "dependencies" : [ {
     "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.6.2"
@@ -20,5 +21,41 @@
   "repositories" : {
     "dkpro" : "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"
   },
-  "version" : "1.6.2"
+  "version" : "1.6.2",
+  "engines" : [
+    {
+      "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder",
+      "description" : null,
+      "name" : "opennlp.ner.location.en",
+      "parameters" : {
+        "language" : "en",
+        "modelVariant" : "location"
+      }
+    },
+    {
+      "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder",
+      "description" : null,
+      "name" : "opennlp.ner.person.en",
+      "parameters" : {
+        "language" : "en",
+        "modelVariant" : "person"
+      }
+    },
+    {
+      "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger",
+      "description" : null,
+      "name" : "opennlp.pos.en",
+      "parameters" : {
+        "language" : "en"
+      }
+    },
+    {
+      "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter",
+      "description" : null,
+      "name" : "opennlp.segmenter.en",
+      "parameters" : {
+        "language" : "en"
+      }
+    }
+  ]
 }

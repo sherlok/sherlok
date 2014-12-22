@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.sherlok.mappings.EngineDef;
+import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.utils.ValidationException;
 
 public class RutaTests {

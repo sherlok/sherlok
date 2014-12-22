@@ -1,4 +1,5 @@
 {
+  "domain" : "dkpro",
   "dependencies" : [
   {
     "type" : "mvn",
@@ -13,5 +14,16 @@
   "repositories" : {
     "dkpro" : "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"
   },
-  "version" : "1.6.2"
+  "version" : "1.6.2",
+  "engines" : [
+    {
+      "class" : "de.tudarmstadt.ukp.dkpro.core.berkeleyparser.BerkeleyParser",
+      "name" : "berkeleyparser.en",
+      "parameters" : {
+        "language" : "en",
+        "modelVariant" : "sm6",
+        "writePennTree" : "true"
+      }
+    }
+  ]
 }

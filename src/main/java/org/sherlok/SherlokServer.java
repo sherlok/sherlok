@@ -38,7 +38,6 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
 import org.sherlok.mappings.BundleDef;
-import org.sherlok.mappings.EngineDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.utils.Create;
 import org.sherlok.utils.ValidationException;
@@ -65,8 +64,6 @@ public class SherlokServer {
     static final String ANNOTATE = "annotate";
     /** Route and path for pipelines */
     static final String PIPELINES = "pipelines";
-    /** Route and path for engines */
-    static final String ENGINES = "engines";
     /** Route and path for bundles */
     static final String BUNDLES = "bundles";
     /** Route and path for Ruta resources */
@@ -229,67 +226,67 @@ public class SherlokServer {
             }
         });
 
-        // ROUTES: ENGINES
+        // ROUTES: BUNDLES
         // ////////////////////////////////////////////////////////////////////////////
-        get(new JsonRoute("/" + ENGINES) { // LIST
+        get(new JsonRoute("/" + BUNDLES) { // LIST
             @Override
             public Object handle(Request req, Response resp) {
                 try {
                     resp.type(JSON);
-                    return controller.listEngines();
+                    return controller.listBundles();
                 } catch (Exception e) {// this error should not happen
-                    return error("LIST engines", e, resp);
+                    return error("LIST bundle", e, resp);
                 }
             }
         });
-        get(new JsonRoute("/" + ENGINES + "/:engineName/:version") { // GET
+        get(new JsonRoute("/" + BUNDLES + "/:name/:version") { // GET
             @Override
             public Object handle(Request req, Response resp) {
-                String name = req.params(":engineName");
+                String name = req.params(":name");
                 String version = req.params(":version");
                 try {
                     String id = check(name, version);
-                    EngineDef pDef = controller.getEngineDef(id);
-                    if (pDef != null) {
+                    BundleDef b = controller.getBundleDef(id);
+                    if (b != null) {
                         resp.type(JSON);
-                        return pDef;
+                        return b;
                     } else
-                        throw new ValidationException("no engine with id '"
+                        throw new ValidationException("no bundle with id '"
                                 + id + "' found");
                 } catch (ValidationException ve) {
-                    return invalid("GET engine '" + name + "'", ve, resp);
+                    return invalid("GET bundle '" + name + "'", ve, resp);
                 } catch (Exception e) {
-                    return error("GET engine '" + name + "'", e, resp);
+                    return error("GET bundle '" + name + "'", e, resp);
                 }
             }
         });
-        put(new Route("/" + ENGINES, JSON) { // PUT
+        put(new Route("/" + BUNDLES, JSON) { // PUT
             @Override
             public Object handle(Request req, Response resp) {
                 try {
-                    String newId = controller.putEngine(req.body());
+                    String newId = controller.putBundle(req.body());
                     resp.status(STATUS_OK);
                     return newId;
                 } catch (ValidationException ve) {
-                    return invalid("PUT engine '" + req.body() + "'", ve, resp);
+                    return invalid("PUT bundle '" + req.body() + "'", ve, resp);
                 } catch (Exception e) {
                     return error("PUT '" + req.body(), e, resp);
                 }
             }
         });
-        delete(new JsonRoute("/" + ENGINES + "/:engineName/:version") { // DELETE
+        delete(new JsonRoute("/" + BUNDLES + "/:name/:version") { // DELETE
             @Override
             public Object handle(Request req, Response resp) {
-                String name = req.params(":engineName");
+                String name = req.params(":name");
                 String version = req.params(":version");
                 try {
                     String id = check(name, version);
-                    controller.deleteEngineDef(id);
+                    controller.deleteBundleDef(id);
                     return "";
                 } catch (ValidationException ve) {
-                    return invalid("DELETE engine '" + name + "'", ve, resp);
+                    return invalid("DELETE bundle '" + name + "'", ve, resp);
                 } catch (Exception e) {
-                    return error("DELETE '" + name, e, resp);
+                    return error("DELETE bundle '" + name, e, resp);
                 }
             }
         });

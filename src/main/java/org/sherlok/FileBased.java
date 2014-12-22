@@ -34,7 +34,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.io.FileUtils;
 import org.sherlok.mappings.BundleDef;
-import org.sherlok.mappings.EngineDef;
+import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.utils.ValidationException;
 
@@ -61,7 +61,6 @@ public class FileBased {
 
     static final String TYPES_PATH = CONFIG_DIR_PATH + "types/";
     static final String BUNDLES_PATH = CONFIG_DIR_PATH + "bundles/";
-    static final String ENGINES_PATH = CONFIG_DIR_PATH + "engines/";
     static final String PIPELINES_PATH = CONFIG_DIR_PATH + "pipelines/";
     static final String RUTA_RESOURCES_PATH = CONFIG_DIR_PATH + "ruta/";
     static final String RUTA_PIPELINE_CACHE_PATH = RUTA_RESOURCES_PATH
@@ -84,20 +83,9 @@ public class FileBased {
     public static BundleDef putBundle(String bundleStr)
             throws ValidationException {
         try {
-            BundleDef bundleDef = MAPPER.readValue(bundleStr, BundleDef.class);
-            writeBundle(bundleDef);
-            return bundleDef;
-        } catch (Exception e) {
-            throw new ValidationException(e);// TODO validate better
-        }
-    }
-
-    public static EngineDef putEngine(String engineStr)
-            throws ValidationException {
-        try {
-            EngineDef engineDef = MAPPER.readValue(engineStr, EngineDef.class);
-            writeEngine(engineDef);
-            return engineDef;
+            BundleDef b = MAPPER.readValue(bundleStr, BundleDef.class);
+            writeBundle(b);
+            return b;
         } catch (Exception e) {
             throw new ValidationException(e);// TODO validate better
         }
@@ -150,20 +138,12 @@ public class FileBased {
         return MAPPER.writeValueAsString(obj);
     }
 
-    private static void writeBundle(BundleDef def) throws ValidationException {
-        def.validate(def.toString());
-        File defFile = new File(BUNDLES_PATH + def.getName() + "_"
-                + def.getVersion() + ".json");
-        defFile.getParentFile().mkdirs();
-        write(defFile, def);
-    }
-
-    private static void writeEngine(EngineDef def) throws ValidationException {
-        def.validate(def.toString());
-        File defFile = new File(ENGINES_PATH + def.getDomain() + "/"
-                + def.getName() + "_" + def.getVersion() + ".json");
-        defFile.getParentFile().mkdirs();
-        write(defFile, def);
+    private static void writeBundle(BundleDef b) throws ValidationException {
+        b.validate(b.toString());
+        File esFile = new File(BUNDLES_PATH + b.getName() + "_"
+                + b.getVersion() + ".json");
+        esFile.getParentFile().mkdirs();
+        write(esFile, b);
     }
 
     private static void writePipeline(PipelineDef def)
@@ -213,16 +193,6 @@ public class FileBased {
         return ret;
     }
 
-    public static Collection<EngineDef> allEngineDefs()
-            throws ValidationException {
-        List<EngineDef> ret = list();
-        for (File bf : newArrayList(iterateFiles(new File(ENGINES_PATH),
-                new String[] { "json" }, true))) {
-            ret.add(read(bf, EngineDef.class));
-        }
-        return ret;
-    }
-
     public static Collection<PipelineDef> allPipelineDefs()
             throws ValidationException {
         List<PipelineDef> ret = list();
@@ -244,7 +214,7 @@ public class FileBased {
                     String relativePath = Paths.get(dir.getAbsolutePath())
                             .relativize(Paths.get(f.getAbsolutePath()))
                             .toString();
-                            //+ "/" + f.getName();
+                    // + "/" + f.getName();
                     if (!relativePath.startsWith(".")) {
                         resources.add(relativePath);
                     }
@@ -262,16 +232,6 @@ public class FileBased {
                 + getVersion(bundleId) + ".json");
         if (!defFile.exists())
             throw new ValidationException("Cannot delete bundle '" + bundleId
-                    + "', since it does not exist");
-        return defFile.delete();
-    }
-
-    public static boolean deleteEngine(String engineId, String domain)
-            throws ValidationException {
-        File defFile = new File(ENGINES_PATH + domain + "/" + getName(engineId)
-                + "_" + getVersion(engineId) + ".json");
-        if (!defFile.exists())
-            throw new ValidationException("Cannot delete engine '" + engineId
                     + "', since it does not exist");
         return defFile.delete();
     }

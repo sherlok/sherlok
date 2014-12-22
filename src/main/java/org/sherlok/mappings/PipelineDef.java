@@ -21,6 +21,7 @@ import static org.sherlok.utils.Create.list;
 
 import java.util.List;
 
+import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -236,11 +237,19 @@ public class PipelineDef extends Def {
         return true;
     }
 
+    /**
+     * Extract all {@link EngineDef}s from theses script lines, by scanning for
+     * lines starting with "ENGINE"
+     */
     @JsonIgnore
     public List<String> getEnginesFromScript() {
         return getEnginesFromScript(getScriptLines());
     }
 
+    /**
+     * Extract all {@link EngineDef}s from theses script lines, by scanning for
+     * lines starting with "ENGINE"
+     */
     public static List<String> getEnginesFromScript(List<String> scriptLines) {
         List<String> engineIds = list();
         for (String scriptLine : scriptLines) {

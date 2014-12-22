@@ -18,7 +18,7 @@ package org.sherlok;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.sherlok.mappings.EngineDef;
+import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
 
 public class ControllerTest {

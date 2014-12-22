@@ -1,4 +1,5 @@
 {
+  "domain" : "dkpro",
   "dependencies" : [ {
     "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.maltparser-asl:1.6.2"
@@ -11,5 +12,16 @@
   "repositories" : {
     "dkpro" : "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"
   },
-  "version" : "1.6.2"
+  "version" : "1.6.2",
+  "engines": [
+    {
+      "class" : "de.tudarmstadt.ukp.dkpro.core.maltparser.MaltParser",
+      "description" : null,
+      "name" : "maltparser.en",
+      "parameters" : {
+        "language" : "en",
+        "modelVariant" : "linear"
+      }
+    }
+  ]
 }
