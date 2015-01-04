@@ -69,7 +69,7 @@ public class SherlokServer {
     /** Route and path for Ruta resources */
     static final String RUTA_RESOURCES = "resources";
     /** Location for the temporary uploaded files */
-    private static final MultipartConfigElement RUTA_RESOURCES_UPLOAD_CONFIG = new MultipartConfigElement(
+    protected static final MultipartConfigElement RUTA_RESOURCES_UPLOAD_CONFIG = new MultipartConfigElement(
             createTempDir().getAbsolutePath());
 
     static final String TEST_ONLY = "testonly";
@@ -96,7 +96,7 @@ public class SherlokServer {
     public static final String TEST_TEXT = "Using this calibration procedure, we find that mature granule cells (doublecortin-) contain approximately 40 microm, and newborn granule cells (doublecortin+) contain 0-20 microm calbindin-D28k. U.S. employers added the largest number of workers in nearly three years in October and wages increased, which could bring the Federal Reserve closer to raising interest rates. Nonfarm payrolls surged by 321,000 last month, the most since January of 2012, the Labor Department said on Friday. The unemployment rate held steady at a six-year low of 5.8 percent. Data for September and October were revised to show 44,000 more jobs created than previously reported. Economists polled by Reuters had forecast payrolls increasing by only 230,000 last month. November marked the 10th straight month that job growth has exceeded 200,000, the longest stretch since 1994, and further confirmed the economy is weathering slowdowns in China and the euro zone, as well as a recession in Japan.";
 
     /** Called at server startup. Registers all {@link Route}s */
-    static void init(int port, String ip) throws ValidationException {
+    public static PipelineLoader init(int port, String ip) throws ValidationException {
 
         final Controller controller = new Controller().load();
         final PipelineLoader pipelineLoader = new PipelineLoader(controller);
@@ -410,6 +410,7 @@ public class SherlokServer {
                 }
             }
         });
+        return pipelineLoader;
     }
 
     protected static Object annotateRequest(Request req, Response resp,

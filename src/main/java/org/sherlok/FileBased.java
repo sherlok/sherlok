@@ -62,7 +62,7 @@ public class FileBased {
     static final String TYPES_PATH = CONFIG_DIR_PATH + "types/";
     static final String BUNDLES_PATH = CONFIG_DIR_PATH + "bundles/";
     static final String PIPELINES_PATH = CONFIG_DIR_PATH + "pipelines/";
-    static final String RUTA_RESOURCES_PATH = CONFIG_DIR_PATH + "ruta/";
+    static final String RUTA_RESOURCES_PATH = CONFIG_DIR_PATH + "resources/";
     static final String RUTA_PIPELINE_CACHE_PATH = RUTA_RESOURCES_PATH
             + ".pipelines/";
     static final String RUTA_ENGINE_CACHE_PATH = RUTA_RESOURCES_PATH
@@ -186,7 +186,11 @@ public class FileBased {
     public static Collection<BundleDef> allBundleDefs()
             throws ValidationException {
         List<BundleDef> ret = list();
-        for (File bf : newArrayList(iterateFiles(new File(BUNDLES_PATH),
+        File bPath = new File(BUNDLES_PATH);
+        validateArgument(bPath.exists(), "bundles directory '" + BUNDLES_PATH
+                + "' does not exist (resolves to '" + bPath.getAbsolutePath()
+                + "')");
+        for (File bf : newArrayList(iterateFiles(bPath,
                 new String[] { "json" }, true))) {
             ret.add(read(bf, BundleDef.class));
         }
@@ -196,7 +200,13 @@ public class FileBased {
     public static Collection<PipelineDef> allPipelineDefs()
             throws ValidationException {
         List<PipelineDef> ret = list();
-        for (File bf : newArrayList(iterateFiles(new File(PIPELINES_PATH),
+        File pPath = new File(PIPELINES_PATH);
+        validateArgument(
+                pPath.exists(),
+                "pipelines directory '" + PIPELINES_PATH
+                        + "' does not exist (resolves to '"
+                        + pPath.getAbsolutePath() + "')");
+        for (File bf : newArrayList(iterateFiles(pPath,
                 new String[] { "json" }, true))) {
             ret.add(FileBased.read(bf, PipelineDef.class));
         }
@@ -207,6 +217,9 @@ public class FileBased {
         try {
             List<String> resources = list();
             File dir = new File(RUTA_RESOURCES_PATH);
+            validateArgument(dir.exists(), "resources directory '"
+                    + RUTA_RESOURCES_PATH + "' does not exist (resolves to '"
+                    + dir.getAbsolutePath() + "')");
             Iterator<File> fit = FileUtils.iterateFiles(dir, null, true);
             while (fit.hasNext()) {
                 File f = fit.next();

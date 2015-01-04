@@ -55,6 +55,7 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
+import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeDescription;
@@ -252,6 +253,27 @@ public class UimaPipeline {
             }
         }
         return engines;
+    }
+
+    public interface Annotate {
+        public Object annotate(JCas jCas, AnalysisEngine[] aes) throws AnalysisEngineProcessException;
+    }
+
+    /**
+     * @param annotate
+     *            object, using visitor pattern
+     */
+    public void annotate(Annotate annotate) throws UIMAException, SAXException,
+            ValidationException {
+
+        CAS cas = null;
+        try {
+            // TODO how long to wait?
+            cas = casPool.getCas(0);// cas.reset done by casPool
+            annotate.annotate(cas.getJCas(), aes);
+        } finally {
+            casPool.releaseCas(cas);
+        }
     }
 
     /**
