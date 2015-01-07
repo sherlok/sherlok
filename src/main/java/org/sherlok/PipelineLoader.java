@@ -16,6 +16,7 @@
 package org.sherlok;
 
 import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
@@ -42,7 +43,6 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.uima.UIMAException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -55,7 +55,6 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.BundleDef.EngineDef;
@@ -182,6 +181,10 @@ public class PipelineLoader {
         return uimaPipeline;
     }
 
+    /**
+     * Resolves a maven dependency tree, download the dependencies and add them
+     * (jars) to the classpath
+     */
     static void solveDependencies(Set<BundleDef> bundleDefs,
             String pipelineName, String version, int nrEngines)
             throws IOException, TemplateException, ArtifactResolutionException,
@@ -189,29 +192,13 @@ public class PipelineLoader {
 
         // create fake POM from bundles and copy it
         String fakePom = MavenPom.writePom(bundleDefs, pipelineName, version);
-
-        // solve dependecies
-        RepositorySystem system = AetherResolver.newRepositorySystem();
-        RepositorySystemSession session = AetherResolver
-                .newRepositorySystemSession(system, LOCAL_REPO_PATH);
-
         Artifact rootArtifact = new DefaultArtifact(fakePom);
         LOG.trace("* rootArtifact: '{}'", rootArtifact);
 
-        CollectRequest collectRequest = new CollectRequest();
-        collectRequest.setRoot(new Dependency(rootArtifact, ""));
-        collectRequest.setRepositories(AetherResolver.newRepositories(system,
-                session, new HashMap<String, String>()));
-
-        CollectResult collectResult = system.collectDependencies(session,
-                collectRequest);
-
-        collectResult.getRoot().accept(
-                new AetherResolver.ConsoleDependencyGraphDumper());
-
-        PreorderNodeListGenerator p = new PreorderNodeListGenerator();
-        collectResult.getRoot().accept(p);
-
+        // add remote repository urls
+        RepositorySystem system = AetherResolver.newRepositorySystem();
+        RepositorySystemSession session = AetherResolver
+                .newRepositorySystemSession(system, LOCAL_REPO_PATH);
         Map<String, String> repositoriesDefs = map();
         for (BundleDef b : bundleDefs) {
             for (Entry<String, String> id_url : b.getRepositories().entrySet()) {
@@ -220,57 +207,64 @@ public class PipelineLoader {
         }
         List<RemoteRepository> repos = AetherResolver.newRepositories(system,
                 session, repositoriesDefs);
+
+        // solve dependencies
+        CollectResult collectResult = system.collectDependencies(
+                session,
+                new CollectRequest(new Dependency(rootArtifact, ""),
+                        AetherResolver.newRepositories(system, session,
+                                new HashMap<String, String>())));
+        collectResult.getRoot().accept(
+                new AetherResolver.ConsoleDependencyGraphDumper());
+        PreorderNodeListGenerator p = new PreorderNodeListGenerator();
+        collectResult.getRoot().accept(p);
         List<Dependency> dependencies = p.getDependencies(true);
+        // validate for syntax problems in pom (can go unnoticed otherwise)
         if (nrEngines > 0) {
             // TODO better validation of pom
             validateArgument(dependencies.size() > 1,
                     "There must have been an error resolving dependencies");
         }
-        for (Dependency dependency : p.getDependencies(true)) {
 
-            Artifact artifact = dependency.getArtifact();
-            ArtifactRequest artifactRequest = new ArtifactRequest();
-            artifactRequest.setArtifact(artifact);
-            artifactRequest.setRepositories(repos);
+        // now do the real fetching, and add jars to classpath
+        for (Dependency dependency : dependencies) {
+            Artifact resolvedArtifact = system.resolveArtifact(session,
+                    new ArtifactRequest(dependency.getArtifact(), repos, ""))
+                    .getArtifact();
+            File jar = resolvedArtifact.getFile();
 
-            ArtifactResult artifactResult = system.resolveArtifact(session,
-                    artifactRequest);
-
-            artifact = artifactResult.getArtifact();
-
+            // add downloaded artifact to local ~/.m2/repository, if possible
+            // FIXME test
             if (AetherResolver.localRepo.exists()
                     && AetherResolver.localRepo.canWrite()) {
-                // FIXME test
-
                 File sherlokRepo = new File(AetherResolver.LOCAL_REPO_PATH);
-                String canonicalPath = artifact.getFile().getCanonicalPath();
+                String canonicalPath = jar.getCanonicalPath();
                 String relative = canonicalPath.substring(sherlokRepo
                         .getAbsolutePath().length(), canonicalPath.length());
-
                 File localRepoFile = new File(AetherResolver.localRepo,
                         relative);
                 if (!localRepoFile.exists()) {
                     LOG.trace("artifact '{}' added to local maven repo",
-                            artifact.getFile().getName());
-                    copyFile(artifact.getFile(), localRepoFile);
+                            jar.getName());
+                    copyFile(jar, localRepoFile);
                 }
             }
 
             // add this jar to the classpath (if it has not been added before)
-            if (!isAlreadyOnClasspath(artifact.getFile())) {
-                ClassPathHack.addFile(artifact.getFile());
+            if (!isAlreadyOnClasspath(jar)) {
+                ClassPathHack.addFile(jar);
                 LOG.trace("* resolved artifact '{}', added to classpath: '{}'",
-                        artifact, artifact.getFile().getAbsolutePath());
+                        resolvedArtifact, jar.getAbsolutePath());
             } else {
                 LOG.trace("* resolved artifact '{}', already on classpath",
-                        artifact);
+                        resolvedArtifact);
             }
         }
     }
 
     private static boolean isAlreadyOnClasspath(File jar) throws IOException {
 
-        if (!FilenameUtils.getExtension(jar.getName()).equals("jar")) {
+        if (!getExtension(jar.getName()).equals("jar")) {
             return false;
 
         } else {

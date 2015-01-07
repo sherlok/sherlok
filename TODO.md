@@ -9,6 +9,10 @@
 * P3 p not highlighted anymore when save
 
 
+# OTHERS
+
+* http://www.crunchbase.com/organization/indico-data-solutions
+
 # DONE
 
 * P3 order of pipelines in right col

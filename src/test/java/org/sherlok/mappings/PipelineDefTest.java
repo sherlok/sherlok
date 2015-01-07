@@ -30,13 +30,12 @@ import org.sherlok.utils.ValidationException;
 public class PipelineDefTest {
 
     public static PipelineDef getOpennlp_ners() {
-        PipelineDef p = new PipelineDef()
-                .setDomain("dkpro")
+        PipelineDef p = (PipelineDef) new PipelineDef()
                 .addScriptLine("ENGINE opennlp.segmenter.en:1.6.2")
                 .addScriptLine("ENGINE opennlp.pos.en:1.6.2")
                 .setOutput(
                         new PipelineOutput().setAnnotationFilters(list(
-                                "org.Filter", "Me")));
+                                "org.Filter", "Me"))).setDomain("dkpro");
         p.setName("OpenNlpEnSegmenter");
         p.setVersion("1.6.2");
         return p;

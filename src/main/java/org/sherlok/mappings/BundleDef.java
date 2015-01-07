@@ -21,30 +21,34 @@ import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
  * Engine sets group together a set of engines and their library dependencies.
  * 
  * @author renaud@apache.org
- *
  */
-//TODO set field order of json with @Json annot
+// ensure property output order
+@JsonPropertyOrder(value = { "name", "version", "description", "domain",
+        "dependencies", "repositories", "engines" }, alphabetic = true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class BundleDef extends Def {
-
-    /**
-     * Useful to group engine sets together. Letters, numbers, slashes and
-     * underscore only
-     */
-    private String domain;
 
     /** a list of all library dependencies */
     private List<BundleDependency> dependencies = list();
@@ -152,8 +156,8 @@ public class BundleDef extends Def {
         }
     }
 
-    // get/set
-
+    @JsonPropertyOrder({ "name", "class", "description", "parameters" })
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class EngineDef {
 
         /**
@@ -182,16 +186,18 @@ public class BundleDef extends Def {
             return name; // FIXME fallback
         }
 
-        public void setName(String name) {
+        public EngineDef setName(String name) {
             this.name = name;
+            return this;
         }
 
         public String getDescription() {
             return description;
         }
 
-        public void setDescription(String description) {
+        public EngineDef setDescription(String description) {
             this.description = description;
+            return this;
         }
 
         public String getClassz() {
@@ -203,6 +209,7 @@ public class BundleDef extends Def {
             return this;
         }
 
+        // @JsonSerialize(using=ListConverter.class)
         public Map<String, List<String>> getParameters() {
             return parameters;
         }
@@ -234,7 +241,6 @@ public class BundleDef extends Def {
             return true;
         }
 
-        
         public BundleDef getBundle() {
             return bundle;
         }
@@ -243,7 +249,9 @@ public class BundleDef extends Def {
             this.bundle = bundle;
             return this;
         }
-        /** needs bundle */ //TODO should JsonIgnore?
+
+        /** needs bundle */
+        @JsonIgnore
         public String getId() {
             return createId(name, bundle.getVersion());
         }
@@ -252,15 +260,11 @@ public class BundleDef extends Def {
             return getName().replaceAll("[^A-Za-z0-9]", "_") + separator
                     + bundle.getVersion().replaceAll("[^A-Za-z0-9]", "_");
         }
-    }
 
-    public String getDomain() {
-        return domain;
-    }
-
-    public BundleDef setDomain(String domain) {
-        this.domain = domain;
-        return this;
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     public List<BundleDependency> getDependencies() {
@@ -300,7 +304,7 @@ public class BundleDef extends Def {
         return this;
     }
 
-    public BundleDef addEngines(EngineDef engine) {
+    public BundleDef addEngine(EngineDef engine) {
         this.engines.add(engine);
         return this;
     }
@@ -320,4 +324,32 @@ public class BundleDef extends Def {
         }
         return true;
     }
+
+    // LATER
+    public static class ListConverter extends
+            JsonSerializer<Map<String, List<String>>> {
+
+        @Override
+        public void serialize(Map<String, List<String>> params,
+                JsonGenerator jgen, SerializerProvider provider)
+                throws IOException, JsonProcessingException {
+
+            jgen.writeStartObject();
+
+            for (Entry<String, List<String>> en : params.entrySet()) {
+
+                if (en.getValue().size() > 1) {
+                    jgen.writeArrayFieldStart(en.getKey());
+                    for (String val : en.getValue()) {
+                        jgen.writeString(val);
+                    }
+                    jgen.writeEndArray();
+                } else {
+                    jgen.writeStringField(en.getKey(), en.getValue().get(0));
+                }
+            }
+            jgen.writeEndObject();
+        }
+    }
+
 }

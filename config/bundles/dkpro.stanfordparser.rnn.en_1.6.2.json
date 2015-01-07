@@ -12,9 +12,9 @@
   "version" : "1.6.2",
   "engines" : [
     {
-      "class" : "de.tudarmstadt.ukp.dkpro.core.maltparser.MaltParser",
+      "class" : "TODO",
       "description" : null,
-      "name" : "stanfordparser.en",
+      "name" : "stanfordparser.rnn.en",
       "parameters" : {
         "language" : "en",
         "modelVariant" : "linear"

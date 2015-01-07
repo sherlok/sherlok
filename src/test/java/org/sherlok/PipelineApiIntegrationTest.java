@@ -88,7 +88,6 @@ public class PipelineApiIntegrationTest {
                 .statusCode(STATUS_OK)
                 .body("name", equalTo("opennlp.ners.en"))
                 .body("version", equalTo("1.6.2"))
-                .body("loadOnStartup", equalTo(false))
                 .body("script[0]",
                         equalTo("ENGINE opennlp.segmenter.en:1.6.2;"));
     }
@@ -96,8 +95,8 @@ public class PipelineApiIntegrationTest {
     @Test
     /** Let's put a new test pipeline*/
     public void test030PutPipeline() throws JsonProcessingException {
-        PipelineDef e = new PipelineDef().setDomain("test").addScriptLine(
-                "ENGINE sample.engine:1");
+        PipelineDef e = (PipelineDef) new PipelineDef().addScriptLine(
+                "ENGINE sample.engine:1").setDomain("test");
         e.setName("test");
         e.setVersion("1");
         String testPipelineDef = FileBased.writeAsString(e);
@@ -113,8 +112,8 @@ public class PipelineApiIntegrationTest {
 
         String name = PipelineApiIntegrationTest.class.getSimpleName()
                 + "_test";
-        PipelineDef pd = new PipelineDef().setDomain("test").addScriptLine(
-                "DECLARE Dog;");
+        PipelineDef pd = (PipelineDef) new PipelineDef().addScriptLine(
+                "DECLARE Dog;").setDomain("test");
         pd.setName(name);
         pd.setVersion("1");
         String pdJson = FileBased.writeAsString(pd);
@@ -135,8 +134,8 @@ public class PipelineApiIntegrationTest {
 
         String name = PipelineApiIntegrationTest.class.getSimpleName()
                 + "_test_faulty";
-        PipelineDef pd = new PipelineDef().setDomain("test").addScriptLine(
-                "DECL_wrong_ARE Dog;");
+        PipelineDef pd = (PipelineDef) new PipelineDef().addScriptLine(
+                "DECL_wrong_ARE Dog;").setDomain("test");
         pd.setName(name);
         pd.setVersion("1");
         String pdJson = FileBased.writeAsString(pd);

@@ -15,8 +15,8 @@
  */
 package org.sherlok.mappings;
 
-import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
+import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.sherlok.utils.ValidationException;
@@ -42,7 +42,12 @@ public abstract class Def {
      */
     version,
     /** (optional) */
-    description;
+    description,
+    /**
+     * Useful to group engine sets together. Letters, numbers, slashes and
+     * underscore only
+     */
+    domain;
 
     // get/set
 
@@ -50,24 +55,36 @@ public abstract class Def {
         return name;
     }
 
-    public void setName(String name) {
+    public Def setName(String name) {
         this.name = name;
+        return this;
     }
 
     public String getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public Def setVersion(String version) {
         this.version = version;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public Def setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public Def setDomain(String domain) {
+        this.domain = domain;
+        return this;
     }
 
     public boolean validate(String msgName) throws ValidationException {

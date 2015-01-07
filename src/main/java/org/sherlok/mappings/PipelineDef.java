@@ -25,7 +25,9 @@ import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * A pipeline describes the steps to perform a text mining analysis. This
@@ -34,15 +36,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  * @author renaud@apache.org
  */
+// ensure property output order
+@JsonPropertyOrder(value = { "name", "version", "description", "language",
+        "domain", "loadOnStartup", "scriptLines", "output", "tests" }, alphabetic = true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PipelineDef extends Def {
 
     /** Which language this pipeline works for (ISO code). Defaults to 'en' */
-    private String language = "en",
-    /**
-     * Useful to group pipelines together. Letters, numbers, slashes and
-     * underscore only. Defaults to empty.
-     */
-    domain = "";
+    private String language = "en";
+
     /**
      * Whether this pipeline should be loaded on server startup. Defaults to
      * false
@@ -133,15 +135,6 @@ public class PipelineDef extends Def {
 
     public PipelineDef setLanguage(String language) {
         this.language = language;
-        return this;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public PipelineDef setDomain(String domain) {
-        this.domain = domain;
         return this;
     }
 
