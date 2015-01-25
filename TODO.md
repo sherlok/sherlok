@@ -1,6 +1,21 @@
 # TODOs
 
 
+
+--- a/config/pipelines/bluima/neuroner/neuroner_0.1.json
++++ b/config/pipelines/bluima/neuroner/neuroner_0.1.json
+@@ -69,8 +69,9 @@
+    "Neuron{NOT(REGEXP(\"[Cc]ells?\")) -> MARK(NeuronWithProperties, 1, 1)}; ",
+    "(NeuronProperty+ (COMMA | \"and\" | (COMMA \"and\")))* {-> MARK(NeuronWithProperties, 1, 3)} NeuronProperty+ Neuron;",
+    "// keep only longest NeuronWithProperties",
+-   "// ERROR NeuronWithProperties{PARTOFNEQ(NeuronWithProperties) -> DEL};",
+-   "ENGINE KeepLargestAnnotationAnnotator:0.0.1;",
++   "NeuronWithProperties{PARTOFNEQ(NeuronWithProperties) -> DEL};",
++   "//ENGINE NoOpAnnotator:0.0.1;",
++   "//ENGINE KeepLargestAnnotationAnnotator:0.0.1;",
+    "// TODO remove cells without NeuronProperty",
+
+
 * P1 should work offline, too
 
 * P2 spinning wheel while running tests

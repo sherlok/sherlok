@@ -78,6 +78,18 @@ public class BundleDef extends Def {
         public BundleDependency() {
         }
 
+        /**
+         * A maven dependency
+         * 
+         * @param value
+         *            artifact specification with format
+         *            <code>{group id}:{artifact
+         *            id}:{version}</code>
+         */
+        public BundleDependency(String value) {
+            this(DependencyType.mvn, value);
+        }
+
         public BundleDependency(DependencyType type, String value) {
             this.type = type;
             this.value = value;
@@ -229,15 +241,7 @@ public class BundleDef extends Def {
         }
 
         public boolean validate(String msgName) throws ValidationException {
-            try {
-                if (name == null) {
-                    checkOnlyAlphanumDot(name);
-                }
-                // TODO more validation
-            } catch (Throwable e) {
-                throw new ValidationException("" + msgName + ": "
-                        + e.getMessage());
-            }
+            checkOnlyAlphanumDot(name, msgName);
             return true;
         }
 

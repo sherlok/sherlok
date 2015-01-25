@@ -246,9 +246,9 @@ public class PipelineDef extends Def {
     public static List<String> getEnginesFromScript(List<String> scriptLines) {
         List<String> engineIds = list();
         for (String scriptLine : scriptLines) {
-            if (scriptLine.startsWith("ENGINE ")) {
+            if (scriptLine.startsWith("ENGINE")) {
                 String pengineId = scriptLine.trim()
-                        .substring("ENGINE ".length()).replaceAll(";", "");
+                        .substring("ENGINE".length()).trim().replaceAll(";", "");
                 engineIds.add(pengineId);
             }
         }

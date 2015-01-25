@@ -96,7 +96,8 @@ public class SherlokServer {
     public static final String TEST_TEXT = "Using this calibration procedure, we find that mature granule cells (doublecortin-) contain approximately 40 microm, and newborn granule cells (doublecortin+) contain 0-20 microm calbindin-D28k. U.S. employers added the largest number of workers in nearly three years in October and wages increased, which could bring the Federal Reserve closer to raising interest rates. Nonfarm payrolls surged by 321,000 last month, the most since January of 2012, the Labor Department said on Friday. The unemployment rate held steady at a six-year low of 5.8 percent. Data for September and October were revised to show 44,000 more jobs created than previously reported. Economists polled by Reuters had forecast payrolls increasing by only 230,000 last month. November marked the 10th straight month that job growth has exceeded 200,000, the longest stretch since 1994, and further confirmed the economy is weathering slowdowns in China and the euro zone, as well as a recession in Japan.";
 
     /** Called at server startup. Registers all {@link Route}s */
-    public static PipelineLoader init(int port, String ip) throws ValidationException {
+    public static PipelineLoader init(int port, String ip)
+            throws ValidationException {
 
         final Controller controller = new Controller().load();
         final PipelineLoader pipelineLoader = new PipelineLoader(controller);
@@ -419,9 +420,7 @@ public class SherlokServer {
         String version = req.queryParams("version");
         String text = req.queryParams("text");
         try {
-            validateNotNull(pipelineName,
-                    "'pipeline' req parameter should not be null");
-            checkOnlyAlphanumDot(pipelineName);
+            checkOnlyAlphanumDot(pipelineName, "'pipeline' req parameter");
             validateNotNull(text, "'text' req parameter should not be null");
             validateArgument(text.length() > 0,
                     "'text' req parameter should not be empty");
@@ -501,10 +500,8 @@ public class SherlokServer {
 
     private static String check(String name, String version)
             throws ValidationException {
-        validateNotNull(name, "'name' should not be null");
-        validateNotNull(version, "'version' should not be null");
-        checkOnlyAlphanumDot(name);
-        checkOnlyAlphanumDot(version);
+        checkOnlyAlphanumDot(name, "'name'");
+        checkOnlyAlphanumDot(version, "'version'");
         return createId(name, version);
     }
 

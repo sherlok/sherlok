@@ -1,0 +1,34 @@
+{
+  "name" : "dkpro.mallet",
+  "version" : "1.7.0",
+  "domain" : "dkpro",
+  "dependencies" : [ {
+    "type" : "mvn",
+    "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.mallet-asl:1.7.0"
+  } ],
+  "engines" : [ {
+    "name" : "MalletTopicModelEstimator",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.mallet.topicmodel.MalletTopicModelEstimator",
+    "parameters" : {
+      "typeName" : "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token",
+      "nTopics" : "10",
+      "nIterations" : "1000",
+      "useLemma" : "false" ,
+      "optimizeInterval" :  "50" ,
+      "displayNTopicWords" :  "7" ,
+      "targetLocation" : "TODO",
+      "nThreads" :  "1"
+    }
+  }, {
+    "name" : "MalletTopicModelInferencer",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.mallet.topicmodel.MalletTopicModelInferencer",
+    "parameters" : {
+      "nIterations" : "10" ,
+      "typeName" :  "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token" ,
+      "thinning" : "5" ,
+      "modelLocation" : "TODO",
+      "useLemma" :  "false" ,
+      "burnIn" : "1"
+    }
+  } ]
+}

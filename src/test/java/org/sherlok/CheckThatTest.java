@@ -26,37 +26,42 @@ public class CheckThatTest {
 
     @Test(expected = ValidationException.class)
     public void testStar() throws Exception {
-        checkOnlyAlphanumDot("*_");
+        checkOnlyAlphanumDot("*_", "");
     }
 
     @Test(expected = ValidationException.class)
     public void testParenthesis() throws Exception {
-        checkOnlyAlphanumDot("(asd)");
+        checkOnlyAlphanumDot("(asd)", "");
     }
 
     @Test
     public void test() throws Exception {
-        checkOnlyAlphanumDot("abAC09.32no__in23");
+        checkOnlyAlphanumDot("abAC09.32no__in23", "");
     }
 
     @Test
     public void testValidId() throws Exception {
-        validateId("ab:cd");
+        validateId("ab:cd", "");
     }
 
     @Test
     public void testValidIdWithUnderscores() throws Exception {
-        validateId("a_b:c_d");
+        validateId("a_b:c_d", "");
     }
 
     @Test(expected = ValidationException.class)
     public void testValidIdTwoColumns() throws Exception {
-        validateId("a:_b:c_d");
+        validateId("a:_b:c_d", "");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidIdEmpty() throws Exception {
+        validateId("ab:", "");
     }
 
     @Test(expected = ValidationException.class)
     public void testValidIdMissingColumn() throws Exception {
-        validateId("a_bc_d");
+        validateId("a_bc_d", "");
     }
 
     @Test

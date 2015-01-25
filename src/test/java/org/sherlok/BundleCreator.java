@@ -50,14 +50,24 @@ public class BundleCreator {
     public static void main(String[] args) throws Exception {
 
         BundleDef b1 = new BundleDef();
-        b1.addRepository(
-                "dkpro",
-                "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/");
+        // b1.addRepository(
+        // "dkpro",
+        // "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/");
         b1.addDependency(new BundleDependency(DependencyType.mvn,
-        // "junit:junit:3.7"));
-        // "org.sherlok:sherlok_mallet:0.0.1-SNAPSHOT"));
-                "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"));
-        // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.6.2"));
+
+        // Mallet Sherlok
+        // "org.sherlok:sherlok_mallet:0.0.1-SNAPSHOT"
+                // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"));
+                // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.6.2"));
+
+                // Mallet LDA
+                // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.mallet-asl:1.7.0"
+
+                // MST parser
+                "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.mstparser-asl:1.7.0"
+
+        //
+        ));
         Set<BundleDef> bundleDefs = set(b1);
 
         createBundle(bundleDefs);

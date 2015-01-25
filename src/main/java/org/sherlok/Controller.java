@@ -15,6 +15,7 @@
  */
 package org.sherlok;
 
+import static org.sherlok.utils.CheckThat.validateId;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -72,6 +73,9 @@ public class Controller {
 
             // all engines must be found
             for (String pengineId : pd.getEnginesFromScript()) {
+
+                validateId(pengineId, "engine id '" + pengineId
+                        + "' in pipeline '" + pd + "'");
                 if (!engineDefs.containsKey(pengineId)) {
                     throw new ValidationException("no engine def found for '"
                             + pengineId + "' in pipeline '" + pd + "'");

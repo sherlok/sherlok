@@ -1,0 +1,14 @@
+{
+  "name" : "sherlok",
+  "version" : "0.0.1",
+  "engines" : [ {
+    "name" : "KeepLargestAnnotationAnnotator",
+    "class" : "org.sherlok.uima.engines.KeepLargestAnnotationAnnotator",
+    "parameters" : {
+      "annotationClass" : "neuroner.NeuronWithProperties"
+    }
+  }, {
+    "name" : "NoOpAnnotator",
+    "class" : "org.apache.uima.fit.component.NoOpAnnotator"
+  } ]
+}

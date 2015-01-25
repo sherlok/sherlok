@@ -23,32 +23,54 @@ import java.util.regex.Pattern;
 public class CheckThat {
 
     /** Letters, numbers, dots and underscore only */
-    private static final Pattern ALPHANUM_DOT = Pattern
-            .compile("[^a-zA-Z0-9\\._]");
+    private static final Pattern ALPHANUM_DOT = compile("[^a-zA-Z0-9\\._]");
 
-    public static void checkOnlyAlphanumDot(String test)
+    /**
+     * @param test
+     *            the string to validate
+     * @param context
+     *            text is prepended to exception
+     * @throws ValidationException
+     *             if <code>test</code> is empty/null, or contains something
+     *             else than letters, numbers or dots.
+     */
+    public static void checkOnlyAlphanumDot(String test, String context)
             throws ValidationException {
+        if (test == null || test.length() == 0) {
+            throw new ValidationException(context + ": cannot be empty or null");
+        }
         if (ALPHANUM_DOT.matcher(test).find()) {
-            throw new ValidationException("'" + test
+            throw new ValidationException(context + ": '" + test
                     + "' contains something else than"
                     + " letters, numbers or dots");
         }
     }
 
-    /** @return true if 'id' contains a single column */
-    public static void validateId(String id) throws ValidationException {
+    /**
+     * @param id
+     *            the id to validate
+     * @param context
+     *            text is prepended to exception
+     * @throws ValidationException
+     *             if <code>id</code> contains a single column, or if name or
+     *             value is not valid.
+     */
+    public static void validateId(String id, String context)
+            throws ValidationException {
         if (id.indexOf(SEPARATOR) == -1) {
-            throw new ValidationException(id + " must contain a column (':')");
+            throw new ValidationException(context + ": '" + id
+                    + "' should have the format"//
+                    + " {name}:{version}, but no column was found.");
 
-        } else if (id.split(SEPARATOR).length != 2) {
-            throw new ValidationException("'" + id
-                    + "' must contain a single column (':')");
+        } else if (id.split(SEPARATOR).length !=2) {
+            throw new ValidationException(context + ": '" + id
+                    + "' should have the format"//
+                    + " {name}:{version}, but more than one column was found.");
         } else {
             String[] splits = id.split(SEPARATOR);
-            checkOnlyAlphanumDot(splits[0]);
-            checkOnlyAlphanumDot(splits[1]);
+            checkOnlyAlphanumDot(splits[0], context);
+            checkOnlyAlphanumDot(splits[1], context);
         }
-
     }
 
     public static <T> T validateNotNull(T reference, String errorMessage)

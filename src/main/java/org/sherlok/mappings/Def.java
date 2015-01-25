@@ -16,7 +16,6 @@
 package org.sherlok.mappings;
 
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
-import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.sherlok.utils.ValidationException;
@@ -88,15 +87,8 @@ public abstract class Def {
     }
 
     public boolean validate(String msgName) throws ValidationException {
-        try {
-            validateNotNull(name, "name should not be null");
-            checkOnlyAlphanumDot(name);
-            validateNotNull(version, "version should not be null");
-            checkOnlyAlphanumDot(version);
-            // TODO more validation
-        } catch (Throwable e) {
-            throw new ValidationException("" + msgName + ": " + e.getMessage());
-        }
+        checkOnlyAlphanumDot(name, msgName);
+        checkOnlyAlphanumDot(version, msgName);
         return true;
     }
 

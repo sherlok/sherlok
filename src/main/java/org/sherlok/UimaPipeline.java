@@ -22,6 +22,7 @@ import static org.apache.uima.ruta.engine.RutaEngine.PARAM_RESOURCE_PATHS;
 import static org.apache.uima.ruta.engine.RutaEngine.PARAM_SCRIPT_PATHS;
 import static org.apache.uima.ruta.engine.RutaEngine.SCRIPT_FILE_EXTENSION;
 import static org.apache.uima.util.FileUtils.saveString2File;
+import static org.sherlok.utils.CheckThat.validateId;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -116,18 +117,22 @@ public class UimaPipeline {
         this.pipelineId = pipelineId;
         this.language = language;
 
-        try {
-            // needed since we might have added new jars to the classpath
-            TypeSystemDescriptionFactory.forceTypeDescriptorsScan();
-            tsd = TypeSystemDescriptionFactory.createTypeSystemDescription();
-        } catch (ResourceInitializationException e) {
-            throw new RuntimeException(e); // should not happen
-        }
+        this.tsd = reloadTSD();// needed since we have added new jars to the CP
 
         initScript(list(scriptLines) /* a copy */, engineDefs);
         initEngines();
         initCasPool();
         filterAnnots(annotationIncludes, annotationFilters);
+    }
+
+    static TypeSystemDescription reloadTSD() {
+        try {
+            TypeSystemDescriptionFactory.forceTypeDescriptorsScan();
+            return TypeSystemDescriptionFactory.createTypeSystemDescription();
+        } catch (ResourceInitializationException e) {
+            throw new RuntimeException(e); // should not happen
+        }
+
     }
 
     /**
@@ -206,9 +211,12 @@ public class UimaPipeline {
 
     private void initEngines() throws UIMAException, ValidationException {
         // redirect stdout to catch Ruta script errors
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
+        ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
         PrintStream origOut = System.out;
-        System.setOut(new PrintStream(baos));
+        PrintStream origErr = System.err;
+        System.setOut(new PrintStream(baosOut));
+        System.setErr(new PrintStream(baosErr));
 
         try {
             // initialize Engines
@@ -218,18 +226,25 @@ public class UimaPipeline {
             }
         } finally { // so that we restore Sysout in any case
 
-            // catching Ruta script errors
-            String maybeError = baos.toString();
-            for (String line : maybeError.split("\n")) {
+            // catching Ruta script outputs (these contain errors) and errors
+            String maybeOut = baosOut.toString();
+            System.setOut(origOut); // restore
+            String maybeErr = baosErr.toString();
+            System.setErr(origErr); // restore
+
+            if (maybeOut.length() > 0)
+                LOG.info(maybeOut);
+            if (maybeErr.length() > 0)
+                LOG.error(maybeOut);
+
+            if (maybeErr.length() > 0)
+                throw new ValidationException(maybeErr);
+            for (String line : maybeOut.split("\n")) {
                 if (line.startsWith("Error in line")) {
                     throw new ValidationException(line);
                 }
             }
-            System.setOut(origOut);
-            if (maybeError.length() > 0)
-                LOG.info(maybeError);
         }
-
     }
 
     private void initCasPool() throws ResourceInitializationException {
@@ -256,7 +271,8 @@ public class UimaPipeline {
     }
 
     public interface Annotate {
-        public Object annotate(JCas jCas, AnalysisEngine[] aes) throws AnalysisEngineProcessException;
+        public Object annotate(JCas jCas, AnalysisEngine[] aes)
+                throws AnalysisEngineProcessException;
     }
 
     /**
@@ -347,10 +363,12 @@ public class UimaPipeline {
 
             String scriptLine = scriptLines.get(i);
 
-            if (scriptLine.startsWith("ENGINE ")) {
+            if (scriptLine.startsWith("ENGINE")) {
                 // TODO refactor and abstract
                 String pengineId = scriptLine.trim()
-                        .substring("ENGINE ".length()).replaceAll(";", "");
+                        .substring("ENGINE".length()).trim()
+                        .replaceAll(";", "");
+                validateId(pengineId, "ENGINE id in '" + pengineId + "'");
 
                 boolean found = false;
                 for (EngineDef engineDef : engineDefs) {
