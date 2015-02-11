@@ -120,18 +120,18 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     });
   }
 
-  // ENGINES
-  loadEngines = function(){
-    $http.get('/engines').success(function (data) {
-      $scope.engines = {};
-      for (var en in data){
-        $scope.engines[en.name+':'+en.version] = en;
-      }
-    }).error(function (data, status) {
-      console.log('Error ' + data)
-    })
-  }
-  loadEngines();
+  // // ENGINES
+  // loadEngines = function(){
+  //   $http.get('/engines').success(function (data) {
+  //     $scope.engines = {};
+  //     for (var en in data){
+  //       $scope.engines[en.name+':'+en.version] = en;
+  //     }
+  //   }).error(function (data, status) {
+  //     console.log('Error ' + data)
+  //   })
+  // }
+  // loadEngines();
 
   // RUTA EDITOR
   $scope.editorOptions = {

@@ -84,7 +84,7 @@
     border: 1px solid rgb(175, 180, 153);
     color: rgb(67, 70, 56);
 }
-.np_protein { /*darkblue*/
+.np_protein, .np_person, .np_country { /*darkblue*/
     background-color: rgb(187, 211, 230);
     border: 1px solid rgb(170, 197, 238);
     color: rgb(13, 77, 124);
@@ -94,7 +94,7 @@
     border: 1px solid rgb(251, 238, 213);
     color: rgb(144, 118, 49);
 }
-.np_species { /*red*/
+.np_species, .np_location { /*red*/
     background-color: #f3c2c2;
     border: 1px solid #c99797;
     color: #c14240;

@@ -22,7 +22,7 @@ var Sherlok = {
       var newTxt = "";
       var last = txt.length;
       $.each(annots.sort(predicatBy("end")), function(index3, a){
-        //console.log("ANNOT: " + a.begin);
+        console.log(a);
         if (a.end < last){
           newTxt = '<span class="inline-a np_'+ a.value + '" title="'+a.value+'">' + txt.substring(a.begin, a.end) + '</span>' +  txt.substring(a.end, last) + newTxt;
           last = a.begin;

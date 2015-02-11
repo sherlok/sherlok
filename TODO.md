@@ -27,7 +27,11 @@
 # OTHERS
 
 * http://www.crunchbase.com/organization/indico-data-solutions
-
+* http://honnibal.github.io/spaCy/
+* https://github.com/NaturalNode/natural
+* [date parser](http://natty.joestelmach.com/try.jsp)
+* [watson concept insights](http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/doc/concept-insights/)
+* [CLAVIN (Cartographic Location And Vicinity INdexer) open source software package for document geotagging and geoparsing](http://clavin.bericotechnologies.com/)
 # DONE
 
 * P3 order of pipelines in right col
