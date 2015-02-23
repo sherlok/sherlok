@@ -129,7 +129,7 @@ public class Controller {
         return bundleDefs.get(bundleId);
     }
 
-    EngineDef getEngineDef(String engineId) { // FIXME delete?
+    EngineDef getEngineDef(String engineId) {
         return engineDefs.get(engineId);
     }
 

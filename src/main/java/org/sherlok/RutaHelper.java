@@ -180,7 +180,11 @@ public class RutaHelper {
                 return "uima.cas.String";
             case "INT":
                 return "uima.cas.Integer";
-                // FIXME do more
+            case "FLOAT":
+                return "uima.cas.Float";
+            case "DOUBLE":
+                return "uima.cas.Double";
+                // TODO do more
             default:
                 return rangeTypeName;
             }

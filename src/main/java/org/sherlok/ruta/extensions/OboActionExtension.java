@@ -49,7 +49,7 @@ public class OboActionExtension implements IRutaActionExtension {
             ComposedStringExpression ce = (ComposedStringExpression) re;
             String oboFile = ce.getExpressions().get(0).toString();
 
-            // FIXME validate
+            // TODO validate
             return new OboAction(null);
         }
     }

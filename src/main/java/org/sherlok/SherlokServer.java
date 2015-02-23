@@ -505,7 +505,7 @@ public class SherlokServer {
         }
     }
 
-    /*- TODO LATER not working: compressing server output
+    /*- TODO xLATER not working: compressing server output
     // resp.header("Content-Encoding", "gzip");
     public static String compress(String str) throws IOException {
         if (str == null || str.length() == 0) {
