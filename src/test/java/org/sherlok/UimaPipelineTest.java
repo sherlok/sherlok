@@ -15,12 +15,10 @@
  */
 package org.sherlok;
 
-import static org.junit.Assert.assertEquals;
-import static org.sherlok.utils.Create.list;
+import static org.sherlok.mappings.PipelineDef.PipelineTest.Comparison.atLeast;
+import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Test;
 import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
 import org.sherlok.mappings.PipelineDef.TestAnnotation;
@@ -37,9 +35,10 @@ public class UimaPipelineTest {
                 .resolvePipeline("01.ruta.annotate.dog", null);
         String result = pipeline.annotate("dog");
         LOG.debug(result);
-        SherlokTests
-                .assertEquals(list(new TestAnnotation().setBegin(0).setEnd(3)
-                        .setType("Dog")), result, Comparison.exact);
+        SherlokTests.assertEquals(
+                map("1",
+                        new TestAnnotation().setBegin(0).setEnd(3)
+                                .setType("Dog")), result, Comparison.exact);
     }
 
     @Test
@@ -50,8 +49,9 @@ public class UimaPipelineTest {
         String result = (pipeline.annotate("Switzerland"));
         LOG.debug(result);
         SherlokTests.assertEquals(
-                list(new TestAnnotation().setBegin(0).setEnd(11)
-                        .setType("Country")), result, Comparison.exact);
+                map("1",
+                        new TestAnnotation().setBegin(0).setEnd(11)
+                                .setType("Country")), result, Comparison.exact);
     }
 
     @Test
@@ -61,14 +61,13 @@ public class UimaPipelineTest {
                 .resolvePipeline("maltparser.en", null);
         String result = (pipeline.annotate("The dog walks on the lake."));
         LOG.debug(result);
-
-        JSONObject jsonObject = new JSONObject(result);
-        JSONObject annotations = jsonObject.getJSONObject("annotations");
-        JSONArray names = annotations.names();
-        assertEquals(8, names.length());
-        Object country = annotations.get("678");
-        assertEquals(
-                "{\"sofa\":1,\"Governor\":137,\"Dependent\":129,\"@type\":\"Dependency\",\"DependencyType\":\"det\",\"end\":3}",
-                country.toString());
+        SherlokTests.assertEquals(
+                map("678",
+                        new TestAnnotation().setBegin(0).setEnd(3)
+                                .setType("Dependency")
+                                .addProperty("Dependent", 129)
+                                .addProperty("Governor", 137)
+                                .addProperty("DependencyType", "det")), result,
+                atLeast);
     }
 }

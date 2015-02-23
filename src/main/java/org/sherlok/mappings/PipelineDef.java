@@ -118,7 +118,7 @@ public class PipelineDef extends Def {
 
         private String in;
         private Comparison comparison = Comparison.atLeast; // default
-        private List<TestAnnotation> out;
+        private Map<String, TestAnnotation> out;
 
         public String getIn() {
             return in;
@@ -129,8 +129,13 @@ public class PipelineDef extends Def {
             return this;
         }
 
-        public List<TestAnnotation> getOut() {
+        public Map<String, TestAnnotation> getOut() {
             return out;
+        }
+
+        public PipelineTest setOut(Map<String, TestAnnotation> out) {
+            this.out = out;
+            return this;
         }
 
         public Comparison getComparison() {
@@ -145,6 +150,7 @@ public class PipelineDef extends Def {
         public String toString() {
             return in + "::" + out;
         }
+
     }
 
     public static class TestAnnotation {
@@ -165,7 +171,8 @@ public class PipelineDef extends Def {
         }
 
         @JsonAnySetter
-        public TestAnnotation addProperty(String name, Object value) throws JSONException {
+        public TestAnnotation addProperty(String name, Object value)
+                throws JSONException {
             if (!NOT_PROPERTIES.contains(name))
                 properties.put(name, value);
             return this;
@@ -199,7 +206,7 @@ public class PipelineDef extends Def {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(Object o) { // TODO test on properties, too
             if (o instanceof TestAnnotation) {
                 TestAnnotation other = (TestAnnotation) o;
                 if (this.begin == other.begin && //
@@ -278,8 +285,9 @@ public class PipelineDef extends Def {
         return this;
     }
 
-    public void addTests(PipelineTest test) {
+    public PipelineDef addTests(PipelineTest test) {
         this.tests.add(test);
+        return this;
     }
 
     // Utilities //////////////////////////////////////////////////////////////

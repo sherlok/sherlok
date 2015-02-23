@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.sherlok.FileBased.allPipelineDefs;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sherlok.Controller;
 import org.sherlok.PipelineLoader;
@@ -70,6 +71,7 @@ public class SherlokTestsTest {
     }
 
     @Test
+    @Ignore
     public void testFillinPipelineTests() throws Exception {
 
         PipelineLoader pipelineLoader = new PipelineLoader(

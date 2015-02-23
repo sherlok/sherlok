@@ -23,6 +23,7 @@ import org.apache.uima.ruta.visitor.InferenceCrowd;
 public class OboAction extends AbstractRutaAction {
 
     private List<INumberExpression> indexExprList;
+    @SuppressWarnings("unused")
     private String engineName;
 
     public OboAction(String engineName) {

@@ -29,6 +29,7 @@ public class OboActionExtension implements IRutaActionExtension {
         }
     }
 
+    @SuppressWarnings("unused")
     public AbstractRutaAction createAction(String name,
             List<RutaExpression> args) throws RutaParseException {
 
@@ -40,8 +41,8 @@ public class OboActionExtension implements IRutaActionExtension {
             RutaExpression re = args.get(0);
             String c = re.getClass().getName();
 
-             SimpleTypeExpression te = (SimpleTypeExpression) re;
-             Type type = te.getType(null);
+            SimpleTypeExpression te = (SimpleTypeExpression) re;
+            Type type = te.getType(null);
             String annotationClass = te.getTypeString();
 
             re = args.get(1);

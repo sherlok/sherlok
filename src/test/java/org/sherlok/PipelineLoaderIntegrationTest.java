@@ -17,7 +17,7 @@ package org.sherlok;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.junit.Rule;
@@ -62,9 +62,11 @@ public class PipelineLoaderIntegrationTest {
         String result = (pipeline.annotate(TEST_TEXT));
         LOG.debug(result);
 
-        SherlokTests.assertEquals(list(//
-                new TestAnnotation().setBegin(0).setEnd(11)
-                        .setType("NamedEntity").addProperty("value", "person")//
-                ), result, Comparison.atLeast);
+        SherlokTests.assertEquals(
+                map("1",
+                        new TestAnnotation().setBegin(0).setEnd(11)
+                                .setType("NamedEntity")
+                                .addProperty("value", "person")), result,
+                Comparison.atLeast);
     }
 }

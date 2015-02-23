@@ -4,6 +4,7 @@ import static org.sherlok.utils.Create.list;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +13,7 @@ import org.sherlok.mappings.PipelineDef.TestAnnotation;
 
 public class SherlokTests {
 
-    public static void assertEquals(List<TestAnnotation> expectedAnnots,
+    public static void assertEquals(Map<String, TestAnnotation> expected,
             String system, Comparison comparison) throws ValidationException {
 
         // parse
@@ -27,7 +28,7 @@ public class SherlokTests {
         // validate
         switch (comparison) {
         case atLeast:
-            for (TestAnnotation exp : expectedAnnots) {
+            for (TestAnnotation exp : expected.values()) {
                 if (!systemAnnots.contains(exp)) {
                     throw new ValidationException("Expected '" + exp
                             + "', but was not found in SYSTEM: " + system);
@@ -36,14 +37,14 @@ public class SherlokTests {
             break;
 
         case exact: // compare 2-ways; give explicit error msg
-            for (TestAnnotation exp : expectedAnnots) {
+            for (TestAnnotation exp : expected.values()) {
                 if (!systemAnnots.contains(exp)) {
                     throw new ValidationException("Expected '" + exp
                             + "', but was not found in SYSTEM: " + system);
                 }
             }
             for (TestAnnotation sys : systemAnnots) {
-                if (!expectedAnnots.contains(sys)) {
+                if (!expected.values().contains(sys)) {
                     throw new ValidationException("System found '" + sys
                             + "', but was not found in EXPECTED: " + system);
                 }

@@ -12,9 +12,9 @@
   ],
   "tests" : [ {
     "in" : "This is a good dog!",
-    "out" : [
-      {"@type" : "Dog", "begin" : 15,  "end" : 18 }
-    ],
+    "out" : {
+      "1": {"@type" : "Dog", "begin" : 15,  "end" : 18 }
+    },
     "comparison": "exact"
   } ]
 }
