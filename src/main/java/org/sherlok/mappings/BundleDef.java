@@ -195,12 +195,7 @@ public class BundleDef extends Def {
         // get/set
 
         public String getName() {
-            if (name != null && name.length() > 0) {
-                return name;
-            } else { // fallback on class' simple name
-                return classz.substring(classz.lastIndexOf('.'),
-                        classz.length());
-            }
+            return name;
         }
 
         public EngineDef setName(String name) {
