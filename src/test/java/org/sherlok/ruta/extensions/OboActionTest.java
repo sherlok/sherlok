@@ -28,7 +28,5 @@ public class OboActionTest {
                 new String[] { OboActionExtension.class.getName() });
 
         Ruta.apply(jCas.getCas(), script, parameters);
-
     }
-
 }
