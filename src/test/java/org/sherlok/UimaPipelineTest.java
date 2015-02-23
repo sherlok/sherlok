@@ -16,11 +16,15 @@
 package org.sherlok;
 
 import static org.junit.Assert.assertEquals;
+import static org.sherlok.utils.Create.list;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
+import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
+import org.sherlok.mappings.PipelineDef.TestAnnotation;
+import org.sherlok.utils.SherlokTests;
 import org.slf4j.Logger;
 
 public class UimaPipelineTest {
@@ -33,16 +37,9 @@ public class UimaPipelineTest {
                 .resolvePipeline("01.ruta.annotate.dog", null);
         String result = pipeline.annotate("dog");
         LOG.debug(result);
-
-        JSONObject jsonObject = new JSONObject(result);
-        JSONObject annotations = jsonObject
-                .getJSONObject("@cas_feature_structures");
-        JSONArray names = annotations.names();
-        assertEquals(3, names.length());
-
-        Object animal = annotations.get("26");
-        assertEquals("{\"sofa\":1,\"@type\":\"Dog\",\"end\":3}",
-                animal.toString());
+        SherlokTests
+                .assertEquals(list(new TestAnnotation().setBegin(0).setEnd(3)
+                        .setType("Dog")), result, Comparison.exact);
     }
 
     @Test
@@ -52,15 +49,9 @@ public class UimaPipelineTest {
                 .resolvePipeline("02.ruta.annotate.countries", null);
         String result = (pipeline.annotate("Switzerland"));
         LOG.debug(result);
-
-        JSONObject jsonObject = new JSONObject(result);
-        JSONObject annotations = jsonObject
-                .getJSONObject("@cas_feature_structures");
-        JSONArray names = annotations.names();
-        assertEquals(3, names.length());
-        Object country = annotations.get("30");
-        assertEquals("{\"sofa\":1,\"@type\":\"Country\",\"end\":11}",
-                country.toString());
+        SherlokTests.assertEquals(
+                list(new TestAnnotation().setBegin(0).setEnd(11)
+                        .setType("Country")), result, Comparison.exact);
     }
 
     @Test
@@ -72,8 +63,7 @@ public class UimaPipelineTest {
         LOG.debug(result);
 
         JSONObject jsonObject = new JSONObject(result);
-        JSONObject annotations = jsonObject
-                .getJSONObject("@cas_feature_structures");
+        JSONObject annotations = jsonObject.getJSONObject("annotations");
         JSONArray names = annotations.names();
         assertEquals(8, names.length());
         Object country = annotations.get("678");

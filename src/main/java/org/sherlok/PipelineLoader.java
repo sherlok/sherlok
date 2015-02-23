@@ -168,11 +168,7 @@ public class PipelineLoader {
         // 5. create UimaPipeline and add components
         UimaPipeline uimaPipeline;
         try {
-            uimaPipeline = new UimaPipeline(pipelineDef.getId(),
-                    pipelineDef.getLanguage(), engineDefs,
-                    pipelineDef.getScriptLines(), pipelineDef.getOutput()
-                            .getAnnotationIncludes(), pipelineDef.getOutput()
-                            .getAnnotationFilters());
+            uimaPipeline = new UimaPipeline(pipelineDef, engineDefs);
         } catch (IOException | UIMAException e) {
             throw new ValidationException(
                     "could not initialize UIMA pipeline: " + e.getMessage(), e);

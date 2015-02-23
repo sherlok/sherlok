@@ -88,7 +88,7 @@ import org.xml.sax.SAXException;
 public class UimaPipeline {
     private static Logger LOG = getLogger(UimaPipeline.class);
 
-    private final String pipelineId;
+    private final PipelineDef pipelineDef;
     private final String language;
 
     private List<AnalysisEngineDescription> aeds = list();
@@ -110,19 +110,18 @@ public class UimaPipeline {
      * @param annotationIncludes
      * @param annotationFilters
      */
-    public UimaPipeline(String pipelineId, String language,
-            List<EngineDef> engineDefs, List<String> scriptLines,
-            List<String> annotationIncludes, List<String> annotationFilters)
+    public UimaPipeline(PipelineDef pipelineDef, List<EngineDef> engineDefs)
             throws IOException, ValidationException, UIMAException {
-        this.pipelineId = pipelineId;
-        this.language = language;
+        this.pipelineDef = pipelineDef;
+        this.language = pipelineDef.getLanguage();
 
         this.tsd = reloadTSD();// needed since we have added new jars to the CP
 
-        initScript(list(scriptLines) /* a copy */, engineDefs);
+        initScript(list(pipelineDef.getScriptLines()) /* a copy */, engineDefs);
         initEngines();
         initCasPool();
-        filterAnnots(annotationIncludes, annotationFilters);
+        filterAnnots(pipelineDef.getOutput().getAnnotationIncludes(),
+                pipelineDef.getOutput().getAnnotationFilters());
     }
 
     static TypeSystemDescription reloadTSD() {
@@ -132,7 +131,6 @@ public class UimaPipeline {
         } catch (ResourceInitializationException e) {
             throw new RuntimeException(e); // should not happen
         }
-
     }
 
     /**
@@ -325,7 +323,11 @@ public class UimaPipeline {
 
             StringWriter sw = new StringWriter();
             xcs.serializeJson(cas, sw);
-            return sw.toString();
+
+            String json = sw.toString();
+            // rename JSON field, for readibility
+            json = json.replaceFirst("@cas_feature_structures", "annotations");
+            return json;
 
         } catch (AnalysisEngineProcessException aepe) {
             Throwable cause = aepe.getCause();
@@ -347,9 +349,13 @@ public class UimaPipeline {
         }
     }
 
+    public PipelineDef getPipelineDef() {
+        return pipelineDef;
+    }
+
     @Override
     public String toString() {
-        return pipelineId;
+        return pipelineDef.toString();
     }
 
     @SuppressWarnings("unchecked")
@@ -500,7 +506,8 @@ public class UimaPipeline {
         }
 
         // write Ruta script to tmp file
-        String scriptName = pipelineId.replace(".", "_");// ruta not like dots
+        // ruta does not like dots
+        String scriptName = pipelineDef.getId().replace(".", "_");
         File scriptFile = new File(FileBased.RUTA_PIPELINE_CACHE_PATH
                 + scriptName + SCRIPT_FILE_EXTENSION);
         scriptFile.getParentFile().mkdirs();

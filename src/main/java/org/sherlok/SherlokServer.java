@@ -39,7 +39,9 @@ import javax.servlet.http.Part;
 
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.PipelineDef;
+import org.sherlok.mappings.PipelineDef.PipelineTest;
 import org.sherlok.utils.Create;
+import org.sherlok.utils.SherlokTests;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
@@ -62,6 +64,8 @@ public class SherlokServer {
 
     /** Route for annotating */
     static final String ANNOTATE = "annotate";
+    /** Route for testing */
+    static final String TEST = "test";
     /** Route and path for pipelines */
     static final String PIPELINES = "pipelines";
     /** Route and path for bundles */
@@ -109,20 +113,55 @@ public class SherlokServer {
         // http://{host}:{port}/css/style.css
         externalStaticFileLocation(PUBLIC);
         validatePluginsNames(PUBLIC);
+        
+        try {// prevent error "This must be done before route mapping has begun"
+            Thread.sleep(20);
+        } catch (InterruptedException e) {// nope
+        }
 
-        // ROUTES: ANNOTATE
+        // ROUTES: ANNOTATE & TEST
         // ////////////////////////////////////////////////////////////////////////////
-        get(new Route("/" + ANNOTATE + "/:pipelineName", JSON) {
+        get(new Route("/" + ANNOTATE + "/:name", JSON) {
             @Override
             public Object handle(Request req, Response resp) {
                 return annotateRequest(req, resp, pipelineLoader);
             }
         });
-        // same, but POST
-        post(new Route("/" + ANNOTATE + "/:pipelineName", JSON) {
+        post(new Route("/" + ANNOTATE + "/:name", JSON) {// same, but POST
             @Override
             public Object handle(Request req, Response resp) {
                 return annotateRequest(req, resp, pipelineLoader);
+            }
+        });
+
+        get(new Route("/" + TEST + "/:name", JSON) {
+            @Override
+            public Object handle(Request req, Response resp) {
+
+                String pipelineName = req.params(":name");
+                String version = req.queryParams("version");
+                resp.type(JSON);
+
+                try { // test
+                    checkOnlyAlphanumDot(pipelineName,
+                            "'pipeline' req parameter");
+
+                    UimaPipeline pipeline = pipelineLoader.resolvePipeline(
+                            pipelineName, version);
+
+                    for (PipelineTest test : pipeline.getPipelineDef()
+                            .getTests()) {
+                        String systemOut = pipeline.annotate(test.getIn());
+                        SherlokTests.assertEquals(test.getOut(), systemOut,
+                                test.getComparison());
+                    }
+                } catch (ValidationException ve) {
+                    return invalid("test failed: ", ve, resp);
+                } catch (Exception e) {
+                    return error("test failed: ", e, resp);
+                }
+
+                return "All test passed :-)";
             }
         });
 
@@ -156,10 +195,10 @@ public class SherlokServer {
                 }
             }
         });
-        get(new JsonRoute("/" + PIPELINES + "/:pipelineName/:version") { // GET
+        get(new JsonRoute("/" + PIPELINES + "/:name/:version") { // GET
             @Override
             public Object handle(Request req, Response resp) {
-                String name = req.params(":pipelineName");
+                String name = req.params(":name");
                 String version = req.params(":version");
                 try {
                     String id = check(name, version);
@@ -209,10 +248,10 @@ public class SherlokServer {
                 }
             }
         });
-        delete(new JsonRoute("/" + PIPELINES + "/:pipelineName/:version") { // DELETE
+        delete(new JsonRoute("/" + PIPELINES + "/:name/:version") { // DELETE
             @Override
             public Object handle(Request req, Response resp) {
-                String name = req.params(":pipelineName");
+                String name = req.params(":name");
                 String version = req.params(":version");
                 try {
                     String id = check(name, version);
@@ -292,76 +331,6 @@ public class SherlokServer {
             }
         });
 
-        // ROUTES: BUNDLES
-        // ////////////////////////////////////////////////////////////////////////////
-        get(new JsonRoute("/" + BUNDLES) { // LIST
-            @Override
-            public Object handle(Request req, Response resp) {
-                try {
-                    resp.type(JSON);
-                    return controller.listBundles();
-                } catch (Exception e) {// this error should not happen
-                    return error("LIST bundles", e, resp);
-                }
-            }
-        });
-        get(new JsonRoute("/" + BUNDLES + "/:bundleName/:version") { // GET
-            @Override
-            public Object handle(Request req, Response resp) {
-                String name = req.params(":bundleName");
-                String version = req.params(":version");
-                try {
-                    String id = check(name, version);
-                    BundleDef pDef = controller.getBundleDef(id);
-                    if (pDef != null) {
-                        resp.type(JSON);
-                        return pDef;
-                    } else
-                        throw new ValidationException("no bundle with id '"
-                                + id + "' found");
-                } catch (ValidationException ve) {
-                    return invalid("GET bundle '" + name + "'", ve, resp);
-                } catch (Exception e) {
-                    return error("GET bundle '" + name + "'", e, resp);
-                }
-            }
-        });
-        put(new Route("/" + BUNDLES, JSON) { // PUT
-            @Override
-            public Object handle(Request req, Response resp) {
-                try {
-                    String newId = controller.putBundle(req.body());
-                    resp.status(STATUS_OK);
-                    return newId;
-                } catch (ValidationException ve) {
-                    return invalid("PUT bundle '" + req.body() + "'", ve, resp);
-                } catch (Exception e) {
-                    return error("PUT '" + req.body(), e, resp);
-                }
-            }
-        });
-        delete(new JsonRoute("/" + BUNDLES + "/:bundleName/:version") { // DELETE
-            @Override
-            public Object handle(Request req, Response resp) {
-                String name = req.params(":bundleName");
-                String version = req.params(":version");
-                try {
-                    String id = check(name, version);
-                    controller.deleteBundleDef(id);
-                    return "";
-                } catch (ValidationException ve) {
-                    Object r = invalid("DELETE bundle '" + name + "'", ve, resp);
-                    try {
-                        return FileBased.writeAsString(r);
-                    } catch (JsonProcessingException e) {
-                        return r;
-                    }
-                } catch (Exception e) {
-                    return error("DELETE '" + name, e, resp);
-                }
-            }
-        });
-
         // ROUTES: RUTA RESOURCES
         // ////////////////////////////////////////////////////////////////////////////
         get(new JsonRoute("/" + RUTA_RESOURCES) { // LIST
@@ -416,7 +385,7 @@ public class SherlokServer {
 
     protected static Object annotateRequest(Request req, Response resp,
             PipelineLoader pipelineLoader) {
-        String pipelineName = req.params(":pipelineName");
+        String pipelineName = req.params(":name");
         String version = req.queryParams("version");
         String text = req.queryParams("text");
         try {
@@ -437,15 +406,13 @@ public class SherlokServer {
         try {
             resp.type(JSON);
 
-            long start = currentTimeMillis();
+            long start = currentTimeMillis(); // stats
             UimaPipeline pipeline = pipelineLoader.resolvePipeline(
                     pipelineName, version);
             long resolved = currentTimeMillis(), //
             resolve = resolved - start;
             String json = pipeline.annotate(text);
             long annotate = currentTimeMillis() - resolved;
-
-            json = json.replace("@cas_feature_structures", "annotations");
 
             // remove last '}' of json, append some stats
             StringBuilder sb = new StringBuilder(json.substring(0,
@@ -538,7 +505,7 @@ public class SherlokServer {
         }
     }
 
-    /*- TODO LATER not working
+    /*- TODO LATER not working: compressing server output
     // resp.header("Content-Encoding", "gzip");
     public static String compress(String str) throws IOException {
         if (str == null || str.length() == 0) {
@@ -552,7 +519,7 @@ public class SherlokServer {
         return outStr;
     }*/
 
-    // MAIN stuff
+    // MAIN stuff (to start Sherlok server)
     // ////////////////////////////////////////////////////////////////////////////
     public static final int DEFAULT_PORT = 9600;
     public static final String DEFAULT_IP = "0.0.0.0";

@@ -17,12 +17,14 @@ package org.sherlok;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.sherlok.utils.Create.list;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Rule;
 import org.junit.Test;
+import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
+import org.sherlok.mappings.PipelineDef.TestAnnotation;
+import org.sherlok.utils.SherlokTests;
 import org.sherlok.utils.Strings;
 import org.slf4j.Logger;
 
@@ -60,14 +62,9 @@ public class PipelineLoaderIntegrationTest {
         String result = (pipeline.annotate(TEST_TEXT));
         LOG.debug(result);
 
-        JSONObject jsonObject = new JSONObject(result);
-        JSONObject annotations = jsonObject
-                .getJSONObject("@cas_feature_structures");
-        JSONArray names = annotations.names();
-        assertEquals(5, names.length());
-        Object firstPerson = annotations.get("1009");
-        assertEquals(
-                "{\"sofa\":1,\"@type\":\"NamedEntity\",\"value\":\"person\",\"end\":11}",
-                firstPerson.toString());
+        SherlokTests.assertEquals(list(//
+                new TestAnnotation().setBegin(0).setEnd(11)
+                        .setType("NamedEntity").addProperty("value", "person")//
+                ), result, Comparison.atLeast);
     }
 }

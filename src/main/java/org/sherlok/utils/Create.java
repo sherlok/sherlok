@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Convenience class to create lists, maps and sets.
@@ -32,7 +33,7 @@ public class Create {
     }
 
     @SafeVarargs
-    public static <E> ArrayList<E> list(E... elements) {
+    public static <E> List<E> list(E... elements) {
         ArrayList<E> list = new ArrayList<E>(elements.length);
         Collections.addAll(list, elements);
         return list;

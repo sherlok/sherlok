@@ -65,16 +65,8 @@ public class RutaIntegrationTest {
             given().param("text", TEST_TEXT).when()
                     .get(API_URL + ANNOTATE + "/neuroner").then().log()
                     .everything().contentType(JSON).statusCode(STATUS_OK)
-                    .body(containsString(TEST_TEXT));
-                    //FIXME better testing
-                    //.body("annotations.283.@type", equalTo("Layer"));
-            /*-
-            "283": {
-                "@type": "Layer",
-                "sofa": 1,
-                "end": 7
-            },
-             */
+                    .body(containsString(TEST_TEXT))
+                    .body(containsString("Layer"));
 
             afterClass();
         }

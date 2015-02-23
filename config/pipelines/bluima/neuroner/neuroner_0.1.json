@@ -11,9 +11,21 @@
   },
   "tests" : [ {
     "in" : "layer V and layer iii large pyramidal neurons",
-    "out" : ""
+    "out" : [
+      {"@type" : "Layer",  "end" : 7,  "ontologyId" : "HBP_NEUROTRANSMITTER:0000005" },
+      {"@type" : "Layer",  "begin" : 12,  "end" : 21,  "ontologyId" : "HBP_NEUROTRANSMITTER:0000003" },
+      {"@type" : "Size",  "begin" : 22,  "end" : 27 },
+      {"@type" : "Neuron",  "begin" : 38,  "end" : 45 },
+      {"@type" : "Morphology",  "begin" : 28,  "end" : 37 },
+      {"@type" : "BrainRegionProp",  "end" : 7 },
+      {"@type" : "BrainRegionProp",  "begin" : 12,  "end" : 21 }
+    ]
   }, {
     "in" : "slowly adapting stretch receptor neuron",
-    "out" : ""
+    "out" : [
+      {"@type" : "Function",  "end" : 23 },
+      {"@type" : "Function",  "begin" : 24,  "end" : 32 },
+      {"@type" : "Neuron",  "begin" : 33,  "end" : 39 }
+    ]
   } ]
 }

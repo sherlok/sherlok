@@ -18,12 +18,19 @@ package org.sherlok.mappings;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateTypeIdentifier;
 import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.json.JSONException;
 import org.sherlok.mappings.BundleDef.EngineDef;
+import org.sherlok.utils.Create;
 import org.sherlok.utils.ValidationException;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -101,7 +108,17 @@ public class PipelineDef extends Def {
 
     /** An engine definition */
     public static class PipelineTest {
-        private String in, out;
+
+        public enum Comparison {
+            /** all expected {@link TestAnnotation}s are present in system */
+            atLeast,
+            /** expected and system {@link TestAnnotation}s are exactly equals */
+            exact;
+        }
+
+        private String in;
+        private Comparison comparison = Comparison.atLeast; // default
+        private List<TestAnnotation> out;
 
         public String getIn() {
             return in;
@@ -112,18 +129,95 @@ public class PipelineDef extends Def {
             return this;
         }
 
-        public String getOut() {
+        public List<TestAnnotation> getOut() {
             return out;
         }
 
-        public PipelineTest setOut(String out) {
-            this.out = out;
-            return this;
+        public Comparison getComparison() {
+            return comparison;
+        }
+
+        public void setComparison(Comparison comparison) {
+            this.comparison = comparison;
         }
 
         @Override
         public String toString() {
             return in + "::" + out;
+        }
+    }
+
+    public static class TestAnnotation {
+
+        final public static Set<String> NOT_PROPERTIES = Create.set("begin",
+                "end", "@type");
+
+        private int begin = 0;
+        private int end = 0;
+        @JsonProperty("@type")
+        private String type;
+        private Map<String, Object> properties = map();
+
+        // "any getter" needed for serialization
+        @JsonAnyGetter
+        public Map<String, Object> any() {
+            return properties;
+        }
+
+        @JsonAnySetter
+        public TestAnnotation addProperty(String name, Object value) throws JSONException {
+            if (!NOT_PROPERTIES.contains(name))
+                properties.put(name, value);
+            return this;
+        }
+
+        public int getBegin() {
+            return begin;
+        }
+
+        public TestAnnotation setBegin(int begin) {
+            this.begin = begin;
+            return this;
+        }
+
+        public int getEnd() {
+            return end;
+        }
+
+        public TestAnnotation setEnd(int end) {
+            this.end = end;
+            return this;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public TestAnnotation setType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof TestAnnotation) {
+                TestAnnotation other = (TestAnnotation) o;
+                if (this.begin == other.begin && //
+                        this.end == other.end && //
+                        this.type.equals(other.type)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return type + "[" + begin + ":" + end + "]";
+        }
+
+        public Map<String, Object> getProperties() {
+            return properties;
         }
     }
 
@@ -248,7 +342,8 @@ public class PipelineDef extends Def {
         for (String scriptLine : scriptLines) {
             if (scriptLine.startsWith("ENGINE")) {
                 String pengineId = scriptLine.trim()
-                        .substring("ENGINE".length()).trim().replaceAll(";", "");
+                        .substring("ENGINE".length()).trim()
+                        .replaceAll(";", "");
                 engineIds.add(pengineId);
             }
         }
