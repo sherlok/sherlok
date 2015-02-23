@@ -173,6 +173,19 @@ public class RutaHelper {
             this.rangeTypeName = rangeTypeName;
         }
 
+        public String getRangeTypeNameCleaned() {
+
+            switch (rangeTypeName) {
+            case "STRING":
+                return "uima.cas.String";
+            case "INT":
+                return "uima.cas.Integer";
+                // FIXME do more
+            default:
+                return rangeTypeName;
+            }
+        }
+
         @Override
         public String toString() {
             return featureName + ":" + rangeTypeName;

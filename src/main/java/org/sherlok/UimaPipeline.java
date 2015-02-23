@@ -250,7 +250,7 @@ public class UimaPipeline {
     private void initCasPool() throws ResourceInitializationException {
 
         // for (TypeDescription td : tsd.getTypes())
-        // LOG.debug("type: {}", td);
+        // LOG.debug("type: {}", td.getName());
 
         AnalysisEngine noOpEngine = AnalysisEngineFactory.createEngine(
                 NoOpAnnotator.class, tsd);
@@ -487,12 +487,15 @@ public class UimaPipeline {
             if (supertypeName.indexOf('.') == -1) {
                 supertypeName = nameSpace + "." + supertypeName;
             }
-            // LOG.debug("adding type {}::{}", typeName, supertypeName);
+            LOG.trace("adding type {}::{}", typeName, supertypeName);
 
             TypeDescription typeD = tsd.addType(typeName, t.description,
                     supertypeName);
             for (TypeFeatureDTO f : t.getTypeFeatures()) {
-                typeD.addFeature(f.featureName, f.description, f.rangeTypeName);
+                LOG.trace("  adding feat {}::{}", f.featureName,
+                        f.getRangeTypeNameCleaned());
+                typeD.addFeature(f.featureName, f.description,
+                        f.getRangeTypeNameCleaned());
             }
         }
 
