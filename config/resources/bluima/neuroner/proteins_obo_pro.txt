@@ -9605,7 +9605,6 @@ neuropathy target esterase
 neuropeptide B
 neuropeptide S
 neuropeptide W
-neuropeptide Y
 neuropilin and tolloid-like protein 1
 neuropilin and tolloid-like protein 2
 neuropilin-1

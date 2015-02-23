@@ -1,0 +1,1100 @@
+human;ncbi:9606
+rats;ncbi:10116
+mice;ncbi:10095
+rat;ncbi:10116
+mouse;ncbi:10090
+HIV;ncbi:12721
+humans;ncbi:9606
+dogs;ncbi:9615
+bovine;ncbi:9913
+yeast;ncbi:4932
+man;ncbi:9606
+Escherichia coli;ncbi:562
+Rabbit;ncbi:9986
+E. coli;ncbi:562
+HIV-1;ncbi:11676
+rabbits;ncbi:9986
+HCV;ncbi:11096
+sheep;ncbi:9940
+pigs;ncbi:9823
+cats;ncbi:9685
+cows;ncbi:9913
+tobacco;ncbi:4097
+chicken;ncbi:9031
+HBV;ncbi:10407
+cattle;ncbi:9913
+dog;ncbi:9615
+cat;ncbi:9685
+CMV;ncbi:12305
+pig;ncbi:9823
+wheat;ncbi:4565
+Staphylococcus aureus;ncbi:1280
+rice;ncbi:4530
+guinea pig;ncbi:10141
+calves;ncbi:9913
+H. pylori;ncbi:210
+Saccharomyces cerevisiae;ncbi:4932
+transgenic mice;ncbi:10090
+chick;ncbi:9031
+calf;ncbi:9913
+horses;ncbi:9796
+adenovirus;ncbi:10535
+EBV;ncbi:10376
+chickens;ncbi:9031
+HPV;ncbi:10566
+Wistar rats;ncbi:10116
+corn;ncbi:381124
+guinea pigs;ncbi:10141
+human immunodeficiency virus;ncbi:12721
+S. aureus;ncbi:1280
+Soybean;ncbi:3847
+SHR;ncbi:10116
+Sprague-Dawley rats;ncbi:10116
+MRSA;ncbi:1280
+maize;ncbi:381124
+Pseudomonas aeruginosa;ncbi:287
+swine;ncbi:9823
+lambs;ncbi:9940
+zebrafish;ncbi:7955
+nude mice;ncbi:10090
+P. aeruginosa;ncbi:287
+horse;ncbi:9796
+SV40;ncbi:10633
+guinea-pig;ncbi:10141
+LI;ncbi:29546
+HSV-1;ncbi:10298
+cow;ncbi:9913
+RSV;ncbi:11886
+Lake;ncbi:83971
+Chinese hamster;ncbi:10029
+hepatitis C virus;ncbi:11103
+goats;ncbi:9925
+gag;ncbi:103820
+horseradish;ncbi:3704
+hepatitis B virus;ncbi:10407
+C. albicans;ncbi:5476
+equine;ncbi:9796
+hepatitis C;ncbi:11103
+Tomato;ncbi:4081
+Epstein-Barr virus;ncbi:10376
+fossa;ncbi:94188
+M. tuberculosis;ncbi:1773
+Candida albicans;ncbi:5476
+turkey;ncbi:9103
+Mycobacterium tuberculosis;ncbi:1773
+Bacillus subtilis;ncbi:1423
+influenza virus;ncbi:11309
+Drosophila melanogaster;ncbi:7227
+barley;ncbi:4513
+MAC;ncbi:37162
+cotton;ncbi:3635
+Helicobacter pylori;ncbi:210
+goat;ncbi:9925
+Plasmodium falciparum;ncbi:5833
+yeasts;ncbi:4932
+Arabidopsis thaliana;ncbi:3702
+S. cerevisiae;ncbi:4932
+potato;ncbi:4113
+P. falciparum;ncbi:5833
+L. monocytogenes;ncbi:1639
+HCMV;ncbi:10359
+Streptococcus pneumoniae;ncbi:1313
+retrovirus;ncbi:31931
+human immunodeficiency virus type 1;ncbi:11676
+SIV;ncbi:11723
+coffee;ncbi:13443
+bacteriophage;ncbi:38018
+human papillomavirus;ncbi:10566
+C. elegans;ncbi:4853
+poliovirus;ncbi:138950
+Xenopus laevis;ncbi:8355
+Caenorhabditis elegans;ncbi:6239
+Baculovirus;ncbi:10469
+rhesus monkeys;ncbi:9544
+T. cruzi;ncbi:5693
+B. subtilis;ncbi:1423
+Haemophilus influenzae;ncbi:727
+VZV;ncbi:10335
+vaccinia virus;ncbi:10245
+marijuana;ncbi:3483
+pea;ncbi:3888
+T. gondii;ncbi:5811
+Listeria monocytogenes;ncbi:1639
+rainbow trout;ncbi:8022
+tetra;ncbi:42554
+HEV;ncbi:12461
+herpesvirus;ncbi:39059
+peanut;ncbi:3818
+S. pneumoniae;ncbi:1313
+CFA;ncbi:31658
+H. influenzae;ncbi:727
+Apple;ncbi:3750
+mum;ncbi:41568
+Klebsiella pneumoniae;ncbi:573
+comet;ncbi:302767
+PVA;ncbi:12215
+Alfalfa;ncbi:3879
+chimpanzees;ncbi:9598
+Toxoplasma gondii;ncbi:5811
+HIV-2;ncbi:11709
+WKy;ncbi:10116
+C. jejuni;ncbi:197
+spinach;ncbi:3562
+PPV;ncbi:10796
+V. cholerae;ncbi:666
+Trypanosoma cruzi;ncbi:5693
+goldfish;ncbi:7957
+WNV;ncbi:11082
+Chlamydia trachomatis;ncbi:813
+C. trachomatis;ncbi:813
+garlic;ncbi:4682
+B. burgdorferi;ncbi:139
+P. gingivalis;ncbi:837
+CNV;ncbi:12143
+Schistosoma mansoni;ncbi:6183
+HHV-6;ncbi:10368
+chimpanzee;ncbi:9598
+turkeys;ncbi:9103
+carp;ncbi:7962
+S. mutans;ncbi:1309
+BVDV;ncbi:11099
+simian virus 40;ncbi:10633
+S. mansoni;ncbi:6183
+FIV;ncbi:11673
+VSV;ncbi:11276
+MMTV;ncbi:11757
+PCV;ncbi:46221
+Herpes simplex virus type 1;ncbi:10298
+C. difficile;ncbi:1496
+oat;ncbi:4498
+AAV;ncbi:10535
+PRV;ncbi:10345
+HAV;ncbi:12092
+anthrax;ncbi:1392
+K. pneumoniae;ncbi:573
+NDV;ncbi:11176
+HDV;ncbi:12475
+duck;ncbi:8839
+rhesus monkey;ncbi:9544
+M. bovis;ncbi:1765
+D. melanogaster;ncbi:7227
+measles virus;ncbi:11234
+human cytomegalovirus;ncbi:10359
+M. leprae;ncbi:1769
+bee;ncbi:7460
+Schizosaccharomyces pombe;ncbi:4896
+C. parvum;ncbi:5807
+L. pneumophila;ncbi:446
+Vibrio cholerae;ncbi:666
+C. pneumoniae;ncbi:83558
+Staphylococcus epidermidis;ncbi:1282
+influenza A virus;ncbi:11320
+Pneumocystis carinii;ncbi:4754
+Neisseria gonorrhoeae;ncbi:485
+fission yeast;ncbi:4896
+mink;ncbi:452646
+Salmonella enterica;ncbi:28901
+PRRSV;ncbi:28344
+rye;ncbi:4550
+respiratory syncytial virus;ncbi:12814
+reovirus;ncbi:10891
+ducks;ncbi:8839
+bees;ncbi:7460
+P. carinii;ncbi:4754
+murine leukemia virus;ncbi:11786
+vesicular stomatitis virus;ncbi:11276
+MV;ncbi:11234
+cardinal;ncbi:405018
+FMDV;ncbi:12110
+sorghum;ncbi:4558
+ginseng;ncbi:4054
+Borrelia burgdorferi;ncbi:139
+bacteriophages;ncbi:38018
+S. epidermidis;ncbi:1282
+C. neoformans;ncbi:5207
+HP;ncbi:6536
+Aspergillus fumigatus;ncbi:746128
+TMV;ncbi:12242
+BLV;ncbi:11901
+Ad;ncbi:10535
+Zea mays;ncbi:4577
+dengue virus;ncbi:12637
+Cryptococcus neoformans;ncbi:5207
+MCMV;ncbi:10366
+Enterococcus faecalis;ncbi:1351
+Campylobacter jejuni;ncbi:197
+Clostridium difficile;ncbi:1496
+Neisseria meningitidis;ncbi:487
+LCMV;ncbi:11623
+A. fumigatus;ncbi:746128
+ferrets;ncbi:9669
+P. vivax;ncbi:5855
+rabies virus;ncbi:11292
+catfish;ncbi:71179
+ferret;ncbi:9669
+E. faecalis;ncbi:1351
+beagle dogs;ncbi:9615
+cucumber;ncbi:3659
+M. avium;ncbi:1764
+Streptococcus pyogenes;ncbi:1314
+KSHV;ncbi:39059
+Euro;ncbi:9319
+HGV;ncbi:54290
+E. histolytica;ncbi:5759
+smallpox;ncbi:10255
+Pseudomonas putida;ncbi:303
+Aedes aegypti;ncbi:7159
+Streptococcus mutans;ncbi:1309
+Bacillus thuringiensis;ncbi:1428
+Y. enterocolitica;ncbi:630
+non-A;ncbi:12440
+Aspergillus niger;ncbi:5061
+BPV;ncbi:10571
+Serratia marcescens;ncbi:615
+elk;ncbi:9860
+Neurospora crassa;ncbi:5141
+cynomolgus monkeys;ncbi:9541
+B. cereus;ncbi:1396
+Clostridium perfringens;ncbi:1502
+onion;ncbi:4679
+Mycobacterium bovis;ncbi:1765
+Bacillus cereus;ncbi:1396
+B. pertussis;ncbi:520
+Sendai virus;ncbi:11191
+MTB;ncbi:1773
+EPEC;ncbi:562
+N. gonorrhoeae;ncbi:485
+Dictyostelium discoideum;ncbi:44689
+L. major;ncbi:5664
+Bacteroides fragilis;ncbi:817
+Trypanosoma brucei;ncbi:5691
+Phaseolus vulgaris;ncbi:3885
+S. pombe;ncbi:4896
+Mayo;ncbi:162683
+TTV;ncbi:68887
+M. pneumoniae;ncbi:2104
+Entamoeba histolytica;ncbi:5759
+Legionella pneumophila;ncbi:446
+drill;ncbi:9568
+rhesus macaques;ncbi:9544
+STEC;ncbi:562
+IBDV;ncbi:10995
+C. perfringens;ncbi:1502
+Yersinia enterocolitica;ncbi:630
+Bordetella pertussis;ncbi:520
+Rous sarcoma virus;ncbi:11886
+B. fragilis;ncbi:817
+A. thaliana;ncbi:3702
+BKV;ncbi:10629
+ETEC;ncbi:562
+medaka;ncbi:8090
+Oryza sativa;ncbi:4530
+BTV;ncbi:40051
+Nicotiana tabacum;ncbi:4097
+carrot;ncbi:4039
+T. brucei;ncbi:5691
+CAV;ncbi:10537
+Pichia pastoris;ncbi:4922
+A. actinomycetemcomitans;ncbi:714
+apes;ncbi:4456
+Proteus mirabilis;ncbi:584
+CDV;ncbi:11232
+SFV;ncbi:10271
+Agrobacterium tumefaciens;ncbi:358
+silkworm;ncbi:7091
+B. thuringiensis;ncbi:1428
+Mycoplasma pneumoniae;ncbi:2104
+B. anthracis;ncbi:1392
+hepatitis A virus;ncbi:12092
+Y. pestis;ncbi:632
+lime;ncbi:159033
+BDV;ncbi:12455
+ovo;ncbi:341683
+simian immunodeficiency virus;ncbi:11723
+GBV-C;ncbi:54290
+varicella-zoster virus;ncbi:10335
+P. putida;ncbi:303
+coxsackievirus;ncbi:12066
+Atlantic salmon;ncbi:8030
+soybeans;ncbi:3847
+bullfrog;ncbi:8400
+Syrian hamsters;ncbi:10036
+Porphyromonas gingivalis;ncbi:837
+Pseudomonas sp;ncbi:306
+Aspergillus nidulans;ncbi:162425
+Glycine max;ncbi:3847
+West Nile virus;ncbi:11082
+Newcastle disease virus;ncbi:11176
+Syrian hamster;ncbi:10036
+banana;ncbi:4641
+E. faecium;ncbi:1352
+guar;ncbi:3832
+EHEC;ncbi:562
+Pseudomonas fluorescens;ncbi:294
+N. caninum;ncbi:29176
+Macaca mulatta;ncbi:9544
+N. meningitidis;ncbi:487
+safflower;ncbi:4222
+adeno-associated virus;ncbi:272636
+Pisum sativum;ncbi:3888
+Chlamydomonas reinhardtii;ncbi:3055
+JCV;ncbi:10632
+S. pyogenes;ncbi:1314
+Triticum aestivum;ncbi:4565
+CPV;ncbi:10243
+A. niger;ncbi:5061
+Japanese quail;ncbi:93934
+Suzuki;ncbi:8164
+cassava;ncbi:3983
+SHRs;ncbi:10116
+MuLV;ncbi:11786
+P. multocida;ncbi:747
+JEV;ncbi:11072
+Bt;ncbi:1428
+E.coli;ncbi:562
+MDV;ncbi:10390
+L. donovani;ncbi:5661
+Bombyx mori;ncbi:7091
+EHV-1;ncbi:10326
+Chlamydia pneumoniae;ncbi:83558
+sesame;ncbi:4182
+potatoes;ncbi:4113
+cocoa;ncbi:3641
+PTV;ncbi:11587
+B. abortus;ncbi:235
+A. baumannii;ncbi:470
+marmosets;ncbi:38020
+Leishmania donovani;ncbi:5661
+Bacillus anthracis;ncbi:1392
+L. lactis;ncbi:29397
+VV;ncbi:10245
+Mycobacterium leprae;ncbi:1769
+Enterobacter cloacae;ncbi:550
+leishmania major;ncbi:5664
+Lactococcus lactis;ncbi:1358
+sugarcane;ncbi:4547
+group A streptococci;ncbi:36470
+Oncorhynchus mykiss;ncbi:8022
+MSV;ncbi:11809
+Enterococcus faecium;ncbi:1352
+PCV2;ncbi:46221
+Sindbis virus;ncbi:11034
+Pasteurella multocida;ncbi:747
+lobster;ncbi:6693
+C. glabrata;ncbi:5478
+strawberry;ncbi:3747
+Mycobacterium avium;ncbi:1764
+earthworm;ncbi:6402
+V. parahaemolyticus;ncbi:670
+parvovirus B19;ncbi:10798
+bacteriophage lambda;ncbi:10710
+honeybee;ncbi:7460
+Giardia lamblia;ncbi:5741
+S. enterica;ncbi:28901
+Manduca sexta;ncbi:7130
+S. marcescens;ncbi:615
+Pseudomonas syringae;ncbi:317
+T. vaginalis;ncbi:5722
+Cryptosporidium parvum;ncbi:5807
+T. spiralis;ncbi:6334
+Plasmodium berghei;ncbi:5821
+Brucella abortus;ncbi:235
+C. burnetii;ncbi:777
+camel;ncbi:9838
+A. nidulans;ncbi:162425
+radish;ncbi:3726
+X. laevis;ncbi:8355
+apples;ncbi:3750
+MPV;ncbi:10244
+Macaca fascicularis;ncbi:9541
+pseudorabies virus;ncbi:10345
+FeLV;ncbi:11768
+earthworms;ncbi:6402
+mouse mammary tumor virus;ncbi:11757
+Bacillus stearothermophilus;ncbi:1422
+C. tropicalis;ncbi:5482
+M. smegmatis;ncbi:1772
+pear;ncbi:23211
+Ginkgo biloba;ncbi:3311
+S. flexneri;ncbi:623
+camels;ncbi:9838
+honeycomb;ncbi:119431
+teleost fish;ncbi:70862
+Shigella flexneri;ncbi:623
+phage lambda;ncbi:10710
+Starling;ncbi:9172
+Anopheles gambiae;ncbi:7165
+Clostridium botulinum;ncbi:1491
+grapefruit;ncbi:37656
+Mus musculus;ncbi:10090
+F. tularensis;ncbi:263
+tobacco mosaic virus;ncbi:12242
+A. flavus;ncbi:5059
+P. syringae;ncbi:317
+actinomycete;ncbi:100235
+Plasmodium vivax;ncbi:5855
+Rubella virus;ncbi:11041
+ADV;ncbi:28314
+Colo;ncbi:307630
+P. acnes;ncbi:1747
+yawning;ncbi:143334
+LDV;ncbi:11048
+S. haematobium;ncbi:6185
+Trichomonas vaginalis;ncbi:5722
+P. mirabilis;ncbi:584
+T. pallidum;ncbi:160
+Rhodobacter sphaeroides;ncbi:1063
+P. fluorescens;ncbi:294
+ginger;ncbi:94328
+ALV;ncbi:11864
+Ricinus communis;ncbi:3988
+A. hydrophila;ncbi:644
+C. coli;ncbi:195
+S. japonicum;ncbi:6182
+Treponema pallidum;ncbi:160
+Thermus thermophilus;ncbi:274
+Mycobacterium smegmatis;ncbi:1772
+Homo sapiens;ncbi:9606
+P. pastoris;ncbi:4922
+V. vulnificus;ncbi:672
+EIAV;ncbi:11665
+Aeromonas hydrophila;ncbi:644
+Yersinia pestis;ncbi:632
+fruit fly;ncbi:7227
+Aspergillus flavus;ncbi:5059
+RRV;ncbi:11029
+Hordeum vulgare;ncbi:4513
+lemon;ncbi:2708
+elephant;ncbi:9783
+P. berghei;ncbi:5821
+AMV;ncbi:11866
+Red deer;ncbi:9860
+Fasciola hepatica;ncbi:6192
+Black tea;ncbi:4442
+RV;ncbi:11041
+sugar beet;ncbi:3555
+DHBV;ncbi:12639
+reindeer;ncbi:9870
+Trichinella spiralis;ncbi:6334
+Danio rerio;ncbi:7955
+oats;ncbi:4498
+L. plantarum;ncbi:1590
+Spodoptera frugiperda;ncbi:7108
+Lymphocytic choriomeningitis virus;ncbi:11623
+C. parapsilosis;ncbi:5480
+gorilla;ncbi:9593
+streptococcus faecalis;ncbi:1351
+PMV;ncbi:12181
+F. hepatica;ncbi:6192
+Actinobacillus actinomycetemcomitans;ncbi:714
+TCV;ncbi:11988
+Peach;ncbi:3760
+cowpea;ncbi:3917
+beet;ncbi:161934
+BMV;ncbi:12302
+L. casei;ncbi:1582
+foot-and-mouth disease virus;ncbi:12110
+N. crassa;ncbi:5141
+Acinetobacter baumannii;ncbi:470
+Lactobacillus casei;ncbi:1582
+Amphioxus;ncbi:7740
+golden hamsters;ncbi:10036
+tuna;ncbi:8233
+goose;ncbi:8847
+peanuts;ncbi:3818
+DENV;ncbi:12637
+cynomolgus monkey;ncbi:9541
+Lactobacillus plantarum;ncbi:1590
+channel catfish;ncbi:7998
+Sprague-Dawley rat;ncbi:10116
+Bacillus sp;ncbi:1409
+AAV2;ncbi:10804
+Echinococcus granulosus;ncbi:6210
+GAS;ncbi:36470
+Histoplasma capsulatum;ncbi:5037
+Haemonchus contortus;ncbi:6289
+raccoons;ncbi:9654
+B. pseudomallei;ncbi:28450
+B virus;ncbi:10325
+bream;ncbi:323764
+Ascaris suum;ncbi:6253
+S. sanguis;ncbi:1305
+Brassica napus;ncbi:3708
+Streptomyces coelicolor;ncbi:1902
+flax;ncbi:4006
+herpes simplex virus type 2;ncbi:10310
+C. glutamicum;ncbi:1718
+lentil;ncbi:3864
+Lycopersicon esculentum;ncbi:4081
+HSV1;ncbi:10298
+Candida tropicalis;ncbi:5482
+Coxiella burnetii;ncbi:777
+Aedes albopictus;ncbi:7160
+BRSV;ncbi:11246
+G. lamblia;ncbi:5741
+FPV;ncbi:11313
+Y. pseudotuberculosis;ncbi:633
+white-tailed deer;ncbi:9874
+Streptococcus agalactiae;ncbi:1311
+baker's yeast;ncbi:4932
+Moraxella catarrhalis;ncbi:480
+Ascaris lumbricoides;ncbi:6252
+perch;ncbi:8168
+Schistosoma japonicum;ncbi:6182
+FCV;ncbi:11978
+Fusarium oxysporum;ncbi:5507
+Mongolian gerbils;ncbi:10047
+H. contortus;ncbi:6289
+daphnia magna;ncbi:35525
+NTHI;ncbi:727
+A. pleuropneumoniae;ncbi:715
+B. henselae;ncbi:38323
+echovirus;ncbi:33758
+niger;ncbi:4230
+honey bee;ncbi:7460
+A. tumefaciens;ncbi:358
+M. catarrhalis;ncbi:480
+Propionibacterium acnes;ncbi:1747
+HHV-7;ncbi:10372
+Vibrio parahaemolyticus;ncbi:670
+mumps virus;ncbi:11161
+GBS;ncbi:1319
+S. suis;ncbi:1307
+Rana pipiens;ncbi:8404
+D. discoideum;ncbi:44689
+scallop;ncbi:6574
+Mycobacterium avium complex;ncbi:37162
+peas;ncbi:3888
+CSFV;ncbi:11096
+R. equi;ncbi:43767
+almond;ncbi:3755
+E. granulosus;ncbi:6210
+Solanum tuberosum;ncbi:4113
+lambda phage;ncbi:10710
+Cyprinus carpio;ncbi:7962
+turmeric;ncbi:136217
+Ixodes ricinus;ncbi:34613
+E. cloacae;ncbi:550
+Norway rats;ncbi:10116
+Bacillus megaterium;ncbi:1404
+Bos taurus;ncbi:9913
+Apis mellifera;ncbi:7460
+U. urealyticum;ncbi:2130
+Rattus norvegicus;ncbi:10116
+Vicia faba;ncbi:3906
+bluetongue virus;ncbi:40051
+C. botulinum;ncbi:1491
+JC virus;ncbi:10632
+Helix pomatia;ncbi:6536
+euros;ncbi:9319
+feline immunodeficiency virus;ncbi:11673
+rhesus macaque;ncbi:9544
+Culex quinquefasciatus;ncbi:7176
+chinchilla;ncbi:10152
+cauliflower mosaic virus;ncbi:10641
+EMCV;ncbi:12104
+ape;ncbi:4456
+Ureaplasma urealyticum;ncbi:2130
+JE;ncbi:11072
+C. reinhardtii;ncbi:3055
+avian influenza virus;ncbi:11309
+VTEC;ncbi:562
+P. brasiliensis;ncbi:121759
+swift;ncbi:8895
+O. volvulus;ncbi:6282
+M. hominis;ncbi:2098
+Nicotiana benthamiana;ncbi:4100
+MG;ncbi:2096
+C. krusei;ncbi:4909
+PVX;ncbi:12183
+PVY;ncbi:12216
+Dermatophagoides pteronyssinus;ncbi:6956
+Azotobacter vinelandii;ncbi:354
+cinnamon;ncbi:128608
+Candida glabrata;ncbi:5478
+domestic cats;ncbi:9685
+A. phagocytophilum;ncbi:948
+honeybees;ncbi:7460
+Laboratory rats;ncbi:10116
+hepatitis E virus;ncbi:12461
+Bacillus licheniformis;ncbi:1402
+F. nucleatum;ncbi:851
+M. paratuberculosis;ncbi:1770
+D. simulans;ncbi:7240
+bacteriophage T7;ncbi:10760
+BIV;ncbi:11657
+Autographa californica;ncbi:572729
+carrots;ncbi:4039
+WHV;ncbi:35269
+L. infantum;ncbi:5671
+E. tenella;ncbi:5802
+B. bronchiseptica;ncbi:518
+Micrococcus luteus;ncbi:1270
+MAI;ncbi:55883
+wild boar;ncbi:9823
+H. capsulatum;ncbi:5037
+HIV1;ncbi:11676
+axolotl;ncbi:8296
+P. haemolytica;ncbi:75985
+Aspergillus oryzae;ncbi:5062
+Ebola virus;ncbi:205488
+Francisella tularensis;ncbi:263
+Onchocerca volvulus;ncbi:6282
+neem;ncbi:124943
+encephalomyocarditis virus;ncbi:12104
+MSSA;ncbi:1280
+Streptococcus sanguis;ncbi:1305
+Lactobacillus acidophilus;ncbi:1579
+BK virus;ncbi:10629
+HHV8;ncbi:37296
+M. kansasii;ncbi:1768
+common carp;ncbi:7962
+SVV;ncbi:35246
+L. acidophilus;ncbi:1579
+ellipse;ncbi:301928
+A. marginale;ncbi:770
+ASFV;ncbi:10497
+B. napus;ncbi:3708
+Neospora caninum;ncbi:29176
+S. coelicolor;ncbi:1902
+sweet potato;ncbi:4120
+Ulex europaeus;ncbi:3902
+chickpea;ncbi:3827
+Streptomyces lividans;ncbi:1916
+kava;ncbi:130404
+Schistosoma haematobium;ncbi:6185
+tall fescue;ncbi:4606
+B. cepacia;ncbi:292
+papaya;ncbi:3649
+Salmo salar;ncbi:8030
+Toxocara canis;ncbi:6265
+E. multilocularis;ncbi:6211
+MAP;ncbi:1770
+African green monkey;ncbi:9534
+New Zealand rabbits;ncbi:9986
+Corynebacterium glutamicum;ncbi:1718
+EAV;ncbi:11047
+Citrobacter freundii;ncbi:546
+ostrich;ncbi:8801
+tiger;ncbi:9694
+T. congolense;ncbi:5692
+C. psittaci;ncbi:83554
+M. intracellulare;ncbi:1767
+canary;ncbi:9135
+MLV;ncbi:11786
+Fusobacterium nucleatum;ncbi:851
+S. lividans;ncbi:1916
+Leishmania infantum;ncbi:5671
+murine cytomegalovirus;ncbi:10366
+Yersinia pseudotuberculosis;ncbi:633
+Candida parapsilosis;ncbi:5480
+A. suum;ncbi:6253
+S. bovis;ncbi:6184
+R. meliloti;ncbi:382
+B. mori;ncbi:7091
+sperm whale;ncbi:9755
+Proteus vulgaris;ncbi:585
+Rana catesbeiana;ncbi:8400
+Kaposi's sarcoma-associated herpesvirus;ncbi:37296
+Rhodobacter capsulatus;ncbi:1061
+C. dubliniensis;ncbi:42374
+Brugia malayi;ncbi:6279
+B. melitensis;ncbi:29459
+Lymnaea stagnalis;ncbi:6523
+B. bovis;ncbi:9913
+donkey;ncbi:9793
+Tetrahymena thermophila;ncbi:5911
+Strongyloides stercoralis;ncbi:6248
+PV;ncbi:520
+CP;ncbi:5807
+golden hamster;ncbi:10036
+I. ricinus;ncbi:34613
+drills;ncbi:9568
+nuclear polyhedrosis virus;ncbi:10471
+Botrytis cinerea;ncbi:40559
+H. ducreyi;ncbi:730
+Tetrahymena pyriformis;ncbi:5908
+LM;ncbi:1639
+D. magna;ncbi:35525
+malachite;ncbi:64457
+Chlamydia psittaci;ncbi:83554
+bovine viral diarrhea virus;ncbi:11099
+Sulfolobus solfataricus;ncbi:2287
+Leptospira interrogans;ncbi:173
+Trichoderma reesei;ncbi:51453
+Wuchereria bancrofti;ncbi:6293
+Medicago sativa;ncbi:3879
+ramps;ncbi:138334
+CHC;ncbi:11103
+P. yoelii;ncbi:5861
+llamas;ncbi:9844
+Rana temporaria;ncbi:8407
+Compton;ncbi:235354
+donkeys;ncbi:9793
+CAEV;ncbi:11660
+Japanese encephalitis;ncbi:11072
+PVM;ncbi:11263
+gatekeeper;ncbi:111938
+M. fortuitum;ncbi:1766
+T. denticola;ncbi:158
+Rhodospirillum rubrum;ncbi:1085
+Panax ginseng;ncbi:4054
+Taenia solium;ncbi:6204
+hepatitis delta virus;ncbi:12475
+Rhizobium meliloti;ncbi:382
+Pasteurella haemolytica;ncbi:75985
+moose;ncbi:999462
+Vibrio vulnificus;ncbi:672
+emu;ncbi:8790
+amaranth;ncbi:3567
+turbot;ncbi:52904
+F. oxysporum;ncbi:5507
+Culex pipiens;ncbi:7175
+Euglena gracilis;ncbi:3039
+lion;ncbi:9689
+Mytilus edulis;ncbi:6550
+chinchillas;ncbi:10152
+Trichophyton rubrum;ncbi:5551
+S. meliloti;ncbi:382
+Phanerochaete chrysosporium;ncbi:5306
+T. solium;ncbi:6204
+domestic cat;ncbi:9685
+bovine leukemia virus;ncbi:11901
+Japanese encephalitis virus;ncbi:11072
+Syrian golden hamsters;ncbi:10036
+S. sonnei;ncbi:624
+Mycoplasma hominis;ncbi:2098
+P. vulgaris;ncbi:585
+gorillas;ncbi:9593
+Synechocystis sp. PCC 6803;ncbi:1148
+R. sphaeroides;ncbi:1063
+Oryzias latipes;ncbi:8090
+SFFV;ncbi:11819
+canine distemper virus;ncbi:11232
+domestic pigs;ncbi:9825
+Ber;ncbi:157914
+AIV;ncbi:11309
+Dirofilaria immitis;ncbi:6287
+bovine papillomavirus;ncbi:10571
+Kluyveromyces lactis;ncbi:28985
+honey bees;ncbi:7460
+Shigella sonnei;ncbi:624
+Trichophyton mentagrophytes;ncbi:523103
+Musca domestica;ncbi:7370
+Paracoccidioides brasiliensis;ncbi:121759
+lions;ncbi:9689
+mango;ncbi:29780
+Physarum polycephalum;ncbi:5791
+Myxococcus xanthus;ncbi:34
+TEV;ncbi:11084
+T. thermophilus;ncbi:274
+PA;ncbi:9555
+raccoon;ncbi:9654
+K. lactis;ncbi:28985
+parsley;ncbi:4043
+B. malayi;ncbi:6279
+TBEV;ncbi:11084
+brown trout;ncbi:8032
+Bradyrhizobium japonicum;ncbi:375
+kangaroo;ncbi:9322
+Vibrio fischeri;ncbi:668
+Acinetobacter calcoaceticus;ncbi:471
+T. evansi;ncbi:5697
+Ct;ncbi:813
+B. japonicum;ncbi:375
+Brucella melitensis;ncbi:29459
+S. agalactiae;ncbi:1311
+Rhizobium leguminosarum;ncbi:384
+Paracoccus denitrificans;ncbi:266
+A. oryzae;ncbi:5062
+Argentine;ncbi:442169
+Aplysia californica;ncbi:6500
+infectious bursal disease virus;ncbi:10995
+Streptomyces griseus;ncbi:1911
+peppermint;ncbi:34256
+feline leukemia virus;ncbi:11768
+VHSV;ncbi:11287
+T. canis;ncbi:6265
+group B streptococcus;ncbi:1319
+abalone;ncbi:6453
+orangutan;ncbi:9600
+HVT;ncbi:37108
+gibbon;ncbi:9581
+D. pteronyssinus;ncbi:6956
+E. chaffeensis;ncbi:945
+CaMV;ncbi:10641
+avocado;ncbi:3435
+Rana esculenta;ncbi:8401
+zebra finch;ncbi:59729
+Sinorhizobium meliloti;ncbi:382
+Carassius auratus;ncbi:7957
+Shigella dysenteriae;ncbi:622
+M. sexta;ncbi:7130
+S. maltophilia;ncbi:40324
+starlings;ncbi:9172
+Burkholderia pseudomallei;ncbi:28450
+R. leguminosarum;ncbi:384
+herpes simplex virus 1;ncbi:10298
+mito;ncbi:262676
+Vitis vinifera;ncbi:29760
+D. immitis;ncbi:6287
+T. parva;ncbi:5875
+B. licheniformis;ncbi:1402
+woodchucks;ncbi:9995
+red clover;ncbi:57577
+B. stearothermophilus;ncbi:1422
+Burkholderia cepacia;ncbi:292
+Marek's disease virus;ncbi:10390
+Actinobacillus pleuropneumoniae;ncbi:715
+ginkgo;ncbi:3311
+rosemary;ncbi:39367
+Medicago truncatula;ncbi:3880
+influenza B virus;ncbi:11520
+watermelon;ncbi:260674
+A. aegypti;ncbi:7159
+human herpesvirus 8;ncbi:37296
+M. gallisepticum;ncbi:2096
+S. sobrinus;ncbi:1310
+oilseed rape;ncbi:3708
+MAV;ncbi:11960
+cline;ncbi:57788
+llama;ncbi:9844
+C. pylori;ncbi:210
+Callithrix jacchus;ncbi:9483
+M. hyopneumoniae;ncbi:2099
+hagfish;ncbi:7769
+bovines;ncbi:9913
+human herpesvirus 6;ncbi:10368
+Stenotrophomonas maltophilia;ncbi:40324
+T. mentagrophytes;ncbi:523103
+Mycoplasma gallisepticum;ncbi:2096
+SSV;ncbi:11970
+HERV-K;ncbi:45617
+porcine reproductive and respiratory syndrome virus;ncbi:28344
+Biomphalaria glabrata;ncbi:6526
+M. tuberculosis complex;ncbi:77643
+P. intermedia;ncbi:28131
+T. rubrum;ncbi:5551
+EAEC;ncbi:562
+M. xanthus;ncbi:34
+CIV;ncbi:176652
+Streptococcus thermophilus;ncbi:1308
+Pyrococcus furiosus;ncbi:2261
+Periplaneta americana;ncbi:6978
+Pan troglodytes;ncbi:9598
+IPNV;ncbi:11002
+Eimeria tenella;ncbi:5802
+N. brasiliensis;ncbi:27835
+I. scapularis;ncbi:6945
+ST;ncbi:4097
+marine bacterium;ncbi:56765
+C. sinensis;ncbi:4442
+S. gordonii;ncbi:1302
+REV;ncbi:11636
+wild boars;ncbi:9823
+Nippostrongylus brasiliensis;ncbi:27835
+SHIV;ncbi:12721
+Thermotoga maritima;ncbi:2336
+Enterobacter aerogenes;ncbi:548
+zebu;ncbi:9915
+Woodchuck;ncbi:9995
+E. canis;ncbi:944
+M. genitalium;ncbi:2097
+Bordetella bronchiseptica;ncbi:518
+L. innocua;ncbi:1642
+avian myeloblastosis virus;ncbi:11866
+fruit flies;ncbi:7227
+Strongylocentrotus purpuratus;ncbi:7668
+UPEC;ncbi:562
+Caulobacter crescentus;ncbi:155892
+Echinococcus multilocularis;ncbi:6211
+mongolian gerbil;ncbi:10047
+Bufo marinus;ncbi:8386
+Pseudomonas cepacia;ncbi:292
+B. garinii;ncbi:29519
+S. faecalis;ncbi:1351
+Trichuris trichiura;ncbi:36087
+B19;ncbi:10798
+B. cinerea;ncbi:40559
+IAV;ncbi:11320
+chinook salmon;ncbi:74940
+Candida krusei;ncbi:4909
+S. thermophilus;ncbi:1308
+P. cepacia;ncbi:292
+Prevotella intermedia;ncbi:28131
+Penicillium chrysogenum;ncbi:5076
+Bos indicus;ncbi:9915
+sturgeon;ncbi:61674
+SV5;ncbi:11207
+Ciona intestinalis;ncbi:7719
+V. harveyi;ncbi:669
+Chat;ncbi:8063
+Puma;ncbi:9696
+VACV;ncbi:10245
+Mycobacterium tuberculosis complex;ncbi:77643
+A. vinelandii;ncbi:354
+Klebsiella oxytoca;ncbi:571
+Plasmodium yoelii;ncbi:5861
+onions;ncbi:4679
+B. megaterium;ncbi:1404
+Torpedo californica;ncbi:7787
+lucerne;ncbi:3879
+Campylobacter coli;ncbi:195
+midge;ncbi:7154
+Xanthomonas campestris;ncbi:339
+M. marinum;ncbi:1781
+Branhamella catarrhalis;ncbi:480
+M. avium subsp. paratuberculosis;ncbi:1770
+SV;ncbi:11034
+V. fischeri;ncbi:668
+lobsters;ncbi:6693
+Coca;ncbi:289672
+L. mexicana;ncbi:5665
+Coccidioides immitis;ncbi:5501
+human rhinovirus;ncbi:169066
+Sus scrofa;ncbi:9823
+Ixodes scapularis;ncbi:6945
+Anopheles stephensi;ncbi:30069
+Gunn rats;ncbi:10116
+liver fluke;ncbi:6192
+B. bassiana;ncbi:475271
+Gossypium hirsutum;ncbi:3635
+DBS;ncbi:59837
+PHV;ncbi:11603
+S. dysenteriae;ncbi:622
+filamentous phage;ncbi:12420
+Japanese cedar;ncbi:3369
+B. afzelii;ncbi:29518
+coho salmon;ncbi:8019
+Lens culinaris;ncbi:3864
+Mesocricetus auratus;ncbi:10036
+group A streptococcus;ncbi:36470
+Synechococcus sp;ncbi:1131
+oregano;ncbi:39352
+Norway spruce;ncbi:3329
+castor bean;ncbi:3988
+B. sphaericus;ncbi:1421
+comets;ncbi:302767
+T. vivax;ncbi:5699
+visna virus;ncbi:11741
+B. glabrata;ncbi:6526
+coyotes;ncbi:9614
+Microsporum canis;ncbi:63405
+Bartonella henselae;ncbi:38323
+Streptococcus bovis;ncbi:1335
+D. farinae;ncbi:6954
+pineapple;ncbi:4615
+timothy;ncbi:15957
+JSRV;ncbi:11746
+A. gambiae;ncbi:7165
+Trypanosoma congolense;ncbi:5692
+Allium cepa;ncbi:4679
+Dermatophagoides farinae;ncbi:6954
+Atlantic cod;ncbi:8049
+LEC;ncbi:128608
+F. graminearum;ncbi:5518
+Meriones unguiculatus;ncbi:10047
+Rhodococcus equi;ncbi:43767
+Pc;ncbi:4754
+Mytilus galloprovincialis;ncbi:29158
+tamarins;ncbi:9491
+M. ulcerans;ncbi:1809
+M. pulmonis;ncbi:2107
+Vibrio harveyi;ncbi:669
+M. avium complex;ncbi:37162
+T. foetus;ncbi:56690
+Scots pine;ncbi:3349
+orangutans;ncbi:9600
+SeV;ncbi:11191
+mallards;ncbi:8839
+thyme;ncbi:49992
+M. truncatula;ncbi:3880
+Arachis hypogaea;ncbi:3818
+A. viscosus;ncbi:1656
+killifish;ncbi:8078
+HVS;ncbi:10381
+Gardnerella vaginalis;ncbi:2702
+BFV;ncbi:11020
+S. intermedius;ncbi:817
+R. capsulatus;ncbi:1061
+M. musculus;ncbi:10090
+Anaplasma marginale;ncbi:770
+V. anguillarum;ncbi:55601
+Dolichos biflorus;ncbi:3840
+W. bancrofti;ncbi:6293
+EC;ncbi:562
+Hypericum perforatum;ncbi:65561
+L. amazonensis;ncbi:5659
+leopard;ncbi:9691
+spotted fever group;ncbi:114277
+Bacillus sphaericus;ncbi:1421
+C. fetus;ncbi:196
+Nocardia asteroides;ncbi:1824
+N. fowleri;ncbi:5763
+Fusarium solani;ncbi:169388
+TSV;ncbi:142102
+L. tropica;ncbi:5666
+Trichoplusia ni;ncbi:7111
+A. lumbricoides;ncbi:6252
+L. braziliensis;ncbi:5660
+A. parasiticus;ncbi:5067
+IHNV;ncbi:11290
+B. longum;ncbi:216816
+N. benthamiana;ncbi:4100
+Clove;ncbi:219868
+platypus;ncbi:9258
+C. diphtheriae;ncbi:1717
+AHSV;ncbi:40050
+HRSV;ncbi:11250
+Beta vulgaris;ncbi:161934
+S. stercoralis;ncbi:6248
+Yarrowia lipolytica;ncbi:4952
+common marmoset;ncbi:9483
+Locusta migratoria;ncbi:7004
+Trypanosoma brucei brucei;ncbi:5702
+striped bass;ncbi:34816
+RVFV;ncbi:11588
+Streptococcus suis;ncbi:1307
+Brassica oleracea;ncbi:3712
+Chinese cabbage;ncbi:51351
+S. neurona;ncbi:42890
+L. interrogans;ncbi:173
+Campylobacter pylori;ncbi:210
+ISAV;ncbi:55987
+D. virilis;ncbi:7244
+Mycobacterium fortuitum;ncbi:1766
+Microcystis aeruginosa;ncbi:1126
+CPMV;ncbi:12264
+Chlorella vulgaris;ncbi:3077
+Cucumis sativus;ncbi:3659
+head lice;ncbi:121225
+Human parvovirus B19;ncbi:10798
+Saimiri sciureus;ncbi:9521
+Gallus gallus;ncbi:9031
+MRV;ncbi:28327
+CRPV;ncbi:10623
+African green monkeys;ncbi:9534
+B. ovis;ncbi:5869
+Helianthus annuus;ncbi:4232
+G. vaginalis;ncbi:2702
+midges;ncbi:7154
+Aloe vera;ncbi:34199
+ILTV;ncbi:10386
+B. rapa;ncbi:3711
+cucumber mosaic virus;ncbi:12305
+Plum;ncbi:3758
+E. dispar;ncbi:46681
+ide;ncbi:69811
+P. malariae;ncbi:5858
+tick-borne encephalitis virus;ncbi:11084
+B. gingivalis;ncbi:837
+B. bigemina;ncbi:5866
+Desulfovibrio vulgaris;ncbi:881
+Herpesvirus saimiri;ncbi:10381
+RHDV;ncbi:11976
+B. catarrhalis;ncbi:480
+A. salmonicida;ncbi:645
+clines;ncbi:57788
+DV;ncbi:12637
+Lolium perenne;ncbi:4522
+Babesia bovis;ncbi:5865

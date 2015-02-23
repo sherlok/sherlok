@@ -604,7 +604,6 @@ swift
 O. volvulus
 M. hominis
 Nicotiana benthamiana
-MG
 C. krusei
 Dermatophagoides pteronyssinus
 PVY

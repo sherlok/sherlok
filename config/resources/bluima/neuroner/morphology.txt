@@ -1,3 +1,5 @@
+axon
+Axon
 amacrine
 basket
 bitufted
@@ -7,6 +9,7 @@ candelabrum
 chandelier
 cartwheel
 cone
+Cone
 double bouquet
 early bifurcating
 fusiform
@@ -18,10 +21,14 @@ polymorphous
 Lugaro
 spiny
 late bifurcating
+Martinotti
+nest
+Nest
 mitral
 multipolar
 neurogliaform
 nest
+Nest
 octopus
 parasol ganglion
 Purkinje
@@ -30,6 +37,7 @@ Renshaw
 rod bipolar
 spiny
 star
+Star
 stellate
 tufted
 thick tufted
@@ -44,6 +52,7 @@ aspiny
 neural stem
 glial
 hair
+Hair
 Schwann
 magnocellular
 parvocellular

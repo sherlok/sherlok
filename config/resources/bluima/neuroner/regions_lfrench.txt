@@ -2321,7 +2321,6 @@ nigrostriatal fibers
 superior temporal gyrus
 dentate gyrus medial blade molecular layer
 interfascicular nucleus raphe
-
 medial forebrain bundle
 spinal nucleus of the trigeminal oral part
 stria medullaris thalamica

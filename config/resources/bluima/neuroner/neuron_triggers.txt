@@ -15,8 +15,10 @@ motorneurone
 motorneurons
 motorneurones
 cell
+Cell
 cells
 glia
+Glia
 astrocyte
 astrocytes
 oligodendrocyte

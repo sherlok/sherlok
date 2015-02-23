@@ -24,5 +24,6 @@
 	* names from OBO PRO ontology
 * regions_lfrench.txt
 	* compiled from Leon French resources
-* species.txt
+* species.txt and species.csv
     * top 1000 most frequent species found with Linnaeus in PubMed abstracts
+	* `select species, species_id, count(species) from species group by species order by count(species) desc`

@@ -9,8 +9,8 @@ C-type
 C type
 D-type
 D type
-L-type 
-L type 
+L-type
+L type
 Onset
 Pause-build
 Rebound-regular
@@ -22,7 +22,7 @@ primary motor
 secondary motor
 receptor
 olfactory
-slowly adapting stretch 
+slowly adapting stretch
 auditory
 gustatory
 somatosensory
@@ -71,5 +71,3 @@ nondifferentiated
 relay
 local
 functional
-presympathetic
-parasympathetic

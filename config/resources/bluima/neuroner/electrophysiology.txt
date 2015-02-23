@@ -1,12 +1,56 @@
-bursting
-burst firing
-hyperpolarized
-depolarized
+spiking
+firing
+
+regular-spiking
+regular spiking
+regular firing
+
+irregular
+irregular spiking
+
 fast-spiking
 fast spiking
-late spiking
+fast-firing
+fast firing
+rapid
+
 late-spiking
+late-firing
+
+delayed firing
+delayed-firing
+regular-firing
+stuttering
+late spiking
+ 
+
+hyperpolarized
+depolarized
+
 low threshold spiking
+classical 
+Chattering neurons 
+intrinsic
+
+burst-firing
+burst firing
+burst-spiking
+bursting-firing
+bursting-spiking
+bursting firing
+bursting
+
+stuttering  
+
+delayed
+
+continuous
+continuous firing
+
+Low-threshold bursters
+
 accomodating
 non-accomodating
+non-accommodating
 nonaccomodating
+accommodating
