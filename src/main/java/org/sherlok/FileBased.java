@@ -34,7 +34,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.io.FileUtils;
 import org.sherlok.mappings.BundleDef;
-import org.sherlok.mappings.BundleDef.EngineDef;
+import org.sherlok.mappings.Def;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.utils.ValidationException;
 
@@ -49,15 +49,19 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 /**
- * Single entry point to interact with JSON config files for {@link TypesDef}s,
- * {@link BundleDef}s, {@link EngineDef}s and {@link PipelineDef}s. All these
- * JSON files are stored in the directory {@link Sherlok#CONFIG_DIR_PATH}.
+ * Single entry point to interact with JSON config files for {@link BundleDef}s,
+ * {@link PipelineDef}s and Resources. All these JSON files are stored in the
+ * directory {@link Sherlok#CONFIG_DIR_PATH}.
  * 
  * @author renaud@apache.org
  */
+/**
+ * @author richarde
+ *
+ */
 public class FileBased {
 
-    static final String CONFIG_DIR_PATH = "config/";
+    private static final String CONFIG_DIR_PATH = "config/";
 
     static final String TYPES_PATH = CONFIG_DIR_PATH + "types/";
     static final String BUNDLES_PATH = CONFIG_DIR_PATH + "bundles/";
@@ -75,11 +79,18 @@ public class FileBased {
             new JsonFactory());
     static {
         MAPPER.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        // TODO indent json output does not work
+        // TODO indent json output does not work, is important for readability
         MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
         MAPPER.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     }
 
+    /**
+     * PUTs (writes) this bundle to disk.
+     * 
+     * @param bundleStr
+     *            a {@link BundleDef} as a String
+     * @return the {@link BundleDef}, for convenience
+     */
     public static BundleDef putBundle(String bundleStr)
             throws ValidationException {
         try {
@@ -97,6 +108,13 @@ public class FileBased {
         return MAPPER.readValue(pipelineStr, PipelineDef.class);
     }
 
+    /**
+     * PUTs (writes) this pipeline to disk.
+     * 
+     * @param bundleStr
+     *            a {@link PipelineDef} as a String
+     * @return the {@link PipelineDef}, for convenience
+     */
     public static PipelineDef putPipeline(String pipelineStr)
             throws ValidationException {
         try {
@@ -108,6 +126,14 @@ public class FileBased {
         }
     }
 
+    /**
+     * PUTs (writes) this resource to disk.
+     * 
+     * @param path
+     *            the path where to write this resource to
+     * @param part
+     *            holds the resource file itself
+     */
     public static void putResource(String path, Part part)
             throws ValidationException {
 
@@ -125,14 +151,25 @@ public class FileBased {
         }
     }
 
+    /**
+     * Writes a {@link Def} to a file<br/>
+     * Note: this should be private, but is used in tests...
+     * 
+     * @param f
+     *            the file to write to
+     * @param def
+     *            the object to write
+     * @throws ValidationException
+     */
     public static void write(File f, Object def) throws ValidationException {
         try {
             MAPPER.writeValue(f, def);
         } catch (Exception e) {
-            throw new ValidationException(e);// TODO validate better
+            throw new ValidationException(e);
         }
     }
 
+    /** Writes this object as String, using Jackson {@link ObjectMapper} */
     public static String writeAsString(Object obj)
             throws JsonProcessingException {
         return MAPPER.writeValueAsString(obj);
@@ -155,6 +192,17 @@ public class FileBased {
         write(defFile, def);
     }
 
+    /**
+     * Read a JSON-serialized object from file and parse it back to an object.
+     * 
+     * @param f
+     *            the file to read
+     * @param clazz
+     *            the class to cast this object into
+     * @return the parsed object
+     * @throws ValidationException
+     *             if the object cannot be found or parsed
+     */
     public static <T> T read(File f, Class<T> clazz) throws ValidationException {
         try {
             return MAPPER.readValue(new FileInputStream(f), clazz);
@@ -183,6 +231,7 @@ public class FileBased {
         }
     }
 
+    /** @return all {@link BundleDef}s */
     public static Collection<BundleDef> allBundleDefs()
             throws ValidationException {
         List<BundleDef> ret = list();
@@ -197,6 +246,7 @@ public class FileBased {
         return ret;
     }
 
+    /** @return all {@link PipelineDef}s */
     public static Collection<PipelineDef> allPipelineDefs()
             throws ValidationException {
         List<PipelineDef> ret = list();
@@ -213,6 +263,7 @@ public class FileBased {
         return ret;
     }
 
+    /** @return paths to all resources */
     public static Collection<String> allResources() throws ValidationException {
         try {
             List<String> resources = list();
@@ -265,7 +316,8 @@ public class FileBased {
         validateArgument(file.delete(), "could not delete file '" + path + "'");
     }
 
-    public static File getResource(String path) throws ValidationException {
+    /** @return this resource's {@link File} */
+    static File getResource(String path) throws ValidationException {
         File file = new File(RUTA_RESOURCES_PATH, path);
         validateArgument(file.exists(), "could not find file '" + path + "'");
         return file;
@@ -274,13 +326,9 @@ public class FileBased {
     /** Util to read and rewrite all {@link Def}s */
     /*-
     public static void main(String[] args) throws ValidationException {
-
         Controller controller = new Controller().load();
-
         for (BundleDef b : controller.listBundles())
             writeBundle(b);
-        for (EngineDef e : controller.listEngines())
-            writeEngine(e);
         for (PipelineDef p : controller.listPipelines())
             writePipeline(p);
     }*/
