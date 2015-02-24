@@ -8,3 +8,6 @@ branches:
 notifications:
   email:
   - renaud.richardet@gmail.ch
+before_script:
+ - "echo $JAVA_OPTS"
+ - "export JAVA_OPTS=-Xmx1G"
