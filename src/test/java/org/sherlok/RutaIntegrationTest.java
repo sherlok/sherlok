@@ -63,9 +63,11 @@ public class RutaIntegrationTest {
             beforeClass();
 
             given().param("text", TEST_TEXT).when()
-                    .get(API_URL + ANNOTATE + "/neuroner").then().log()
-                    .everything().contentType(JSON).statusCode(STATUS_OK)
-                    .body(containsString(TEST_TEXT))
+                    .get(API_URL + ANNOTATE + "/neuroner")//
+                    .then().log().everything()//
+                    .statusCode(STATUS_OK)//
+                    .contentType(JSON)//
+                    .body(containsString(TEST_TEXT))//
                     .body(containsString("Layer"));
 
             afterClass();

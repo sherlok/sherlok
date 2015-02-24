@@ -71,8 +71,8 @@ public class PipelineApiIntegrationTest {
                 .then()
                 .log()
                 .everything()
-                .contentType(JSON)
                 .statusCode(STATUS_OK)
+                .contentType(JSON)
                 .content(containsString("opennlp.ners.en"))
                 .content(
                         containsString("\"description\" : \"annotates English persons and locations using OpenNLP models\","));
@@ -84,8 +84,8 @@ public class PipelineApiIntegrationTest {
                 .then()
                 .log()
                 .everything()
-                .contentType(JSON)
                 .statusCode(STATUS_OK)
+                .contentType(JSON)
                 .body("name", equalTo("opennlp.ners.en"))
                 .body("version", equalTo("1.6.2"))
                 .body("script[0]",
@@ -95,13 +95,12 @@ public class PipelineApiIntegrationTest {
     @Test
     /** Let's put a new test pipeline*/
     public void test030PutPipeline() throws JsonProcessingException {
-        PipelineDef e = (PipelineDef) new PipelineDef().addScriptLine(
+        PipelineDef p = (PipelineDef) new PipelineDef().addScriptLine(
                 "ENGINE sample.engine:1").setDomain("test");
-        e.setName("test");
-        e.setVersion("1");
-        String testPipelineDef = FileBased.writeAsString(e);
+        p.setName("test");
+        p.setVersion("1");
 
-        given().content(testPipelineDef)//
+        given().content(FileBased.writeAsString(p))//
                 .when().put(API_URL)//
                 .then().log().everything().statusCode(STATUS_OK);
     }
@@ -165,7 +164,8 @@ public class PipelineApiIntegrationTest {
     /** .. and check that the new test pipeline is here */
     public void test040GetTestPipeline() {
         get(API_URL + "/test/1").then().log().everything()//
-                .contentType(JSON).statusCode(STATUS_OK)//
+                .statusCode(STATUS_OK)//
+                .contentType(JSON)//
                 .body("name", equalTo("test"))//
                 .body("version", equalTo("1"))//
                 .body("script[0]", equalTo("ENGINE sample.engine:1"));

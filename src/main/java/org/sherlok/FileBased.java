@@ -24,6 +24,7 @@ import static org.sherlok.utils.Create.list;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -206,6 +207,12 @@ public class FileBased {
     public static <T> T read(File f, Class<T> clazz) throws ValidationException {
         try {
             return MAPPER.readValue(new FileInputStream(f), clazz);
+
+        } catch (FileNotFoundException io) {
+            throw new ValidationException("pipeline '" + io.getMessage()//
+                    .replaceFirst(PIPELINES_PATH, "").replaceFirst(//
+                            "\\(No such file or directory\\)", "")
+                    + "' does not exsist");
         } catch (UnrecognizedPropertyException upe) {
             String msg = "Unrecognized field \"" + upe.getPropertyName()
                     + "\" in file '" + f.getName() + "',  "

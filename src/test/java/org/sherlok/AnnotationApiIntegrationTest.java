@@ -68,7 +68,7 @@ public class AnnotationApiIntegrationTest {
     public void test010_GETAnnotate() {
         given().param("text", TEST_TEXT).when()
                 .get(API_URL + "/opennlp.ners.en").then().log().everything()
-                .contentType(JSON).statusCode(STATUS_OK)
+                .statusCode(STATUS_OK).contentType(JSON)
                 .body(containsString(TEST_TEXT))//
                 .body("annotations.1009.value", equalTo("person"));
     }
@@ -76,35 +76,42 @@ public class AnnotationApiIntegrationTest {
     @Test
     public void test011_POSTAnnotate() {
         given().param("text", TEST_TEXT).when()
-                .post(API_URL + "/opennlp.ners.en").then().log().everything()
-                .contentType(JSON).statusCode(STATUS_OK)
+                .post(API_URL + "/opennlp.ners.en")//
+                .then().log().everything()//
+                .statusCode(STATUS_OK)//
+                .contentType(JSON)//
                 .body(containsString(TEST_TEXT))//
                 .body("annotations.1009.value", equalTo("person"));
         // same POST to check multiple calls
         given().param("text", TEST_TEXT).when()
                 .post(API_URL + "/opennlp.ners.en").then().log().everything()
-                .contentType(JSON).statusCode(STATUS_OK)
+                .statusCode(STATUS_OK).contentType(JSON)
                 .body(containsString(TEST_TEXT))//
                 .body("annotations.1009.value", equalTo("person"));
     }
 
     @Test
     public void test012WrongPipeline() {
-        given().param("text", TEST_TEXT).when().post(API_URL + "/blablabla")
-                .then().log().everything().contentType(JSON)
-                .statusCode(STATUS_INVALID);
+        given().param("text", TEST_TEXT) //
+                .when()//
+                .post(API_URL + "/blablabla")//
+                .then().log().everything()//
+                .statusCode(STATUS_INVALID)//
+                .contentType(JSON);
     }
 
     @Test
     public void test020MissingText() throws JsonProcessingException {
         when().post(API_URL + "/opennlp.ners.en")//
-                .then().log().everything().statusCode(STATUS_INVALID);
+                .then().log().everything()//
+                .statusCode(STATUS_INVALID);
     }
 
     @Test
     public void test021EmptyText() throws JsonProcessingException {
-        given().param("text", "").when().post(API_URL + "/opennlp_en_ners")
-                .then().log().everything().contentType(JSON)
-                .statusCode(STATUS_INVALID);
+        given().param("text", "").when()//
+                .post(API_URL + "/opennlp_en_ners")//
+                .then().log().everything()//
+                .contentType(JSON).statusCode(STATUS_INVALID);
     }
 }

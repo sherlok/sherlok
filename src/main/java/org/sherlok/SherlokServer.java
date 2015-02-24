@@ -22,6 +22,7 @@ import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
+import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 import static spark.Spark.delete;
 import static spark.Spark.externalStaticFileLocation;
@@ -33,10 +34,12 @@ import static spark.Spark.setPort;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
+import org.json.JSONObject;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
@@ -113,7 +116,7 @@ public class SherlokServer {
         // http://{host}:{port}/css/style.css
         externalStaticFileLocation(PUBLIC);
         validatePluginsNames(PUBLIC);
-        
+
         try {// prevent error "This must be done before route mapping has begun"
             Thread.sleep(20);
         } catch (InterruptedException e) {// nope
@@ -131,6 +134,46 @@ public class SherlokServer {
             @Override
             public Object handle(Request req, Response resp) {
                 return annotateRequest(req, resp, pipelineLoader);
+            }
+        });
+
+        /** For testing only, does not store the pipeline */
+        post(new JsonRoute("/" + TEST) {
+            @Override
+            public Object handle(Request req, Response resp) {
+                try {
+                    // parse pipeline
+                    PipelineDef pipeline = FileBased.parsePipeline(req.body());
+                    UimaPipeline uimaPipeline = pipelineLoader.load(pipeline);
+
+                    Map<Integer, Object> results = map();
+                    boolean passed = true;
+
+                    for (int i = 0; i < pipeline.getTests().size(); i++) {
+                        PipelineTest test = pipeline.getTests().get(i);
+                        try {
+                            String system = uimaPipeline.annotate(test.getIn());
+                            SherlokTests.assertEquals(test.getOut(), system,
+                                    test.getComparison());
+                            results.put(i, "OK");
+                        } catch (ValidationException e) {
+                            passed = false;
+                            results.put(i, map("FAIL", e));
+                        }
+                    }
+                    if (passed) {
+                        return "OK";
+                    }else{
+                        resp.status(STATUS_INVALID);
+                        return results;
+                    }
+
+                } catch (ValidationException ve) {
+                    return invalid("TEST pipeline '" + req.body() + "'", ve,
+                            resp);
+                } catch (Exception e) {
+                    return error("TEST '" + req.body(), e, resp);
+                }
             }
         });
 
@@ -155,13 +198,13 @@ public class SherlokServer {
                         SherlokTests.assertEquals(test.getOut(), systemOut,
                                 test.getComparison());
                     }
+                    return new JSONObject("{\"status\":\"passed\"}");
+
                 } catch (ValidationException ve) {
                     return invalid("test failed: ", ve, resp);
                 } catch (Exception e) {
                     return error("test failed: ", e, resp);
                 }
-
-                return "All test passed :-)";
             }
         });
 

@@ -59,8 +59,10 @@ public class ResourcesApiIntegrationTest {
 
     @Test
     public void test010GetResources() {
-        get(API_URL).then().log().everything().contentType(JSON)
-                .statusCode(STATUS_OK).content(containsString("countries.txt"));
+        get(API_URL).then().log().everything()//
+                .statusCode(STATUS_OK)//
+                .contentType(JSON)//
+                .content(containsString("countries.txt"));
     }
 
     @Test

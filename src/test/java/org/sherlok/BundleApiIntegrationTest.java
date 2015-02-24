@@ -70,8 +70,9 @@ public class BundleApiIntegrationTest {
 
     @Test
     public void test010GetBundles() {
-        get(API_URL).then().log().everything().contentType(JSON)
-                .statusCode(STATUS_OK)
+        get(API_URL).then().log().everything()//
+                .statusCode(STATUS_OK)//
+                .contentType(JSON)//
                 .content(containsString("\"name\" : \"dkpro.opennlp.en\","));
     }
 
@@ -81,8 +82,8 @@ public class BundleApiIntegrationTest {
                 .then()
                 .log()
                 .everything()
-                .contentType(JSON)
                 .statusCode(STATUS_OK)
+                .contentType(JSON)
                 .body("name", equalTo("dkpro.opennlp.en"))
                 .body("version", equalTo("1.6.2"))
                 .body("repositories.dkpro",
@@ -127,8 +128,8 @@ public class BundleApiIntegrationTest {
                 .then()
                 .log()
                 .everything()
-                .contentType(JSON)
                 .statusCode(STATUS_OK)
+                .contentType(JSON)
                 .body("name", equalTo("test"))
                 .body("version", equalTo("172"))
                 .body("dependencies[0].type", equalTo("mvn"))
@@ -156,12 +157,10 @@ public class BundleApiIntegrationTest {
         get(API_URL + "/test/172")//
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
-    
-    ////
-    ////
-    ////
-   
-   
+
+    // // TODO
+    // //
+    // //
 
     /*-
     @Test
@@ -204,6 +203,6 @@ public class BundleApiIntegrationTest {
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
 
-   */
+     */
 
 }
