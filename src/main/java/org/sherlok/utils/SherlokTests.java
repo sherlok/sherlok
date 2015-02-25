@@ -15,7 +15,7 @@
  */
 package org.sherlok.utils;
 
-import static org.sherlok.utils.Create.list;
+import static java.lang.Integer.parseInt;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.ValidationException.ERR_EXPECTED;
 import static org.sherlok.utils.ValidationException.ERR_UNEXPECTED;
@@ -38,7 +38,7 @@ public class SherlokTests {
             throws ValidationException, JSONException, JsonProcessingException {
 
         // parse
-        List<TestAnnotation> systems = null;
+        Map<Integer, TestAnnotation> systems = null;
         try {
             systems = parseRaw(systemString);
         } catch (JSONException e) {
@@ -50,7 +50,7 @@ public class SherlokTests {
         switch (comparison) {
         case atLeast:
             for (TestAnnotation exp : expecteds.values()) {
-                if (!systems.contains(exp)) {
+                if (!systems.values().contains(exp)) {
                     throw new ValidationException(map(ERR_EXPECTED, exp,
                             "expecteds", expecteds, "system", systems));
                 }
@@ -59,12 +59,12 @@ public class SherlokTests {
 
         case exact: // compare 2-ways; give explicit error msg
             for (TestAnnotation exp : expecteds.values()) {
-                if (!systems.contains(exp)) {
+                if (!systems.values().contains(exp)) {
                     throw new ValidationException(map(ERR_EXPECTED, exp,
                             "expecteds", expecteds, "system", systems));
                 }
             }
-            for (TestAnnotation sys : systems) {
+            for (TestAnnotation sys : systems.values()) {
                 if (!expecteds.values().contains(sys)) {
                     throw new ValidationException(map(ERR_UNEXPECTED, sys,
                             "expecteds", expecteds, "system", systems));
@@ -97,9 +97,9 @@ public class SherlokTests {
      *            the raw json string returned by uimaPipeline.annotate()
      * @return a {@link List} of the parsed {@link TestAnnotation}s
      */
-    public static List<TestAnnotation> parseRaw(String jsonStr)
+    public static Map<Integer, TestAnnotation> parseRaw(String jsonStr)
             throws JSONException {
-        List<TestAnnotation> ret = list();
+        Map<Integer, TestAnnotation> ret = map();
         JSONObject annots = new JSONObject(jsonStr)
                 .getJSONObject("annotations");
         Iterator<?> keys = annots.keys();
@@ -109,7 +109,7 @@ public class SherlokTests {
             // skip Sofa and DocumentAnnotation
             if (!a.getType().equals("Sofa")
                     && !a.getType().equals("DocumentAnnotation"))
-                ret.add(a);
+                ret.put(parseInt(key), a);
         }
         return ret;
 

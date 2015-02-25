@@ -30,7 +30,6 @@ import org.sherlok.FileBased;
 import org.sherlok.mappings.PipelineDef.PipelineOutput;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
 import org.sherlok.mappings.PipelineDef.TestAnnotation;
-import org.sherlok.utils.Create;
 import org.sherlok.utils.ValidationException;
 
 public class PipelineDefTest {
@@ -38,7 +37,7 @@ public class PipelineDefTest {
     public static PipelineDef getOpennlp_ners() throws Exception {
         PipelineDef p = (PipelineDef) new PipelineDef()
                 .addTests(
-                        new PipelineTest().setIn("mytest").setOut(
+                        new PipelineTest().setInput("mytest").setExpected(
                                 map("1", new TestAnnotation().setBegin(1)
                                         .setEnd(2).setType("myType")
                                         .addProperty("myprop", "myValue"))))
@@ -71,8 +70,8 @@ public class PipelineDefTest {
         List<PipelineTest> tests = p2.getTests();
         assertEquals(1, tests.size());
         PipelineTest test = tests.get(0);
-        assertTrue(test.getIn().startsWith("mytest"));
-        Map<String, TestAnnotation> outs = test.getOut();
+        assertTrue(test.getInput().startsWith("mytest"));
+        Map<String, TestAnnotation> outs = test.getExpected();
         assertEquals(1, outs.size());
         TestAnnotation ta = outs.values().iterator().next();
         assertEquals(1, ta.getBegin());

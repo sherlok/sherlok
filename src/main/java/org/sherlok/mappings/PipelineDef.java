@@ -54,7 +54,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonPropertyOrder(value = { "name", "version", "description", "language",
         "domain", "loadOnStartup", "scriptLines", "output", "tests" }, alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class PipelineDef extends Def {
 
     /** Which language this pipeline works for (ISO code). Defaults to 'en' */
@@ -76,8 +75,7 @@ public class PipelineDef extends Def {
     /** Embedded (integration) tests */
     private List<PipelineTest> tests = list();
 
-    /** Output definition (output annotations and payload) */
-    @JsonIgnoreProperties(ignoreUnknown = true)
+    /** Defines what kind of annotation this pipeline outputs */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class PipelineOutput {
 
@@ -117,8 +115,12 @@ public class PipelineDef extends Def {
         }
     }
 
-    /** An engine definition */
+    /**
+     * Tests one single input string against a list of expected
+     * {@link TestAnnotation}s
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class PipelineTest {
 
         public enum Comparison {
@@ -128,25 +130,25 @@ public class PipelineDef extends Def {
             exact;
         }
 
-        private String in;
+        private String input;
+        private Map<String, TestAnnotation> expected;
         private Comparison comparison = Comparison.atLeast; // default
-        private Map<String, TestAnnotation> out;
 
-        public String getIn() {
-            return in;
+        public String getInput() {
+            return input;
         }
 
-        public PipelineTest setIn(String in) {
-            this.in = in;
+        public PipelineTest setInput(String input) {
+            this.input = input;
             return this;
         }
 
-        public Map<String, TestAnnotation> getOut() {
-            return out;
+        public Map<String, TestAnnotation> getExpected() {
+            return expected;
         }
 
-        public PipelineTest setOut(Map<String, TestAnnotation> out) {
-            this.out = out;
+        public PipelineTest setExpected(Map<String, TestAnnotation> expected) {
+            this.expected = expected;
             return this;
         }
 
@@ -160,15 +162,17 @@ public class PipelineDef extends Def {
 
         @Override
         public String toString() {
-            return in + "::" + out;
+            return input + "::" + expected;
         }
 
     }
 
+    /** Represents an expected UIMA annotation */
+    @JsonPropertyOrder(value = { "begin", "end", "type" }, alphabetic = true)
     public static class TestAnnotation {
 
         final public static Set<String> NOT_PROPERTIES = Create.set("begin",
-                "end", "@type");
+                "end", "@type", "sofa");
 
         private int begin = 0;
         private int end = 0;

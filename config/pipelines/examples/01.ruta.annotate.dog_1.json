@@ -3,18 +3,18 @@
   "version" : "1",
   "description" : "Example that annotates 'dog' as an Animal",
   "domain" : "examples",
+  "script" : [
+ "DECLARE Dog;"
+, "W{REGEXP(\"dog\") -> MARK(Dog)};"
+ ],
   "output" : {
     "include_annotations" : [ "org.sherlok.ruta.Dog" ]
   },
-  "script" : [
-    "DECLARE Dog;",
-    "W{REGEXP(\"dog\") -> MARK(Dog)};"
-  ],
   "tests" : [ {
-    "in" : "This is a good dog!",
-    "out" : {
-      "1": {"@type" : "Dog", "begin" : 15,  "end" : 18 }
-    },
-    "comparison": "exact"
+    "comparison" : "exact",
+    "input" : "This is a very good dog!",
+    "expected" : {
+      "1" : { "begin" : 20, "end" : 23, "@type" : "Dog" }
+    }
   } ]
 }

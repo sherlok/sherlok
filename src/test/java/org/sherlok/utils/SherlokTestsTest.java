@@ -58,8 +58,8 @@ public class SherlokTestsTest {
                 "01.ruta.annotate.dog", "1");
 
         for (PipelineTest test : pipeline.getPipelineDef().getTests()) {
-            String systemOut = pipeline.annotate(test.getIn());
-            SherlokTests.assertEquals(test.getOut(), systemOut,
+            String systemOut = pipeline.annotate(test.getInput());
+            SherlokTests.assertEquals(test.getExpected(), systemOut,
                     test.getComparison());
         }
     }
@@ -79,13 +79,13 @@ public class SherlokTestsTest {
 
             for (PipelineTest test : pipeline.getPipelineDef().getTests()) {
 
-                if (test.getOut() != null
-                        && !test.getOut().toString().isEmpty()) {
-                    String systemOut = pipeline.annotate(test.getIn());
-                    SherlokTests.assertEquals(test.getOut(), systemOut,
+                if (test.getExpected() != null
+                        && !test.getExpected().toString().isEmpty()) {
+                    String systemOut = pipeline.annotate(test.getInput());
+                    SherlokTests.assertEquals(test.getExpected(), systemOut,
                             test.getComparison());
                 } else {
-                    LOG.debug("  no output for {}", test.getIn());
+                    LOG.debug("  no output for {}", test.getInput());
                 }
             }
 
@@ -111,11 +111,11 @@ public class SherlokTestsTest {
 
             for (PipelineTest test : pipeline.getPipelineDef().getTests()) {
 
-                if (test.getOut() == null || test.getOut().toString().isEmpty()) {
-                    String systemOut = pipeline.annotate(test.getIn());
+                if (test.getExpected() == null || test.getExpected().toString().isEmpty()) {
+                    String systemOut = pipeline.annotate(test.getInput());
 
                     LOG.debug("TEST: {}\nPROPOSED: {}", pipelineDef + "::"
-                            + test.getIn(), systemOut);
+                            + test.getInput(), systemOut);
                 }
             }
         }

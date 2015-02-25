@@ -9,16 +9,16 @@
   },
   "script" : [ "WORDLIST CountriesList = 'countries.txt';", "DECLARE Country;", "Document{-> MARKFAST(Country, CountriesList)};" ],
   "tests" : [ {
-    "in" : "Switzerland is close to Italy, the land of pasta and Michelangelo. Paris is in France. And Madrid in Spain.",
-    "out" : {
+    "input" : "Switzerland is close to Italy, the land of pasta and Michelangelo. Paris is in France. And Madrid in Spain.",
+    "expected" : {
       "1": {"@type" : "Country", "end" : 11 },
       "2": {"@type" : "Country", "begin" : 24,  "end" : 29 },
       "3": {"@type" : "Country", "begin" : 79,  "end" : 85 },
       "4": {"@type" : "Country", "begin" : 101,  "end" : 106 }
     }
   }, {
-    "in" : "China's GDP has taken over the United States.",
-    "out" : {
+    "input" : "China's GDP has taken over the United States.",
+    "expected" : {
       "1": {"@type" : "Country", "end" : 5 },
       "2": {"@type" : "Country", "begin" : 31,  "end" : 44 }
     }

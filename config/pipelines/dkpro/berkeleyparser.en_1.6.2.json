@@ -14,6 +14,6 @@
     "ENGINE opennlp.pos.en:1.6.2;",
     "ENGINE berkeleyparser.en:1.6.2;"
   ],
-  "tests" : [ {"in": "The blue house of my childhood was bought: what a pity!" } ],
+  "tests" : [ {"input": "The blue house of my childhood was bought: what a pity!" } ],
   "version" : "1.6.2"
 }

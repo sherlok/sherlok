@@ -41,7 +41,6 @@ import java.util.Map;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
-import org.json.JSONObject;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
@@ -149,9 +148,10 @@ public class SherlokServer {
                     for (int i = 0; i < pipeline.getTests().size(); i++) {
                         PipelineTest test = pipeline.getTests().get(i);
                         try {
-                            String system = uimaPipeline.annotate(test.getIn());
-                            SherlokTests.assertEquals(test.getOut(), system,
-                                    test.getComparison());
+                            String system = uimaPipeline.annotate(test
+                                    .getInput());
+                            SherlokTests.assertEquals(test.getExpected(),
+                                    system, test.getComparison());
                         } catch (ValidationException e) {
                             passed = false;
                             results.put(i, e.getMap());
@@ -173,7 +173,7 @@ public class SherlokServer {
             }
         });
 
-        get(new Route("/" + TEST + "/:name", JSON) {
+        get(new JsonRoute("/" + TEST + "/:name") {
             @Override
             public Object handle(Request req, Response resp) {
 
@@ -190,11 +190,11 @@ public class SherlokServer {
 
                     for (PipelineTest test : pipeline.getPipelineDef()
                             .getTests()) {
-                        String systemOut = pipeline.annotate(test.getIn());
-                        SherlokTests.assertEquals(test.getOut(), systemOut,
-                                test.getComparison());
+                        String systemOut = pipeline.annotate(test.getInput());
+                        SherlokTests.assertEquals(test.getExpected(),
+                                systemOut, test.getComparison());
                     }
-                    return new JSONObject("{\"status\":\"passed\"}");
+                    return map("status", "passed");
 
                 } catch (ValidationException ve) {
                     return invalid("test failed: ", ve, resp);
@@ -206,13 +206,13 @@ public class SherlokServer {
 
         // ROUTES: UTILS
         // ////////////////////////////////////////////////////////////////////////////
-        get(new Route("/reload") {
+        get(new JsonRoute("/reload") {
             @Override
             public Object handle(Request req, Response resp) {
                 try {
                     controller.load();
                     pipelineLoader.clearCache();
-                    return "OK";
+                    return map("status", "reloaded");
                 } catch (ValidationException ve) {
                     return invalid("reload", ve, resp);
                 } catch (Exception e) {
@@ -269,7 +269,7 @@ public class SherlokServer {
                         // test
                         String test = TEST_TEXT;
                         if (!parsedPipeline.getTests().isEmpty()) {
-                            test = parsedPipeline.getTests().get(0).getIn();
+                            test = parsedPipeline.getTests().get(0).getInput();
                         }
                         uimaPipeline.annotate(test);
                         return "OK";

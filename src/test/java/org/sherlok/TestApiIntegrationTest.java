@@ -89,7 +89,7 @@ public class TestApiIntegrationTest {
 
         // adding an OK test is OK
         List<PipelineTest> tests = pipeline.getTests();
-        tests.add(new PipelineTest().setIn("another dog").setOut(
+        tests.add(new PipelineTest().setInput("another dog").setExpected(
                 map("1",
                         new TestAnnotation().setBegin(8).setEnd(11)
                                 .setType("Dog"))));
@@ -98,7 +98,7 @@ public class TestApiIntegrationTest {
                 .then().log().everything().statusCode(STATUS_OK);
 
         // adding a faulty test makes it fail
-        tests.add(new PipelineTest().setIn("a cat").setOut(
+        tests.add(new PipelineTest().setInput("a cat").setExpected(
                 map("1",
                         new TestAnnotation().setBegin(1).setEnd(2)
                                 .setType("Cat"))));
