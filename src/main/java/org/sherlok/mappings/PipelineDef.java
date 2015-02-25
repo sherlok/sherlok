@@ -20,6 +20,7 @@ import static org.sherlok.utils.CheckThat.validateTypeIdentifier;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,9 +33,15 @@ import org.sherlok.utils.ValidationException;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * A pipeline describes the steps to perform a text mining analysis. This
@@ -47,6 +54,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder(value = { "name", "version", "description", "language",
         "domain", "loadOnStartup", "scriptLines", "output", "tests" }, alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PipelineDef extends Def {
 
     /** Which language this pipeline works for (ISO code). Defaults to 'en' */
@@ -60,6 +68,7 @@ public class PipelineDef extends Def {
 
     /** The list of engine definitions */
     @JsonProperty("script")
+    @JsonSerialize(using = ListSerializer.class)
     private List<String> scriptLines = list();
     /** Controls the output of this pipeline */
     private PipelineOutput output = new PipelineOutput();
@@ -68,6 +77,8 @@ public class PipelineDef extends Def {
     private List<PipelineTest> tests = list();
 
     /** Output definition (output annotations and payload) */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class PipelineOutput {
 
         @JsonProperty("filter_annotations")
@@ -107,6 +118,7 @@ public class PipelineDef extends Def {
     }
 
     /** An engine definition */
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PipelineTest {
 
         public enum Comparison {
@@ -162,6 +174,7 @@ public class PipelineDef extends Def {
         private int end = 0;
         @JsonProperty("@type")
         private String type;
+        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
         private Map<String, Object> properties = map();
 
         // "any getter" needed for serialization
@@ -356,5 +369,33 @@ public class PipelineDef extends Def {
             }
         }
         return engineIds;
+    }
+
+    /** Adds newlines between entries */
+    @SuppressWarnings("rawtypes")
+    public static class ListSerializer extends JsonSerializer<List> {
+
+        @Override
+        public boolean isEmpty(final List value) {
+            return value.isEmpty();
+        }
+
+        @Override
+        public Class<List> handledType() {
+            return List.class;
+        }
+
+        @Override
+        public void serialize(final List value, final JsonGenerator jgen,
+                final SerializerProvider provider) throws IOException,
+                JsonProcessingException {
+            jgen.writeStartArray();
+            for (Object item : value) {
+                jgen.writeRaw('\n');
+                jgen.writeObject(item);
+            }
+            jgen.writeRaw('\n');
+            jgen.writeEndArray();
+        }
     }
 }
