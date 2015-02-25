@@ -23,8 +23,10 @@ import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.map;
+import static org.sherlok.utils.ValidationException.EXPECTED;
 import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
 import static org.sherlok.utils.ValidationException.MSG;
+import static org.sherlok.utils.ValidationException.SYSTEM;
 import static org.slf4j.LoggerFactory.getLogger;
 import static spark.Spark.delete;
 import static spark.Spark.externalStaticFileLocation;
@@ -44,6 +46,7 @@ import javax.servlet.http.Part;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
+import org.sherlok.mappings.PipelineDef.TestAnnotation;
 import org.sherlok.utils.Create;
 import org.sherlok.utils.SherlokTests;
 import org.sherlok.utils.ValidationException;
@@ -142,26 +145,31 @@ public class SherlokServer {
                     PipelineDef pipeline = FileBased.parsePipeline(req.body());
                     UimaPipeline uimaPipeline = pipelineLoader.load(pipeline);
 
-                    Map<Integer, Object> results = map();
-                    boolean passed = true;
+                    Map<Integer, Object> passed = map(), failed = map();
+                    boolean isPassed = true;
 
                     for (int i = 0; i < pipeline.getTests().size(); i++) {
                         PipelineTest test = pipeline.getTests().get(i);
                         try {
-                            String system = uimaPipeline.annotate(test
+                            String systemStr = uimaPipeline.annotate(test
                                     .getInput());
-                            SherlokTests.assertEquals(test.getExpected(),
-                                    system, test.getComparison());
+                            Map<Integer, TestAnnotation> system = SherlokTests
+                                    .assertEquals(test.getExpected(),
+                                            systemStr, test.getComparison());
+                            passed.put(
+                                    i,
+                                    map(EXPECTED, test.getExpected(), SYSTEM,
+                                            system));
                         } catch (ValidationException e) {
-                            passed = false;
-                            results.put(i, e.getMap());
+                            isPassed = false;
+                            failed.put(i, e.getMap());
                         }
                     }
-                    if (passed) {
-                        return "OK";
+                    if (isPassed) {
+                        return map("passed", passed);
                     } else {
                         resp.status(STATUS_INVALID);
-                        return results;
+                        return map("passed", passed, "failed", failed);
                     }
 
                 } catch (ValidationException ve) {

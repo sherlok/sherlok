@@ -75,6 +75,7 @@
               <span>Tests</span>
               <span style="background-color:{{testsStatus()}};"> ({{activePipe.testsOk}} / {{activePipe.tests.length}} OK, {{activePipe.testsFailed}} failed) </span>
               <span flex></span>
+              <md-button ng-click="newTest()" aria-label="new test">new</md-button>
               <md-button ng-click="runAllTests()" aria-label="run tests">run</md-button>
             </h2>
           </md-toolbar>
@@ -83,14 +84,15 @@
               <span render-annotations></span>
               <span flex></span>
               <span ng-click="test.visible=!test.visible"> [edit]</span>
+              <span ng-click="activePipe.tests.splice($index, 1)"> [del]</span>
             </div>
             <div class="test-edit" ng-show="test.visible">
               <div>Text:</div>
-              <textarea           ng-model="test.input"    rows="5"></textarea>
+              <textarea           ng-model="test.input"    rows="2"></textarea>
               <div>Expected:</div>
-              <textarea json-text ng-model="test.expected" rows="12"></textarea>
+              <textarea json-text ng-model="test.expected" rows="8"></textarea>
               <div>Actual:</div>
-              <textarea json-text ng-model="test.actual"   rows="12"></textarea>
+              <textarea json-text ng-model="test.actual"   rows="8"></textarea>
               <md-button ng-click="runAllTests()" aria-label="run tests">run tests</md-button>
             </div>
             <md-divider/>

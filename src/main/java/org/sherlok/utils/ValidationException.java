@@ -34,7 +34,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class ValidationException extends Exception {
 
     public static final String ERR_NOTFOUND = "not_found";
-    public static final String ERR_EXPECTED = "expected";
+    public static final String EXPECTED = "expected";
+    public static final String SYSTEM = "system";
     public static final String ERR_UNEXPECTED = "unexpected";
     public static final String ERR = "error_value";
     public static final String MSG = "message";

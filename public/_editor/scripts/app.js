@@ -47,7 +47,9 @@ app.directive('jsonText', function() {
         require: 'ngModel',
         link: function(scope, element, attr, ngModel) {
           function into(input) {
-            return JSON.parse(input);
+            if (input){
+              return JSON.parse(input);
+            }
           }
           function out(data) {
             return JSON.stringify(data);
@@ -154,14 +156,21 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
       toast($mdToast, 'all tests passed!');
       $scope.activePipe.testsOk = $scope.activePipe.tests.length;
       $scope.activePipe.testsFailed = 0;
+      var p = data.passed;
+      for (var id in p) {
+        if (p.hasOwnProperty(id)) {
+          $scope.activePipe.tests[id].actual = p[id].system;
+        }
+      }
     }).error(function (testResults, status) {
       toast($mdToast, 'some tests failed');
       console.log(testResults);
-      $scope.activePipe.testsFailed = Object.keys(testResults).length;
+      var f = testResults.failed;
+      $scope.activePipe.testsFailed = Object.keys(f).length;
       $scope.activePipe.testsOk = $scope.activePipe.tests.length - $scope.activePipe.testsFailed;
-      for (var testId in testResults) {
-        if (testResults.hasOwnProperty(testId)) {
-            $scope.activePipe.tests[testId].actual = testResults[testId].system;
+      for (var id in f) {
+        if (f.hasOwnProperty(id)) {
+          $scope.activePipe.tests[id].actual = f[id].system;
         }
       }
     })
@@ -173,6 +182,10 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     } else if ($scope.activePipe.testsFailed > 0){
       return "red";         // fail
     } else return "green";  // ok
+  };
+
+  $scope.newTest = function() {
+    $scope.activePipe.tests.push({"expected" : {}, "input" : "", "visible": true});
   };
 
   // // ENGINES

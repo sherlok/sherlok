@@ -17,8 +17,7 @@ package org.sherlok.utils;
 
 import static java.lang.Integer.parseInt;
 import static org.sherlok.utils.Create.map;
-import static org.sherlok.utils.ValidationException.ERR_EXPECTED;
-import static org.sherlok.utils.ValidationException.ERR_UNEXPECTED;
+import static org.sherlok.utils.ValidationException.*;
 
 import java.util.Iterator;
 import java.util.List;
@@ -33,9 +32,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class SherlokTests {
 
-    public static void assertEquals(Map<String, TestAnnotation> expecteds,
-            String systemString, Comparison comparison)
-            throws ValidationException, JSONException, JsonProcessingException {
+    public static Map<Integer, TestAnnotation> assertEquals(
+            Map<String, TestAnnotation> expecteds, String systemString,
+            Comparison comparison) throws ValidationException, JSONException,
+            JsonProcessingException {
 
         // parse
         Map<Integer, TestAnnotation> systems = null;
@@ -51,8 +51,8 @@ public class SherlokTests {
         case atLeast:
             for (TestAnnotation exp : expecteds.values()) {
                 if (!systems.values().contains(exp)) {
-                    throw new ValidationException(map(ERR_EXPECTED, exp,
-                            "expecteds", expecteds, "system", systems));
+                    throw new ValidationException(map(ERR_NOTFOUND, exp,
+                            EXPECTED, expecteds, SYSTEM, systems));
                 }
             }
             break;
@@ -60,18 +60,19 @@ public class SherlokTests {
         case exact: // compare 2-ways; give explicit error msg
             for (TestAnnotation exp : expecteds.values()) {
                 if (!systems.values().contains(exp)) {
-                    throw new ValidationException(map(ERR_EXPECTED, exp,
-                            "expecteds", expecteds, "system", systems));
+                    throw new ValidationException(map(ERR_NOTFOUND, exp,
+                            EXPECTED, expecteds, SYSTEM, systems));
                 }
             }
             for (TestAnnotation sys : systems.values()) {
                 if (!expecteds.values().contains(sys)) {
                     throw new ValidationException(map(ERR_UNEXPECTED, sys,
-                            "expecteds", expecteds, "system", systems));
+                            EXPECTED, expecteds, SYSTEM, systems));
                 }
             }
             break;
         }
+        return systems;
     }
 
     public static TestAnnotation parse(String jsonStr) throws JSONException {
