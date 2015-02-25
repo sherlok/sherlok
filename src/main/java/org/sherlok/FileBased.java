@@ -148,7 +148,7 @@ public class FileBased {
         try {
             FileUtils.copyInputStreamToFile(part.getInputStream(), outFile);
         } catch (IOException e) {
-            new ValidationException("could not upload file to '" + path + "'");
+            new ValidationException("could not upload file to", path);
         }
     }
 
@@ -209,10 +209,10 @@ public class FileBased {
             return MAPPER.readValue(new FileInputStream(f), clazz);
 
         } catch (FileNotFoundException io) {
-            throw new ValidationException("pipeline '" + io.getMessage()//
-                    .replaceFirst(PIPELINES_PATH, "").replaceFirst(//
-                            "\\(No such file or directory\\)", "")
-                    + "' does not exsist");
+            throw new ValidationException("pipeline does not exsist", io
+                    .getMessage().replaceFirst(PIPELINES_PATH, "")
+                    .replaceFirst(//
+                            "\\(No such file or directory\\)", ""));
         } catch (UnrecognizedPropertyException upe) {
             String msg = "Unrecognized field \"" + upe.getPropertyName()
                     + "\" in file '" + f.getName() + "',  "
@@ -229,10 +229,10 @@ public class FileBased {
             throw new ValidationException(sb.toString().replaceAll(
                     "org\\.sherlok\\.mappings\\.\\w+Def\\[", "["), jme);
         } catch (JsonParseException jpe) {
-            throw new ValidationException("Could not read "
+            throw new ValidationException("Could not read JSON"
                     + clazz.getSimpleName() + " '"
-                    + f.getName().replaceAll("Def$", "") + "', "
-                    + jpe.getMessage());
+                    + f.getName().replaceAll("Def$", "") + "'",
+                    jpe.getMessage());
         } catch (Exception e) {
             throw new ValidationException(e);
         }
@@ -302,8 +302,8 @@ public class FileBased {
         File defFile = new File(BUNDLES_PATH + getName(bundleId) + "_"
                 + getVersion(bundleId) + ".json");
         if (!defFile.exists())
-            throw new ValidationException("Cannot delete bundle '" + bundleId
-                    + "', since it does not exist");
+            throw new ValidationException(
+                    "Cannot delete bundle, since it does not exist", bundleId);
         return defFile.delete();
     }
 
@@ -312,8 +312,9 @@ public class FileBased {
         File defFile = new File(PIPELINES_PATH + domain + "/"
                 + getName(pipelineId) + "_" + getVersion(pipelineId) + ".json");
         if (!defFile.exists())
-            throw new ValidationException("Cannot delete pipeline '"
-                    + pipelineId + "', since it does not exist");
+            throw new ValidationException(
+                    "Cannot delete pipeline, since it does not exist",
+                    pipelineId);
         return defFile.delete();
     }
 

@@ -46,7 +46,9 @@ public class RutaIntegrationTest {
 
     // @BeforeClass
     public static void beforeClass() throws Exception {
+        Thread.sleep(250);
         SherlokServer.init(TEST_PORT, DEFAULT_IP);
+        Thread.sleep(250);
     }
 
     // @AfterClass
@@ -58,7 +60,7 @@ public class RutaIntegrationTest {
     @Test
     public void test010_NeuronerAnnotate() throws Exception {
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
 
             beforeClass();
 

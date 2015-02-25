@@ -15,6 +15,14 @@
  */
 package org.sherlok.utils;
 
+import static org.sherlok.utils.Create.map;
+
+import java.util.Map;
+
+import org.sherlok.FileBased;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 /**
  * Whenever some input is not valid. The error message should provide meaningful
  * about 1) what object type was not valid 2) what object id and 3) what exactly
@@ -25,6 +33,16 @@ package org.sherlok.utils;
 @SuppressWarnings("serial")
 public class ValidationException extends Exception {
 
+    public static final String ERR_NOTFOUND = "not_found";
+    public static final String ERR_EXPECTED = "expected";
+    public static final String ERR_UNEXPECTED = "unexpected";
+    public static final String ERR = "error_value";
+    public static final String MSG = "message";
+
+    private Map<String, ?> map;
+
+    @Deprecated
+    /** use ValidationException(JSONObject json) instead */
     public ValidationException(String message) {
         super(message);
     }
@@ -37,23 +55,33 @@ public class ValidationException extends Exception {
         super(msg, t);
     }
 
-    public static class ValidationErrorMessage {
-        String errorMessage;
+    public ValidationException(Map<String, ?> m) {
+        this.map = m;
+    }
 
-        public String getErrorMessage() {
-            return errorMessage;
-        }
+    public ValidationException(String errorMsg, String errorValue) {
+        this(map(MSG, errorMsg, ERR, errorValue));
+    }
 
-        @Override
-        public String toString() {
-            return errorMessage.toString();
-        }
+    public Map<String, ?> getMap() {
+        return map;
     }
 
     /** To display errors nicely as JSON */
     public Object toJson() {
-        ValidationErrorMessage m = new ValidationErrorMessage();
-        m.errorMessage = getMessage();
-        return m;
+        if (map != null) {
+            return map;
+        } else {
+            return map(ERR, getMessage(), "cause", getCause());
+        }
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return FileBased.writeAsString(toJson());
+        } catch (JsonProcessingException e) {
+            return getMessage();
+        }
     }
 }

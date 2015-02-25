@@ -1,12 +1,15 @@
 package org.sherlok.utils;
 
+import static java.lang.Thread.currentThread;
 import static org.junit.Assert.assertEquals;
 import static org.sherlok.FileBased.allPipelineDefs;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.sherlok.Controller;
+import org.sherlok.MethodNameLoggerWatcher;
 import org.sherlok.PipelineLoader;
 import org.sherlok.UimaPipeline;
 import org.sherlok.mappings.PipelineDef;
@@ -17,8 +20,11 @@ import org.slf4j.Logger;
 public class SherlokTestsTest {
     private static final Logger LOG = getLogger(SherlokTestsTest.class);
 
+    @Rule
+    public MethodNameLoggerWatcher mdlw = new MethodNameLoggerWatcher();
+
     @Test
-    public void testParse() throws Exception {
+    public void testParseTestAnnotation() throws Exception {
         TestAnnotation a = SherlokTests
                 .parse("{\"@type\" : \"Layer\",  \"sofa\" : 1, \"end\" : 21,  \"ontologyId\" : \"HBP_NEUROTRANSMITTER:0000003\" }");
         assertEquals("Layer", a.getType());
@@ -45,6 +51,7 @@ public class SherlokTestsTest {
     }
 
     @Test
+    @SuppressWarnings("static-access")
     public void testAllPipelines() throws Exception {
 
         PipelineLoader pipelineLoader = new PipelineLoader(
@@ -66,6 +73,11 @@ public class SherlokTestsTest {
                 } else {
                     LOG.debug("  no output for {}", test.getIn());
                 }
+            }
+
+            for (int i = 0; i < 5; i++) {
+                System.gc();
+                Thread.currentThread().yield();
             }
         }
     }

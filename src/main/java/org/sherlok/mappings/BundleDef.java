@@ -323,8 +323,8 @@ public class BundleDef extends Def {
             }
             // TODO validate engines
         } catch (Throwable e) {
-            throw new ValidationException("" + bundleObject + ": "
-                    + e.getMessage());
+            throw new ValidationException("invalid bundle '" + bundleObject
+                    + "'", e.getMessage());
         }
         return true;
     }

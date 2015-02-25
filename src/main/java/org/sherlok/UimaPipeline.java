@@ -236,10 +236,11 @@ public class UimaPipeline {
                 LOG.error(maybeOut);
 
             if (maybeErr.length() > 0)
-                throw new ValidationException(maybeErr);
+                throw new ValidationException("Ruta script error", maybeErr);
             for (String line : maybeOut.split("\n")) {
                 if (line.startsWith("Error in line")) {
-                    throw new ValidationException(line);
+                    throw new ValidationException("Ruta script error on line",
+                            line);
                 }
             }
         }
@@ -332,7 +333,8 @@ public class UimaPipeline {
         } catch (AnalysisEngineProcessException aepe) {
             Throwable cause = aepe.getCause();
             if (cause instanceof IllegalArgumentException) {
-                throw new ValidationException(cause.getMessage());
+                throw new ValidationException("Failed to annotate " + text,
+                        cause.getMessage());
             } else {
                 throw aepe;
             }
@@ -459,7 +461,8 @@ public class UimaPipeline {
                     }
                 }
                 if (!found) {
-                    throw new ValidationException(pengineId + "not found");
+                    throw new ValidationException("pipeline engine not found",
+                            pengineId);
                 }
             }
         }

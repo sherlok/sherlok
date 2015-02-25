@@ -19,6 +19,7 @@ import static java.lang.System.currentTimeMillis;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
 
 import java.io.File;
 import java.util.List;
@@ -38,7 +39,7 @@ public class PipelineDefTest {
         PipelineDef p = (PipelineDef) new PipelineDef()
                 .addTests(
                         new PipelineTest().setIn("mytest").setOut(
-                                Create.map("", new TestAnnotation().setBegin(1)
+                                map("1", new TestAnnotation().setBegin(1)
                                         .setEnd(2).setType("myType")
                                         .addProperty("myprop", "myValue"))))
                 .addScriptLine("ENGINE opennlp.segmenter.en:1.6.2")

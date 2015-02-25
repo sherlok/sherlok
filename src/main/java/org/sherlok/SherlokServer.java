@@ -23,6 +23,8 @@ import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.map;
+import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
+import static org.sherlok.utils.ValidationException.MSG;
 import static org.slf4j.LoggerFactory.getLogger;
 import static spark.Spark.delete;
 import static spark.Spark.externalStaticFileLocation;
@@ -117,11 +119,6 @@ public class SherlokServer {
         externalStaticFileLocation(PUBLIC);
         validatePluginsNames(PUBLIC);
 
-        try {// prevent error "This must be done before route mapping has begun"
-            Thread.sleep(20);
-        } catch (InterruptedException e) {// nope
-        }
-
         // ROUTES: ANNOTATE & TEST
         // ////////////////////////////////////////////////////////////////////////////
         get(new Route("/" + ANNOTATE + "/:name", JSON) {
@@ -155,15 +152,14 @@ public class SherlokServer {
                             String system = uimaPipeline.annotate(test.getIn());
                             SherlokTests.assertEquals(test.getOut(), system,
                                     test.getComparison());
-                            results.put(i, "OK");
                         } catch (ValidationException e) {
                             passed = false;
-                            results.put(i, map("FAIL", e));
+                            results.put(i, e.getMap());
                         }
                     }
                     if (passed) {
                         return "OK";
-                    }else{
+                    } else {
                         resp.status(STATUS_INVALID);
                         return results;
                     }
@@ -250,8 +246,8 @@ public class SherlokServer {
                         resp.type(JSON);
                         return pDef;
                     } else
-                        throw new ValidationException("no pipeline with id '"
-                                + id + "' found");
+                        throw new ValidationException(map(MSG, "pipeline id",
+                                ERR_NOTFOUND, id));
                 } catch (ValidationException ve) {
                     return invalid("GET pipeline '" + name + "'", ve, resp);
                 } catch (Exception e) {
@@ -334,8 +330,8 @@ public class SherlokServer {
                         resp.type(JSON);
                         return b;
                     } else
-                        throw new ValidationException("no bundle with id '"
-                                + id + "' found");
+                        throw new ValidationException(map(MSG, "bundle id",
+                                ERR_NOTFOUND, id));
                 } catch (ValidationException ve) {
                     return invalid("GET bundle '" + name + "'", ve, resp);
                 } catch (Exception e) {

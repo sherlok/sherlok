@@ -1,6 +1,9 @@
 package org.sherlok.utils;
 
 import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
+import static org.sherlok.utils.ValidationException.ERR_EXPECTED;
+import static org.sherlok.utils.ValidationException.ERR_UNEXPECTED;
 
 import java.util.Iterator;
 import java.util.List;
@@ -11,42 +14,45 @@ import org.json.JSONObject;
 import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
 import org.sherlok.mappings.PipelineDef.TestAnnotation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 public class SherlokTests {
 
-    public static void assertEquals(Map<String, TestAnnotation> expected,
-            String system, Comparison comparison) throws ValidationException {
+    public static void assertEquals(Map<String, TestAnnotation> expecteds,
+            String systemString, Comparison comparison)
+            throws ValidationException, JSONException, JsonProcessingException {
 
         // parse
-        List<TestAnnotation> systemAnnots = null;
+        List<TestAnnotation> systems = null;
         try {
-            systemAnnots = parseRaw(system);
+            systems = parseRaw(systemString);
         } catch (JSONException e) {
             throw new ValidationException("could not parse systemAnnots "
-                    + system, e);
+                    + systemString, e);
         }
 
         // validate
         switch (comparison) {
         case atLeast:
-            for (TestAnnotation exp : expected.values()) {
-                if (!systemAnnots.contains(exp)) {
-                    throw new ValidationException("Expected '" + exp
-                            + "', but was not found in SYSTEM: " + system);
+            for (TestAnnotation exp : expecteds.values()) {
+                if (!systems.contains(exp)) {
+                    throw new ValidationException(map(ERR_EXPECTED, exp,
+                            "expecteds", expecteds, "system", systems));
                 }
             }
             break;
 
         case exact: // compare 2-ways; give explicit error msg
-            for (TestAnnotation exp : expected.values()) {
-                if (!systemAnnots.contains(exp)) {
-                    throw new ValidationException("Expected '" + exp
-                            + "', but was not found in SYSTEM: " + system);
+            for (TestAnnotation exp : expecteds.values()) {
+                if (!systems.contains(exp)) {
+                    throw new ValidationException(map(ERR_EXPECTED, exp,
+                            "expecteds", expecteds, "system", systems));
                 }
             }
-            for (TestAnnotation sys : systemAnnots) {
-                if (!expected.values().contains(sys)) {
-                    throw new ValidationException("System found '" + sys
-                            + "', but was not found in EXPECTED: " + system);
+            for (TestAnnotation sys : systems) {
+                if (!expecteds.values().contains(sys)) {
+                    throw new ValidationException(map(ERR_UNEXPECTED, sys,
+                            "expecteds", expecteds, "system", systems));
                 }
             }
             break;

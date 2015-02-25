@@ -45,17 +45,15 @@ public class Controller {
             b.validate(b.toString());
             String key = b.getId();
             if (bundleDefs.containsKey(key)) {
-                throw new ValidationException("duplicate bundle ids: '" + key
-                        + "'");
+                throw new ValidationException("duplicate bundle ids", key);
             } else {
                 // validate all engines
                 for (EngineDef en : b.getEngines()) {
                     en.validate(en.toString());
                     en.setBundle(b);
-                    // no duplicate engine ids
                     if (engineDefs.containsKey(en.getId())) {
-                        throw new ValidationException("duplicate engine ids: '"
-                                + en + "'");
+                        throw new ValidationException("duplicate engine ids",
+                                en.getId());
                     }
                 }
                 // add bundle and all engines
@@ -77,14 +75,15 @@ public class Controller {
                 validateId(pengineId, "engine id '" + pengineId
                         + "' in pipeline '" + pd + "'");
                 if (!engineDefs.containsKey(pengineId)) {
-                    throw new ValidationException("no engine def found for '"
-                            + pengineId + "' in pipeline '" + pd + "'");
+                    throw new ValidationException(
+                            "engine def not found in pipeline '" + pd + "'",
+                            pengineId);
                 }
             }
             // no duplicate pipeline ids
             if (pipelineDefs.containsKey(pd.getId())) {
-                throw new ValidationException("duplicate pipeline id '"
-                        + pd.getId() + "'");
+                throw new ValidationException("duplicate pipeline id",
+                        pd.getId());
             } else {
                 pipelineDefs.put(pd.getId(), pd);
             }
@@ -153,7 +152,7 @@ public class Controller {
     // DELETE /////////////////////////////////////////////////////////////
     void deleteBundleDef(String bundleId) throws ValidationException {
         if (!bundleDefs.containsKey(bundleId)) {
-            throw new ValidationException("bundle '" + bundleId + "' not found");
+            throw new ValidationException("bundle not found", bundleId);
         }
         FileBased.deleteBundle(bundleId);
         bundleDefs.remove(bundleId);
@@ -161,8 +160,7 @@ public class Controller {
 
     void deletePipelineDef(String pipelineId) throws ValidationException {
         if (!pipelineDefs.containsKey(pipelineId)) {
-            throw new ValidationException("pipeline '" + pipelineId
-                    + "' not found");
+            throw new ValidationException("pipeline  not found", pipelineId);
         }
         String domain = pipelineDefs.get(pipelineId).getDomain();
         FileBased.deletePipeline(pipelineId, domain);

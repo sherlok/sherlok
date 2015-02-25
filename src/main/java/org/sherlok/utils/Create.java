@@ -64,23 +64,20 @@ public class Create {
     }
 
     public static <K, V> Map<K, V> map(K key, V value) {
-        HashMap<K, V> map = new HashMap<K, V>();
+        HashMap<K, V> map = map();
         map.put(key, value);
         return map;
     }
 
     public static <K, V> Map<K, V> map(K key, V value, K key2, V value2) {
-        HashMap<K, V> map = new HashMap<K, V>();
-        map.put(key, value);
+        Map<K, V> map = map(key, value);
         map.put(key2, value2);
         return map;
     }
 
     public static <K, V> Map<K, V> map(K key, V value, K key2, V value2,
             K key3, V value3) {
-        HashMap<K, V> map = new HashMap<K, V>();
-        map.put(key, value);
-        map.put(key2, value2);
+        Map<K, V> map = map(key, value, key2, value2);
         map.put(key3, value3);
         return map;
     }
