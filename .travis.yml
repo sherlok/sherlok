@@ -6,7 +6,7 @@ script: mvn clean install
 
 env:
   global:
-    - JAVA_OPTS="-Xms1G -Xmx3G"
+    - export JAVA_OPTS="-Xms1G -Xmx3G"
 
 branches:
   only:
