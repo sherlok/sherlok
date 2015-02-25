@@ -41,6 +41,7 @@ Star
 stellate
 tufted
 thick tufted
+thick-tufted
 untufted
 unipolar
 spiral

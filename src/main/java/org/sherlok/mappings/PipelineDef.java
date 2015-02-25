@@ -121,6 +121,7 @@ public class PipelineDef extends Def {
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    @JsonPropertyOrder(value = { "input", "expected", "comparison" }, alphabetic = true)
     public static class PipelineTest {
 
         public enum Comparison {

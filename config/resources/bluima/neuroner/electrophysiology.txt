@@ -7,6 +7,7 @@ regular firing
 
 irregular
 irregular spiking
+irregular-spiking
 
 fast-spiking
 fast spiking
@@ -22,14 +23,14 @@ delayed-firing
 regular-firing
 stuttering
 late spiking
- 
+
 
 hyperpolarized
 depolarized
 
 low threshold spiking
-classical 
-Chattering neurons 
+classical
+Chattering neurons
 intrinsic
 
 burst-firing
@@ -40,14 +41,14 @@ bursting-spiking
 bursting firing
 bursting
 
-stuttering  
+stuttering
 
 delayed
 
 continuous
 continuous firing
 
-Low-threshold bursters
+low-threshold bursters
 
 accomodating
 non-accomodating
