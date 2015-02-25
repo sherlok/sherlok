@@ -1,13 +1,15 @@
 language: java
 jdk:
   - oraclejdk7
+
 script: mvn clean install
+
+env:
+ - JAVA_OPTS="-Xms1G -Xmx2G"
+
 branches:
   only:
   - master
 notifications:
   email:
   - renaud.richardet@gmail.ch
-before_script:
- - "echo $JAVA_OPTS"
- - "export JAVA_OPTS=-Xmx1G"
