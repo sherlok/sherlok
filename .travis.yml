@@ -5,7 +5,8 @@ jdk:
 script: mvn clean install
 
 env:
- - JAVA_OPTS="-Xms1G -Xmx2G"
+  global:
+    - JAVA_OPTS="-Xms1G -Xmx3G"
 
 branches:
   only:
