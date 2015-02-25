@@ -73,20 +73,25 @@
           <md-toolbar class="thin" md-theme="indigo">
             <h2 class="md-toolbar-tools">
               <span>Tests</span>
+              <span style="background-color:{{testsStatus()}};"> ({{activePipe.testsOk}} / {{activePipe.tests.length}} OK, {{activePipe.testsFailed}} failed) </span>
               <span flex></span>
-              <md-button ng-click="runAllTests()" aria-label="run tests">run all</md-button>
-              <md-button ng-click="savePipe();runAllTests()" aria-label="save and run tests">save & run all</md-button>
+              <md-button ng-click="runAllTests()" aria-label="run tests">run</md-button>
             </h2>
           </md-toolbar>
           <div ng-repeat="test in activePipe.tests">
-            <!-- <md-subheader class="md-primary">Test {{$index + 1}}</md-subheader> -->
-            <md-input-group class="test_area md-input-has-value">
-              <label>Input</label>
-              <textarea rows="1" id="test_in_{{$index}}"  ng-model="test.in"></textarea>
-            </md-input-group>
-            <div class="test_out">
-              <label>Output</label>
-              <div id="test_out_{{$index}}"></div>
+            <div layout="row" class="test_row">
+              <span render-annotations></span>
+              <span flex></span>
+              <span ng-click="test.visible=!test.visible"> [edit]</span>
+            </div>
+            <div class="test-edit" ng-show="test.visible">
+              <div>Text:</div>
+              <textarea           ng-model="test.input"    rows="5"></textarea>
+              <div>Expected:</div>
+              <textarea json-text ng-model="test.expected" rows="12"></textarea>
+              <div>Actual:</div>
+              <textarea json-text ng-model="test.actual"   rows="12"></textarea>
+              <md-button ng-click="runAllTests()" aria-label="run tests">run tests</md-button>
             </div>
             <md-divider/>
           </div>

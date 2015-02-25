@@ -26,6 +26,38 @@ app.config(function ($routeProvider) {
   })
 });
 
+app.directive('renderAnnotations', function($compile) {
+  return {
+    link: function(scope, element, attr) {
+      scope.$watchGroup(['test.input', 'test.expected'], function(newTest, oldValue) {
+        if (newTest) {
+          Sherlok.annotateElement(newTest[0], newTest[1], function(annotatedHtml){
+            element[0].innerHTML = annotatedHtml;
+            $compile(element.contents())(scope);
+          });
+        }
+      });
+    }
+  };
+});
+// Binds a (JSON) object to a textarea. Otherwise, displays [object - Object]
+app.directive('jsonText', function() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attr, ngModel) {
+          function into(input) {
+            return JSON.parse(input);
+          }
+          function out(data) {
+            return JSON.stringify(data);
+          }
+          ngModel.$parsers.push(into);
+          ngModel.$formatters.push(out);
+        }
+    };
+});
+
 app.controller('pipelines', function PipelineController($scope, $http, $location, $mdToast, $mdDialog) {
   $scope.splash_page = 'splash_page.html'
 
@@ -39,13 +71,31 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
   }
   loadPipelines();
 
-  $scope.openPipe = function(item){
-    if ($scope.isPipeOpen(item)){
-      $scope.activePipe = undefined;
+  preProcess = function(p){
+    p.scriptString = p.script.join('\n');
+    p.testsOk = 0;
+    p.testsFailed = 0;
+    for (var i = p.tests.length - 1; i >= 0; i--) {
+      p.tests[i].visible = false;
+      p.tests[i].actual = p.tests[i].expected;
+    };
+    return p;
+  }
+
+  postProcess = function(p){
+    pCopy = angular.copy(p);
+    pCopy.script = p.scriptString.split('\n');
+    delete pCopy.scriptString;
+    delete pCopy.testsOk;
+    delete pCopy.testsFailed;
+    return pCopy;
+  }
+
+  $scope.openPipe = function(p){
+    if ($scope.isPipeOpen(p)){ // user clicked on pipeline again?
+      $scope.activePipe = undefined; // then close active pipeline
     } else {
-      $scope.activePipe = item;
-      $scope.activePipe.scriptString = $scope.activePipe.script.join('\n');
-      $scope.activeEngine = undefined;
+      $scope.activePipe = preProcess(p);
     }
   };
 
@@ -80,13 +130,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
   };
 
   $scope.savePipe = function() {
-    console.log($scope.activePipe);
-
-    $scope.activePipe.script = $scope.activePipe.scriptString.split('\n');
-    delete $scope.activePipe.scriptString;
-
-    // FIXME /pipelines?testonly=true
-    $http.put('/pipelines', $scope.activePipe).success(function (data) {
+    $http.put('/pipelines', postProcess($scope.activePipe)).success(function (data) {
       toast($mdToast, 'pipeline \''+$scope.activePipe.name+'\' saved!');
       // refresh and set activePipe
       var name = $scope.activePipe.name;
@@ -97,7 +141,6 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
         if (p.name == name && p.version == version){
           $scope.activePipe = p;
           $scope.activePipe.scriptString = $scope.activePipe.script.join('\n');
-          $scope.activeEngine = undefined;
         }
       }
     }).error(function (data, status) {
@@ -107,18 +150,30 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
 
   // TESTS
   $scope.runAllTests = function(){
-    var ap = $scope.activePipe;
-    for (var i = ap.tests.length - 1; i >= 0; i--) {
-      runTest($scope.activePipe, i);
-    };
-    toast($mdToast, ap.tests.length + ' tests successfully completed');
+    $http.post('/test', postProcess($scope.activePipe)).success(function (data) {
+      toast($mdToast, 'all tests passed!');
+      $scope.activePipe.testsOk = $scope.activePipe.tests.length;
+      $scope.activePipe.testsFailed = 0;
+    }).error(function (testResults, status) {
+      toast($mdToast, 'some tests failed');
+      console.log(testResults);
+      $scope.activePipe.testsFailed = Object.keys(testResults).length;
+      $scope.activePipe.testsOk = $scope.activePipe.tests.length - $scope.activePipe.testsFailed;
+      for (var testId in testResults) {
+        if (testResults.hasOwnProperty(testId)) {
+            $scope.activePipe.tests[testId].actual = testResults[testId].system;
+        }
+      }
+    })
   };
-  runTest = function(ap, id){
-    var test = ap.tests[id];
-    Sherlok.annotate(ap.name, ap.version, test['in'], function(annotatedHtml){
-      $('div#test_out_' + id).html(annotatedHtml);
-    });
-  }
+
+  $scope.testsStatus = function(){
+    if ($scope.activePipe.testsOk + $scope.activePipe.testsFailed == 0){
+      return "gray";       //unknown
+    } else if ($scope.activePipe.testsFailed > 0){
+      return "red";         // fail
+    } else return "green";  // ok
+  };
 
   // // ENGINES
   // loadEngines = function(){
@@ -148,3 +203,10 @@ toast = function(toaster, msg){
     position: 'top right'
   });
 }
+
+$("body").on("focus", ".CodeMirror", function(e){
+  // $(".CodeMirror").css("height", "auto");
+  // var myTextArea = document.getElementById('myText');
+  //   var myCodeMirror = CodeMirror.fromTextArea(myTextArea);
+  //   myCodeMirror.setSize(500, 300);
+});

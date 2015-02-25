@@ -53,6 +53,21 @@ md-input-group > textarea {
     box-sizing: border-box;
 }
 
+.test_row{
+    padding: 5px;
+}
+
+.test-edit textarea {
+    padding: 5px;
+    width: 100%;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 100%;
+    font-family: 'Inconsolata', 'courier';
+    display:block;
+}
+
 /* Welcome text */
 #welcome{
     margin: 80px;
