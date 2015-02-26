@@ -127,7 +127,7 @@ function uiCodemirrorDirective($timeout, uiCodemirrorConfig) {
     codemirror.on('change', function(instance) {
       var newValue = instance.getValue();
       if (newValue !== ngModel.$viewValue) {
-        scope.$applyAsync(function() {
+        scope.$evalAsync(function() {
           ngModel.$setViewValue(newValue);
         });
       }
@@ -140,7 +140,9 @@ function uiCodemirrorDirective($timeout, uiCodemirrorConfig) {
     scope.$watch(uiRefreshAttr, function(newVal, oldVal) {
       // Skip the initial watch firing
       if (newVal !== oldVal) {
-        $timeout(codeMirror.refresh);
+        $timeout(function() {
+          codeMirror.refresh();
+        });
       }
     });
   }

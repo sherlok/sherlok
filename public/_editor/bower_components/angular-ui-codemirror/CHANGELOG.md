@@ -1,3 +1,24 @@
+<a name="0.2.3"></a>
+### 0.2.3 (2015-01-27)
+
+
+#### Bug Fixes
+
+* error calling scope.$applyAsync ([15b84f04](https://github.com/angular-ui/ui-codemirror/commit/15b84f04b322958c6f00e476d0ef8e872ea98770), closes [#89](https://github.com/angular-ui/ui-codemirror/issues/89))
+
+
+<a name="0.2.2"></a>
+### 0.2.2 (2015-01-07)
+
+
+#### Bug Fixes
+
+* use of undefined this/scope ([744bff1](https://github.com/angular-ui/ui-codemirror/commit/744bff199f3cd57c0c7333fd73a775b11b3bde6d))
+
+<a name="0.2.1"></a>
+### 0.2.1 (2015-01-07)
+
+
 <a name="0.2.0"></a>
 ## 0.2.0 (2014-12-08)
 
