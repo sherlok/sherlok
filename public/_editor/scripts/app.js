@@ -31,8 +31,8 @@ app.directive('renderAnnotations', function($compile) {
     link: function(scope, element, attr) {
       scope.$watchGroup(['test.input', 'test.expected'], function(newTest, oldValue) {
         if (newTest) {
-          Sherlok.annotateElement(newTest[0], newTest[1], function(annotatedHtml){
-            element[0].innerHTML = annotatedHtml;
+          Sherlok.annotateElement(newTest[0], newTest[1], function(html, types){
+            element[0].innerHTML = html;
             $compile(element.contents())(scope);
           });
         }
@@ -60,13 +60,21 @@ app.directive('jsonText', function() {
     };
 });
 
-app.controller('pipelines', function PipelineController($scope, $http, $location, $mdToast, $mdDialog) {
-  $scope.splash_page = 'splash_page.html'
+app.controller('pipelines', function PipelineController($scope, $http, $location, $mdToast, $mdDialog, $cookies) {
+  $scope.tabsSelectedIndex = 0;
+
+  $scope.annotate = {};
+  $scope.annotate.annotating = false;
+  $scope.annotate.text = $cookies.annotateText || "";
+  $scope.annotate.types = [];
 
   // PIPELINE
   loadPipelines = function(){
     $http.get('/pipelines').success(function (data) {
       $scope.pipelines = data;
+      // open last viewed pipeline
+      var last = $cookies.lastPipeline || 0;
+      $scope.openPipe($scope.pipelines[last]);
     }).error(function (data, status) {
       alert(JSON.stringify(data));
     })
@@ -74,7 +82,8 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
   loadPipelines();
 
   preProcess = function(p){
-    p.scriptString = p.script.join('\n');
+    // transform json string array & add a few linefeeds
+    p.scriptString = p.script.join('\n') + '\n\n\n';
     p.testsOk = 0;
     p.testsFailed = 0;
     for (var i = p.tests.length - 1; i >= 0; i--) {
@@ -86,7 +95,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
 
   postProcess = function(p){
     pCopy = angular.copy(p);
-    pCopy.script = p.scriptString.split('\n');
+    pCopy.script = p.scriptString.trim().split('\n');
     delete pCopy.scriptString;
     delete pCopy.testsOk;
     delete pCopy.testsFailed;
@@ -94,28 +103,12 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
   }
 
   $scope.openPipe = function(p){
-    if ($scope.isPipeOpen(p)){ // user clicked on pipeline again?
-      $scope.activePipe = undefined; // then close active pipeline
-    } else {
-      $scope.activePipe = preProcess(p);
-    }
-  };
-
-  $scope.isPipeOpen = function(item){
-    return $scope.activePipe === item;
-  };
-
-  $scope.hasActivePipeOpen = function() {
-    return $scope.activePipe !== undefined;
+    $scope.activePipe = preProcess(p);
+    $cookies.lastPipeline = $scope.pipelines.indexOf(p);
   };
 
   $scope.newPipe = function() {
     $scope.activePipe = {};
-  };
-
-  $scope.closePipe = function() {
-    $scope.activePipe = undefined;
-    loadPipelines(); // reload in case some changes have been made
   };
 
   $scope.deletePipe = function() {
@@ -152,6 +145,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
 
   // TESTS
   $scope.runAllTests = function(){
+    $scope.testing = true;
     $http.post('/test', postProcess($scope.activePipe)).success(function (data) {
       toast($mdToast, 'all tests passed!');
       $scope.activePipe.testsOk = $scope.activePipe.tests.length;
@@ -162,6 +156,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
           $scope.activePipe.tests[id].actual = p[id].system;
         }
       }
+      $scope.testing = false;
     }).error(function (testResults, status) {
       toast($mdToast, 'some tests failed');
       console.log(testResults);
@@ -173,6 +168,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
           $scope.activePipe.tests[id].actual = f[id].system;
         }
       }
+      $scope.testing = false;
     })
   };
 
@@ -188,18 +184,50 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     $scope.activePipe.tests.push({"expected" : {}, "input" : "", "visible": true});
   };
 
-  // // ENGINES
-  // loadEngines = function(){
-  //   $http.get('/engines').success(function (data) {
-  //     $scope.engines = {};
-  //     for (var en in data){
-  //       $scope.engines[en.name+':'+en.version] = en;
-  //     }
-  //   }).error(function (data, status) {
-  //     console.log('Error ' + data)
-  //   })
-  // }
-  // loadEngines();
+  // copies current pipeline, and set as first test the text to annotate
+  $scope.annotateText = function(){
+     $scope.annotate.annotating = true;
+    var txt = $scope.annotate.text;
+    var p = angular.copy(postProcess($scope.activePipe));
+    p.tests = {"expected" : {}, "input" : txt};
+    $http.post('/test', p).success(function (data) {
+      var annotated = data.passed[0].system;
+      Sherlok.annotateElement(txt, annotated, function(html, types){
+        $scope.annotate.html = html;
+        $scope.annotate.types = [];
+        for (var t in types) {
+          $scope.annotate.types.push({"name": types[t], "activated":true});
+        }
+        $scope.annotate.annotating = false;
+      });
+    }).error(function (testResults, status) {
+      alert("could not annotate text: ", testResults.failed);
+      console.log(testResults);
+       $scope.annotate.annotating = false;
+    })
+  };
+  $scope.$watch('annotate.text', function() {
+    $cookies.annotateText = $scope.annotate.text || "";
+  });
+
+  $scope.toggleType = function(type){
+    console.log(type);
+
+    if (!type.activated){// --> reactivate
+      $("._inactive" + type.name)
+       //.toggleClass("inline-a")
+       .toggleClass("np_" + type.name)
+       .toggleClass("_inactive" + type.name);
+      type.activated = false;
+
+    } else {              // --> deactivate
+      $(".np_" + type.name)
+      .toggleClass("_inactive" + type.name)
+      .toggleClass("np_" + type.name)
+      //.toggleClass("inline-a");
+      type.activated = true;
+    }
+  }
 
   // RUTA EDITOR
   $scope.editorOptions = {
@@ -213,7 +241,7 @@ toast = function(toaster, msg){
   toaster.show({
     template: '<md-toast>'+msg+'</md-toast>',
     hideDelay: 3000,
-    position: 'top right'
+    position: 'bottom right'
   });
 }
 

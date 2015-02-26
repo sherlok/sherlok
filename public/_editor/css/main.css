@@ -24,7 +24,7 @@ md-item-content.thin div.md-tile-content {
     padding-left: 10px;
 }
 
-/* active pipe in list is dunkler */
+/* active pipe in list is blue */
 md-item-content.pipe_open_true div.md-tile-content {
     background-color: #3f51b5;
     color: white;
@@ -46,7 +46,7 @@ div.test_out  {
     padding-bottom: 8px;
 }
 /* 100% width text textarea */
-md-input-group > textarea {
+md-input-group > textarea, md-input-container > textarea, textarea.max-wide {
     width: 100%;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -68,14 +68,22 @@ md-input-group > textarea {
     display:block;
 }
 
-/* Welcome text */
-#welcome{
-    margin: 80px;
-    max-width: 650px;
+/* so that progress-linear sticks to upper element */
+md-progress-linear .md-container {
+    top: 0px;
 }
 
-
-
+/* less padding around input fields*/
+md-input-container {
+    padding: 0px 0px 0px 0px;
+}
+/* less margin around checkboxes */
+md-checkbox {
+    margin: 0px;
+}
+md-checkbox.md-default-theme.md-checked div.md-icon {
+    background-color: gray;
+}
 
 /* toast with different color */
 /*md-toast.md-default-theme {

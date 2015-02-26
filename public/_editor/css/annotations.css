@@ -7,13 +7,14 @@
     border-color: gray;
     background-color: lightgray;
     border-image: none;
-    border-radius: 3px;
+    border-radius: 1px;
     border-style: solid solid dotted;
     border-width: 1px;
     display: inline-block;
     line-height: 14px;
+    min-height:22px;
     padding: 2px;
-    vertical-align: baseline;
+    vertical-align: bottom;
     white-space: nowrap;
 }
 
@@ -34,70 +35,74 @@
     color: rgb(89, 32, 3);
 }
 
-.np_neuron { /*black*/
-    background-color: #dcdcdc;
-    border: 1px solid #999999;
-    color: #666666;
+/*takes precedence, since span.np... */
+span.np_NeuronTrigger { /*almost black*/
+    background-color: #282828;
+    border: 1px solid #282828;
+    color: white;
 }
-.np_morphology { /* blue */
+span.np_Neuron {
+    border-bottom: 3px solid #282828;
+    -moz-border-bottom-colors: #282828;
+}
+.np_Morphology { /* blue */
     background-color: #d3e9f4;
     border: 1px solid #98c3cd;
     color: #3a87ad;
 }
-.np_layer { /*violet*/
+.np_Layer { /*violet*/
     background-color: rgb(227, 215, 255);
     border: 1px solid rgb(207, 195, 236);
     color: rgb(61, 24, 142);
 }
-.np_brainregionprop { /*lightred*/
+.np_BrainRegionProp { /*lightred*/
     background-color: rgb(242, 222, 222);
     border: 1px solid rgb(229, 211, 211);
     color: rgb(185, 74, 72);
 }
-.np_electrophysiology { /*yellow*/
+.np_Electrophysiology { /*yellow*/
     background-color: #fafdb6;
     border: 1px solid #d9d598;
     color: #cda12a;
 }
-.np_function { /*orange*/
+.np_Function { /*orange*/
     background-color: rgb(254, 228, 189);
     border: 1px solid rgb(252, 205, 127);
     color: rgb(89, 32, 3);
 }
-.np_layer { /*green*/
-    background-color: #dff0d8;
-    border: 1px solid #9bc08c;
-    color: #468847;
-}
-.np_orientation { /*lightgreen*/
+.np_Orientation { /*lightgreen*/
     background-color: rgb(238, 255, 236);
     border: 1px solid rgb(225, 246, 209);
     color: rgb(82, 157, 84);
 }
-.np_size { /*darkgreen*/
+.np_Size { /*darkgreen*/
     background-color: rgb(186, 221, 188);
     border: 1px solid #9bc08c;
     color: rgb(80, 104, 82);
 }
-.np_neurotransmitter { /*forest*/
+.np_Neurotransmitter { /*forest*/
     background-color: rgb(206, 212, 180);
     border: 1px solid rgb(175, 180, 153);
     color: rgb(67, 70, 56);
 }
-.np_protein, .np_person, .np_country { /*darkblue*/
+.np_Protein, .np_ProteinProp, .np_Person, .np_Country { /*darkblue*/
     background-color: rgb(187, 211, 230);
     border: 1px solid rgb(170, 197, 238);
     color: rgb(13, 77, 124);
 }
-.np_developmental { /*lightyellow*/
+.np_Developmental { /*lightyellow*/
     background-color: rgb(252, 248, 227);
     border: 1px solid rgb(251, 238, 213);
     color: rgb(144, 118, 49);
 }
-.np_species, .np_location { /*red*/
+.np_Species, .np_Location { /*red*/
     background-color: #f3c2c2;
     border: 1px solid #c99797;
     color: #c14240;
 }
 
-
+.np_Missing { /*red*/
+    background-color: #f3c2c2;
+    border: 1px solid #c99797;
+    color: #c14240;
+}

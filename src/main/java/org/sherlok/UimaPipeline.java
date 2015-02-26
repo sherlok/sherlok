@@ -119,9 +119,9 @@ public class UimaPipeline {
 
         initScript(list(pipelineDef.getScriptLines()) /* a copy */, engineDefs);
         initEngines();
-        initCasPool();
-        filterAnnots(pipelineDef.getOutput().getAnnotationIncludes(),
-                pipelineDef.getOutput().getAnnotationFilters());
+        casPool = initCasPool(tsd);
+        xcs = filterAnnots(pipelineDef.getOutput().getAnnotationIncludes(),
+                pipelineDef.getOutput().getAnnotationFilters(), casPool);
     }
 
     static TypeSystemDescription reloadTSD() {
@@ -134,16 +134,18 @@ public class UimaPipeline {
     }
 
     /**
-     * Filters the JSON output, either with includes or filters. If no
-     * includes/filter is provided, it is just a copy of the 'normal'
-     * {@link TypeSystem}.
+     * @return a cas JSON serializer that filters the JSON output, either with
+     *         includes or filters. If no includes/filter is provided, no
+     *         filtering is performed (it just uses all the annotations from the
+     *         {@link TypeSystem}).
      */
-    private void filterAnnots(List<String> includes, List<String> filters) {
+    static XmiCasSerializer filterAnnots(List<String> includes,
+            List<String> filters, CasPool casPool) {
 
         CAS cas = casPool.getCas();
         TypeSystem ts = cas.getTypeSystem();
         TypeSystem filteredTs;
-
+        // TODO first include, then filter!
         if (!includes.isEmpty()) {
 
             filteredTs = new FilteringTypeSystem();
@@ -203,8 +205,9 @@ public class UimaPipeline {
         casPool.releaseCas(cas);
 
         // initialize JSON writer with filter
-        xcs = new XmiCasSerializer(filteredTs);
-        xcs.setPrettyPrint(true);
+        XmiCasSerializer xcs_ = new XmiCasSerializer(filteredTs);
+        xcs_.setPrettyPrint(true);
+        return xcs_;
     }
 
     private void initEngines() throws UIMAException, ValidationException {
@@ -246,14 +249,15 @@ public class UimaPipeline {
         }
     }
 
-    private void initCasPool() throws ResourceInitializationException {
+    static CasPool initCasPool(TypeSystemDescription tsd)
+            throws ResourceInitializationException {
 
         // for (TypeDescription td : tsd.getTypes())
         // LOG.debug("type: {}", td.getName());
 
         AnalysisEngine noOpEngine = AnalysisEngineFactory.createEngine(
                 NoOpAnnotator.class, tsd);
-        casPool = new CasPool(10, noOpEngine);
+        return new CasPool(10, noOpEngine);
     }
 
     private static AnalysisEngine[] createEngines(

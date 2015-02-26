@@ -63,7 +63,7 @@ public class PipelineDef extends Def {
      * Whether this pipeline should be loaded on server startup. Defaults to
      * false
      */
-    boolean loadOnStartup = false;
+    private boolean loadOnStartup = false;
 
     /** The list of engine definitions */
     @JsonProperty("script")
@@ -80,10 +80,10 @@ public class PipelineDef extends Def {
     public static class PipelineOutput {
 
         @JsonProperty("filter_annotations")
-        List<String> annotationFilters = list();
+        private List<String> annotationFilters = list();
         @JsonProperty("include_annotations")
-        List<String> annotationIncludes = list();
-        List<String> payloads = list();
+        private List<String> annotationIncludes = list();
+        private List<String> payloads = list();
 
         public List<String> getAnnotationFilters() {
             return annotationFilters;

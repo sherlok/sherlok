@@ -2,7 +2,7 @@
 
   <!-- PIPELINE LIST -->
   <div flex=20>
-    <md-toolbar theme="indigo">
+    <md-toolbar>
       <h2 class="md-toolbar-tools">
         <span>Pipelines</span>
         <span flex></span>
@@ -12,7 +12,7 @@
     <md-content>
       <md-list "overflow:scroll">
         <md-item ng-repeat="pipeline in pipelines | orderBy:'name'">
-          <md-item-content class="thin pipe_open_{{isPipeOpen(pipeline)}}" ng-click="openPipe(pipeline)">
+          <md-item-content class="thin pipe_open_{{(activePipe === pipeline)}}" ng-click="openPipe(pipeline)">
             <div class="md-tile-content">
               <h3>{{pipeline.name}}</h3>
               <h4>version {{pipeline.version}}</h4>
@@ -27,84 +27,112 @@
 
   <!-- ACTIVE PIPELINE -->
   <div flex style="border-left: 1px solid grey;">
-    <ng-switch on="hasActivePipeOpen()">
-      <div class="animate-switch" ng-switch-when="false">
-        <div ng-include="splash_page"></div>
-      </div>
-      <div class="animate-switch" ng-switch-when="true">
-        <md-toolbar md-theme="indigo">
-          <h2 class="md-toolbar-tools">
-            <span>Pipeline '{{activePipe.name}}'</span>
-            <span flex></span>
-            <md-button ng-click="deletePipe()"aria-label="delete pipeline">delete</md-button>
-            <md-button ng-click="savePipe()" aria-label="save pipeline">save</md-button>
-            <md-button ng-click="closePipe()"aria-label="close pipeline">close</md-button>
-          </h2>
-        </md-toolbar>
+    <!-- TITLE -->
+    <md-toolbar>
+      <h2 class="md-toolbar-tools">
+        <span>Pipeline '{{activePipe.name}}'</span>
+        <span flex></span>
+        <md-button ng-click="deletePipe()"aria-label="delete pipeline">delete</md-button>
+        <md-button ng-click="savePipe()" aria-label="save pipeline">save</md-button>
+      </h2>
+    </md-toolbar>
+    <!-- TABS -->
+    <md-tabs class="md-primary" md-selected="tabsSelectedIndex">
+      <md-tab id="tab1-info" aria-controls="tab1-info">Info + Annotate</md-tab>
+      <md-tab id="tab2-embed" aria-controls="tab2-embed">Embed / API</md-tab>
+      <md-tab id="tab3-edit" aria-controls="tab3-edit">Edit script</md-tab>
+      <md-tab id="tab4-test" aria-controls="tab4-test" md-on-select ="runAllTests()">Test</md-tab>
+    </md-tabs>
+    <ng-switch on="tabsSelectedIndex" class="tabpanel-container">
+
+      <!-- TAB #1: INFO & ANNOTATE -->
+      <div role="tabpanel" id="tab1-content" ng-switch-when="0">
         <div layout="row" layout-padding>
-          <md-text-float class="wide" label="Pipeline Name" ng-model="activePipe.name"> </md-text-float>
-          <md-text-float label="Version" ng-model="activePipe.version"> </md-text-float>
+          <md-input-container>
+            <label>Pipeline Name</label>
+            <input class="wide" ng-model="activePipe.name" required type="text">
+          </md-input-container>
+          <md-input-container>
+            <label>Version Name</label>
+            <input ng-model="activePipe.version" required type="text">
+          </md-input-container>
         </div>
         <div layout="row" layout-padding>
-          <md-input-group tabindex="-1" ng-model="activePipe.description" label="Description" class="ng-isolate-scope md-default-theme md-input-has-value ng-valid" aria-invalid="false">
+          <md-input-container tabindex="-1" ng-model="activePipe.description" label="Description" class="ng-isolate-scope md-default-theme md-input-has-value ng-valid" aria-invalid="false">
             <label for="p_desc" class="ng-binding">Description</label>
             <textarea rows="2" cols="60" id="p_desc" aria-disabled="false"
               ng-model="activePipe.description"></textarea>
-          </md-input-group>
+          </md-input-container>
         </div>
-
-        <!-- SCRIPT -->
-        <div>
-          <md-toolbar class="thin" md-theme="indigo">
-            <h2 class="md-toolbar-tools">
-              <span>Script</span>
-              <span flex></span>
-            </h2>
-          </md-toolbar>
-          <md-content>
-            <ui-codemirror ui-codemirror-opts="editorOptions"
-              ng-model="activePipe.scriptString">
-            </ui-codemirror>
-          </md-content>
-        </div>
-
-        <!-- TESTS -->
-        <div>
-          <md-toolbar class="thin" md-theme="indigo">
-            <h2 class="md-toolbar-tools">
-              <span>Tests</span>
-              <span style="background-color:{{testsStatus()}};"> ({{activePipe.testsOk}} / {{activePipe.tests.length}} OK, {{activePipe.testsFailed}} failed) </span>
-              <span flex></span>
-              <md-button ng-click="newTest()" aria-label="new test">new</md-button>
-              <md-button ng-click="runAllTests()" aria-label="run tests">run</md-button>
-            </h2>
-          </md-toolbar>
-          <div ng-repeat="test in activePipe.tests">
-            <div layout="row" class="test_row">
-              <span render-annotations></span>
-              <span flex></span>
-              <span ng-click="test.visible=!test.visible"> [edit]</span>
-              <span ng-click="activePipe.tests.splice($index, 1)"> [del]</span>
+        <!-- ANNOTATE -->
+        <md-toolbar class="thin">
+          <h2 class="md-toolbar-tools">
+            <span flex></span>
+            <md-button ng-disabled="annotate.annotating" ng-click="annotateText()" aria-label="annotate">annotat{{annotate.annotating ? "ing" : "e"}}</md-button>
+          </h2>
+        </md-toolbar>
+        <textarea class="max-wide" ng-model="annotate.text" rows="4"></textarea>
+        <div layout="row">
+          <div data-ng-bind-html="annotate.html"></div>
+          <div style="margin-top:15px;">
+            <div ng-repeat="type in annotate.types">
+              <md-checkbox ng-model="type.activated" ng-click="toggleType(type)" aria-label="type_{{type}}">
+                <span class="inline-a np_{{type.name}}" >{{type.name}}</span>
+              </md-checkbox>
             </div>
-            <div class="test-edit" ng-show="test.visible">
-              <div>Text:</div>
-              <textarea           ng-model="test.input"    rows="2"></textarea>
-              <div>Expected:</div>
-              <textarea json-text ng-model="test.expected" rows="8"></textarea>
-              <div>Actual:</div>
-              <textarea json-text ng-model="test.actual"   rows="8"></textarea>
-              <md-button ng-click="runAllTests()" aria-label="run tests">run tests</md-button>
-            </div>
-            <md-divider/>
           </div>
         </div>
       </div>
-      <md-divider/>
+
+      <!-- TAB #2: EMBED -->
+      <div role="tabpanel" id="tab2-content" ng-switch-when="1">
+          TODO
+      </div>
+
+      <!-- TAB #3: EDIT -->
+      <div role="tabpanel" id="tab3-content" ng-switch-when="2">
+        <md-content>
+          <ui-codemirror ui-codemirror-opts="editorOptions"
+            ng-model="activePipe.scriptString">
+          </ui-codemirror>
+        </md-content>
+      </div>
+
+      <!-- TAB #4: TEST -->
+      <div role="tabpanel" id="tab4-content" ng-switch-when="3">
+        <md-toolbar class="thin">
+          <h2 class="md-toolbar-tools" style="background-color:{{testsStatus()}};">
+            <span>{{activePipe.testsOk}} / {{activePipe.tests.length}} OK, {{activePipe.testsFailed}} failed</span>
+            <span flex></span>
+            <md-button ng-disabled="testing" ng-click="runAllTests()" aria-label="run tests">{{testing ? "running" : "run"}}</md-button>
+            <md-button ng-click="newTest()" aria-label="new test">new</md-button>
+          </h2>
+        </md-toolbar>
+        <md-progress-linear ng-show="testing" md-mode="indeterminate"></md-progress-linear>
+        <div ng-repeat="test in activePipe.tests">
+          <div layout="row" class="test_row">
+            <span render-annotations></span>
+            <span flex></span>
+            <span ng-click="test.visible=!test.visible"> [edit]</span>
+            <span ng-click="activePipe.tests.splice($index, 1)"> [del]</span>
+          </div>
+          <div class="test-edit" ng-show="test.visible">
+            <div>Text:</div>
+            <textarea           ng-model="test.input"    rows="2"></textarea>
+            <div>Expected:</div>
+            <textarea json-text ng-model="test.expected" rows="8"></textarea>
+            <div>Actual:</div>
+            <textarea json-text ng-model="test.actual"   rows="8"></textarea>
+            <md-button ng-click="runAllTests()" aria-label="run tests">run tests</md-button>
+          </div>
+          <md-divider/>
+        </div>
+      </div>
     </ng-switch>
   </div>
 
-  <!--RIGHT PANEL -->
+  <!--RIGHT PANEL
   <div flex=10 style="padding-left:15px; border-left: 1px solid grey;">
     RIGHT
-  </div>
+  </div>-->
 </div>

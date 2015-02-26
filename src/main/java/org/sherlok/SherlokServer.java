@@ -181,6 +181,7 @@ public class SherlokServer {
             }
         });
 
+        /** Test a stored pipeline */
         get(new JsonRoute("/" + TEST + "/:name") {
             @Override
             public Object handle(Request req, Response resp) {
@@ -212,7 +213,7 @@ public class SherlokServer {
             }
         });
 
-        // ROUTES: UTILS
+        // ROUTES: RELOAD
         // ////////////////////////////////////////////////////////////////////////////
         get(new JsonRoute("/reload") {
             @Override
