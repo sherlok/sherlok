@@ -16,9 +16,12 @@
 package org.sherlok.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.*;
 import static org.sherlok.FileBased.allPipelineDefs;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -68,6 +71,9 @@ public class SherlokTestsTest {
     @SuppressWarnings("static-access")
     public void testAllPipelines() throws Exception {
 
+        // skip this test if "skipSlowTests" is set to true
+        assumeFalse("true".equals(System.getProperty("skipSlowTests")));
+
         PipelineLoader pipelineLoader = new PipelineLoader(
                 new Controller().load());
 
@@ -111,7 +117,8 @@ public class SherlokTestsTest {
 
             for (PipelineTest test : pipeline.getPipelineDef().getTests()) {
 
-                if (test.getExpected() == null || test.getExpected().toString().isEmpty()) {
+                if (test.getExpected() == null
+                        || test.getExpected().toString().isEmpty()) {
                     String systemOut = pipeline.annotate(test.getInput());
 
                     LOG.debug("TEST: {}\nPROPOSED: {}", pipelineDef + "::"

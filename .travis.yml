@@ -1,16 +1,10 @@
 language: java
+
 jdk:
   - oraclejdk7
 
-script: mvn clean install
+script: mvn clean install -DskipSlowTests=true
 
-env:
-  global:
-    - export JAVA_OPTS="-Xms1G -Xmx3G"
-
-branches:
-  only:
-  - master
 notifications:
   email:
   - renaud.richardet@gmail.ch
