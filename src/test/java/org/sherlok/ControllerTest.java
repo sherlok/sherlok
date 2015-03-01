@@ -16,6 +16,7 @@
 package org.sherlok;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 import org.sherlok.mappings.BundleDef.EngineDef;
@@ -28,7 +29,7 @@ public class ControllerTest {
         Controller controller = new Controller().load();
 
         PipelineDef pd = controller.getPipelineDef("opennlp.ners.en:1.6.2");
-        assertEquals(false, pd.isLoadOnStartup());
+        assertFalse(pd.isWarmup());
         assertEquals(4, pd.getEnginesFromScript().size());
         assertEquals("ENGINE opennlp.segmenter.en:1.6.2;", pd.getScriptLines()
                 .get(0));

@@ -2,7 +2,7 @@
   "description" : "annotates English persons and locations using OpenNLP models",
   "domain" : "dkpro",
   "language" : "en",
-  "loadOnStartup" : false,
+  "warmup" : false,
   "name" : "opennlp.ners.en",
   "output" : {
     "include_annotations" : [ "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity" ]

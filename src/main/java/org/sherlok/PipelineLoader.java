@@ -138,6 +138,9 @@ public class PipelineLoader {
 
     UimaPipeline load(PipelineDef pipelineDef) throws ValidationException {
 
+        pipelineDef.validate("could not validate pipeline wit Id '"
+                + pipelineDef.getId() + "',"); // just to make sure...
+
         // 3. resolve engines (and their bundles)
         List<EngineDef> engineDefs = list();
         Set<BundleDef> bundleDefs = set();

@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.maven.model.validation.DefaultModelValidator;
+import org.sherlok.Controller;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -249,17 +250,19 @@ public class BundleDef extends Def {
             return bundle;
         }
 
+        /** Is set at load time by {@link Controller#_load()} */
         public EngineDef setBundle(BundleDef bundle) {
             this.bundle = bundle;
             return this;
         }
 
-        /** needs bundle */
+        /** Needs bundle to be set (see {@link #setBundle()}) */
         @JsonIgnore
         public String getId() {
             return createId(name, bundle.getVersion());
         }
 
+        /** @return the id without non-alphanumeric, separated by separator */
         public String getIdForDescriptor(String separator) {
             return getName().replaceAll("[^A-Za-z0-9]", "_") + separator
                     + bundle.getVersion().replaceAll("[^A-Za-z0-9]", "_");

@@ -444,6 +444,7 @@ public class SherlokServer {
 
         // ROUTES: CATCHALLS
         // ////////////////////////////////////////////////////////////////////////////
+        /*- TODO else GET annotate fails...
         get(new JsonRoute("/*") { // GET
             @Override
             public Object handle(Request req, Response resp) {
@@ -451,7 +452,7 @@ public class SherlokServer {
                 resp.type(JSON);
                 return map(MSG, "not found", ERR, req.splat()[0]);
             }
-        });
+        }); */
         put(new Route("/*", JSON) { // PUT
             @Override
             public Object handle(Request req, Response resp) {
@@ -460,7 +461,7 @@ public class SherlokServer {
                 return map(MSG, "invalid PUT url", ERR, req.splat()[0]);
             }
         });
-        delete(new Route("/" + RUTA_RESOURCES + "/*", JSON) { // DELETE
+        delete(new Route("/*", JSON) { // DELETE
             @Override
             public Object handle(Request req, Response resp) {
                 resp.status(STATUS_MISSING);

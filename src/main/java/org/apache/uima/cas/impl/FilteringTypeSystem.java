@@ -15,10 +15,13 @@
  */
 package org.apache.uima.cas.impl; // needed because of methods visibility
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.admin.CASAdminException;
 import org.sherlok.UimaPipeline;
+import org.slf4j.Logger;
 
 /**
  * Used to filter JSON writer, see {@link UimaPipeline}
@@ -28,6 +31,7 @@ import org.sherlok.UimaPipeline;
  * @author renaud@apache.org
  */
 public class FilteringTypeSystem extends TypeSystemImpl {
+    private static final Logger LOG = getLogger(FilteringTypeSystem.class);
 
     /**
      * @param type
@@ -42,12 +46,16 @@ public class FilteringTypeSystem extends TypeSystemImpl {
                 if (!cae.getArguments()[0].equals("sofa")) {
                     throw new RuntimeException(cae);
                 }
+            } catch (Exception e) {
+                LOG.warn(
+                        "failed to add feature '{}' to type '{}': "
+                                + e.getMessage(), f, type);
             }
         }
     }
 
-    /*-
     // for debugging:
+    /*-
     public Type getType(String typeName) {
         System.err.println("Type:: " + typeName);
         return super.getType(typeName);

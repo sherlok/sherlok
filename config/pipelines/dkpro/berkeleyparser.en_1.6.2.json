@@ -2,7 +2,7 @@
   "description" : "Parses syntactic tree",
   "domain" : "dkpro",
   "language" : "en",
-  "loadOnStartup" : false,
+  "warmup" : false,
   "name" : "berkeleyparser.en",
   "output" : {
     "include_annotations" : [

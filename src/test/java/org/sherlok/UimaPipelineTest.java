@@ -15,13 +15,20 @@
  */
 package org.sherlok;
 
+import static org.junit.Assert.*;
 import static org.sherlok.mappings.PipelineDef.PipelineTest.Comparison.atLeast;
+import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.List;
+
 import org.junit.Test;
+import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
+import org.sherlok.mappings.PipelineDef.PipelineOutput;
 import org.sherlok.mappings.PipelineDef.TestAnnotation;
+import org.sherlok.utils.SherlokResult;
 import org.sherlok.utils.SherlokTests;
 import org.slf4j.Logger;
 
@@ -69,5 +76,32 @@ public class UimaPipelineTest {
                                 .addProperty("Governor", 137)
                                 .addProperty("DependencyType", "det")), result,
                 atLeast);
+    }
+
+    @Test
+    public void testFiltering() throws Exception {
+
+        List<String> scriptLines = list("ENGINE opennlp.segmenter.en:1.6.2;",//
+                "ENGINE opennlp.pos.en:1.6.2;");
+
+        PipelineDef pd = (PipelineDef) new PipelineDef()
+                .setScriptLines(scriptLines)
+                .setOutput(
+                        new PipelineOutput()
+                                .setAnnotationFilters(list("de.tudarmstadt.ukp.dkpro.core.api.metadata.type.TagDescription")))
+                .setName("testUseUimaEngines").setVersion("0.1");
+
+        UimaPipeline up = new PipelineLoader(new Controller().load()).load(pd);
+        String json = up.annotate("A sample sentence.");
+        LOG.debug(json);
+        SherlokResult result = SherlokResult.parse(json);
+
+        assertEquals("should have 1 sentence", 1, result.get("Sentence").size());
+        assertEquals("should have 4 tokens", 4, result.get("Token").size());
+        assertEquals("should have 1 article", 1, result.get("ART").size());
+        assertEquals("should have 2 nouns", 2, result.get("NN").size());
+        assertEquals("should have 1 punctuation", 1, result.get("PUNC").size());
+        assertEquals("should have no more TagDescription", 0,
+                result.get("TagDescription").size());
     }
 }

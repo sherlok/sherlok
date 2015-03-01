@@ -56,7 +56,6 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
-import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeDescription;
@@ -122,6 +121,11 @@ public class UimaPipeline {
         casPool = initCasPool(tsd);
         xcs = filterAnnots(pipelineDef.getOutput().getAnnotationIncludes(),
                 pipelineDef.getOutput().getAnnotationFilters(), casPool);
+
+        if (pipelineDef.isWarmup()) {
+            // ensures Ruta errors can be catched, at last
+            annotate("Some test text to check for Ruta script errors.");
+        }
     }
 
     static TypeSystemDescription reloadTSD() {
@@ -274,22 +278,23 @@ public class UimaPipeline {
     }
 
     public interface Annotate {
-        public Object annotate(JCas jCas, AnalysisEngine[] aes)
+        public Object annotate(CAS cas, AnalysisEngine[] aes)
                 throws AnalysisEngineProcessException;
     }
 
     /**
      * @param annotate
-     *            object, using visitor pattern
+     *            visitor pattern
+     * @return a payload, defined by 'annotate'
      */
-    public void annotate(Annotate annotate) throws UIMAException, SAXException,
-            ValidationException {
+    public Object annotate(Annotate annotate) throws UIMAException,
+            SAXException, ValidationException {
 
         CAS cas = null;
         try {
             // TODO how long to wait?
             cas = casPool.getCas(0);// cas.reset done by casPool
-            annotate.annotate(cas.getJCas(), aes);
+            return annotate.annotate(cas, aes);
         } finally {
             casPool.releaseCas(cas);
         }
@@ -299,7 +304,7 @@ public class UimaPipeline {
      * @param text
      *            the text to annotate
      */
-    public String annotate(String text) throws UIMAException, SAXException,
+    public String annotate(String text) throws UIMAException,
             ValidationException {
 
         CAS cas = null;
@@ -342,8 +347,8 @@ public class UimaPipeline {
             } else {
                 throw aepe;
             }
-        } catch (Exception e) {
-            throw e;
+        } catch (SAXException se) {
+            throw new ValidationException(se);
         } finally {
             casPool.releaseCas(cas);
         }

@@ -2,7 +2,7 @@
   "description" : "Parses syntactic tree",
   "domain" : "dkpro",
   "language" : "en",
-  "loadOnStartup" : false,
+  "warmup" : false,
   "name" : "maltparser.en",
   "output" : {
     "include_annotations" : [ "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency" ]

@@ -87,8 +87,8 @@ public abstract class Def {
     }
 
     public boolean validate(String msgName) throws ValidationException {
-        checkOnlyAlphanumDot(name, msgName);
-        checkOnlyAlphanumDot(version, msgName);
+        checkOnlyAlphanumDot(name, msgName + " 'name' ");
+        checkOnlyAlphanumDot(version, msgName + " 'version' ");
         return true;
     }
 

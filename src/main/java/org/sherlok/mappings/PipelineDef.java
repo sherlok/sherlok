@@ -59,12 +59,6 @@ public class PipelineDef extends Def {
     /** Which language this pipeline works for (ISO code). Defaults to 'en' */
     private String language = "en";
 
-    /**
-     * Whether this pipeline should be loaded on server startup. Defaults to
-     * false
-     */
-    private boolean loadOnStartup = false;
-
     /** The list of engine definitions */
     @JsonProperty("script")
     @JsonSerialize(using = ListSerializer.class)
@@ -74,6 +68,9 @@ public class PipelineDef extends Def {
 
     /** Embedded (integration) tests */
     private List<PipelineTest> tests = list();
+
+    /** Whether to run this pipeline when it is loaded. Defaults true */
+    private boolean warmup = true;
 
     /** Defines what kind of annotation this pipeline outputs */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -224,7 +221,7 @@ public class PipelineDef extends Def {
         }
 
         @Override
-        public boolean equals(Object o) { // TODO test on properties, too
+        public boolean equals(Object o) { // FIXME test on properties, too
             if (o instanceof TestAnnotation) {
                 TestAnnotation other = (TestAnnotation) o;
                 if (this.begin == other.begin && //
@@ -254,15 +251,6 @@ public class PipelineDef extends Def {
 
     public PipelineDef setLanguage(String language) {
         this.language = language;
-        return this;
-    }
-
-    public boolean isLoadOnStartup() {
-        return loadOnStartup;
-    }
-
-    public PipelineDef setLoadOnStartup(boolean loadOnStartup) {
-        this.loadOnStartup = loadOnStartup;
         return this;
     }
 
@@ -308,16 +296,27 @@ public class PipelineDef extends Def {
         return this;
     }
 
+    public boolean isWarmup() {
+        return warmup;
+    }
+
+    public void setWarmup(boolean warmup) {
+        this.warmup = warmup;
+    }
+
     // Utilities //////////////////////////////////////////////////////////////
 
-    public boolean validate(String pipelineObject) throws ValidationException {
-        super.validate(pipelineObject);
+    public boolean validate(String errorMsg) throws ValidationException {
+        super.validate(errorMsg);
         try {
             validateArgument(language != null, "'language' can not be null");
             validateArgument(language.length() > 0,
                     "'language' can not be empty");
-            validateArgument(domain.indexOf("..") == -1,
-                    "'domain' can not contain double dots: '" + domain + "'");
+            if (domain != null) {
+                validateArgument(domain.indexOf("..") == -1,
+                        "'domain' can not contain double dots: '" + domain
+                                + "'");
+            }
 
             // output
             validateArgument(
@@ -344,8 +343,7 @@ public class PipelineDef extends Def {
             }
 
         } catch (Throwable e) {
-            throw new ValidationException("" + pipelineObject + ": "
-                    + e.getMessage());
+            throw new ValidationException("" + errorMsg + ": " + e.getMessage());
         }
         return true;
     }
