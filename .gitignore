@@ -2,7 +2,7 @@
 local_repo
 config/resources/.pipelines/*
 config/resources/.engines/*
-
+config/resources/test/*
 
 # Maven          #
 ##################

@@ -16,15 +16,15 @@
 package org.sherlok;
 
 import static com.google.common.io.Files.createTempDir;
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.currentTimeMillis;
 import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.map;
-import static org.sherlok.utils.ValidationException.EXPECTED;
+import static org.sherlok.utils.ValidationException.ERR;
 import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
+import static org.sherlok.utils.ValidationException.EXPECTED;
 import static org.sherlok.utils.ValidationException.MSG;
 import static org.sherlok.utils.ValidationException.SYSTEM;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -37,12 +37,14 @@ import static spark.Spark.setIpAddress;
 import static spark.Spark.setPort;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
+import org.apache.commons.io.IOUtils;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
@@ -70,20 +72,18 @@ public class SherlokServer {
     private static Logger LOG = getLogger(SherlokServer.class);
 
     /** Route for annotating */
-    static final String ANNOTATE = "annotate";
+    public static final String ANNOTATE = "annotate";
     /** Route for testing */
-    static final String TEST = "test";
+    public static final String TEST = "test";
     /** Route and path for pipelines */
-    static final String PIPELINES = "pipelines";
+    public static final String PIPELINES = "pipelines";
     /** Route and path for bundles */
-    static final String BUNDLES = "bundles";
+    public static final String BUNDLES = "bundles";
     /** Route and path for Ruta resources */
-    static final String RUTA_RESOURCES = "resources";
+    public static final String RUTA_RESOURCES = "resources";
     /** Location for the temporary uploaded files */
     protected static final MultipartConfigElement RUTA_RESOURCES_UPLOAD_CONFIG = new MultipartConfigElement(
             createTempDir().getAbsolutePath());
-
-    static final String TEST_ONLY = "testonly";
 
     public static final int STATUS_OK = 200;
     public static final int STATUS_INVALID = 400;
@@ -107,17 +107,25 @@ public class SherlokServer {
     public static final String TEST_TEXT = "Using this calibration procedure, we find that mature granule cells (doublecortin-) contain approximately 40 microm, and newborn granule cells (doublecortin+) contain 0-20 microm calbindin-D28k. U.S. employers added the largest number of workers in nearly three years in October and wages increased, which could bring the Federal Reserve closer to raising interest rates. Nonfarm payrolls surged by 321,000 last month, the most since January of 2012, the Labor Department said on Friday. The unemployment rate held steady at a six-year low of 5.8 percent. Data for September and October were revised to show 44,000 more jobs created than previously reported. Economists polled by Reuters had forecast payrolls increasing by only 230,000 last month. November marked the 10th straight month that job growth has exceeded 200,000, the longest stretch since 1994, and further confirmed the economy is weathering slowdowns in China and the euro zone, as well as a recession in Japan.";
 
     /** Called at server startup. Registers all {@link Route}s */
-    public static PipelineLoader init(int port, String ip)
-            throws ValidationException {
+    public static PipelineLoader init(int port, String ip, String masterUrl,
+            boolean sealed) throws ValidationException {
 
-        final Controller controller = new Controller().load();
+        // CONFIG
+        // ////////////////////////////////////////////////////////////////////////////
+        final Controller controller;
+        if (masterUrl != null) { // slave
+            System.out.println("Starting in SLAVE mode (master url:'"
+                    + masterUrl + "'");
+            controller = new SlaveController(masterUrl).load();
+        } else if (sealed) { // sealed
+            controller = new SealedController().load();
+        } else { // master
+            controller = new Controller().load();
+        }
         final PipelineLoader pipelineLoader = new PipelineLoader(controller);
-
-        // config
         setPort(port);
         setIpAddress(ip);
-        // Static files. E.g. public/css/style.css available as
-        // http://{host}:{port}/css/style.css
+        // E.g. public/a/b.txt available as http://{host}:{port}/a/b.txt
         externalStaticFileLocation(PUBLIC);
         validatePluginsNames(PUBLIC);
 
@@ -268,26 +276,10 @@ public class SherlokServer {
             @Override
             public Object handle(Request req, Response resp) {
                 try {
-                    boolean testOnly = parseBoolean(req.queryParams(TEST_ONLY));
-                    if (testOnly) {
-                        // load
-                        PipelineDef parsedPipeline = FileBased
-                                .parsePipeline(req.body());
-                        UimaPipeline uimaPipeline = pipelineLoader
-                                .load(parsedPipeline);
-                        // test
-                        String test = TEST_TEXT;
-                        if (!parsedPipeline.getTests().isEmpty()) {
-                            test = parsedPipeline.getTests().get(0).getInput();
-                        }
-                        uimaPipeline.annotate(test);
-                        return "OK";
-                    } else {
-                        String newId = controller.putPipeline(req.body());
-                        pipelineLoader.removeFromCache(newId);
-                        resp.status(STATUS_OK);
-                        return newId;
-                    }
+                    String newId = controller.putPipeline(req.body());
+                    pipelineLoader.removeFromCache(newId);
+                    resp.status(STATUS_OK);
+                    return newId;
                 } catch (ValidationException ve) {
                     return invalid("PUT pipeline '" + req.body() + "'", ve,
                             resp);
@@ -392,32 +384,37 @@ public class SherlokServer {
                 }
             }
         });
-        get(new Route("/" + RUTA_RESOURCES + "/:path") { // GET
+        get(new Route("/" + RUTA_RESOURCES + "/*") { // GET
             @Override
             public Object handle(Request req, Response resp) {
-                String path = req.params(":path");
+                String path = req.splat()[0];
                 try {
-                    File f = FileBased.getResource(path);
+                    String name = path.contains("/") ? path.substring(
+                            path.lastIndexOf('/'), path.length()) : path;
                     resp.type("application/octet-stream");
                     resp.header("Content-Disposition",
-                            "attachment; filename=\"" + f.getName() + "\"");
-                    return f;
+                            "attachment; filename=\"" + name + "\"");
+                    InputStream is = controller.getResource(path);
+                    IOUtils.copy(is, resp.raw().getOutputStream());
+                    return "";
                 } catch (ValidationException ve) {
-                    return invalid("GET resource '" + path + "'", ve, resp);
+                    resp.status(STATUS_MISSING);
+                    resp.type(JSON);
+                    return ve.toJson();
                 } catch (Exception e) {
                     return error("GET resource '" + path + "'", e, resp);
                 }
             }
         });
-        put(new Route("/" + RUTA_RESOURCES + "/:path", JSON) { // PUT
+        put(new Route("/" + RUTA_RESOURCES + "/*", JSON) { // PUT
             @Override
             public Object handle(Request req, Response resp) {
                 try {
-                    String path = req.params(":path");
+                    String path = req.splat()[0];
                     req.raw().setAttribute("org.eclipse.multipartConfig",
                             RUTA_RESOURCES_UPLOAD_CONFIG);
                     Part part = req.raw().getPart("file");
-                    FileBased.putResource(path, part);
+                    controller.putResource(path, part);
                     resp.status(STATUS_OK);
                     return "OK";
                 } catch (ValidationException ve) {
@@ -428,6 +425,50 @@ public class SherlokServer {
                 }
             }
         });
+        delete(new Route("/" + RUTA_RESOURCES + "/*", JSON) { // DELETE
+            @Override
+            public Object handle(Request req, Response resp) {
+                try {
+                    String path = req.splat()[0];
+                    controller.deleteResource(path);
+                    resp.status(STATUS_OK);
+                    return "OK";
+                } catch (ValidationException ve) {
+                    return invalid("DELETE resource '" + req.body() + "'", ve,
+                            resp);
+                } catch (Exception e) {
+                    return error("DELETE '" + req.body(), e, resp);
+                }
+            }
+        });
+
+        // ROUTES: CATCHALLS
+        // ////////////////////////////////////////////////////////////////////////////
+        get(new JsonRoute("/*") { // GET
+            @Override
+            public Object handle(Request req, Response resp) {
+                resp.status(STATUS_MISSING);
+                resp.type(JSON);
+                return map(MSG, "not found", ERR, req.splat()[0]);
+            }
+        });
+        put(new Route("/*", JSON) { // PUT
+            @Override
+            public Object handle(Request req, Response resp) {
+                resp.status(STATUS_MISSING);
+                resp.type(JSON);
+                return map(MSG, "invalid PUT url", ERR, req.splat()[0]);
+            }
+        });
+        delete(new Route("/" + RUTA_RESOURCES + "/*", JSON) { // DELETE
+            @Override
+            public Object handle(Request req, Response resp) {
+                resp.status(STATUS_MISSING);
+                resp.type(JSON);
+                return map(MSG, "not found", ERR, req.splat()[0]);
+            }
+        });
+
         return pipelineLoader;
     }
 
@@ -578,11 +619,16 @@ public class SherlokServer {
         int port = DEFAULT_PORT;
         @Parameter(names = "-address", description = "Which ip address to use.")
         String address = DEFAULT_IP;
+        @Parameter(names = "-master-url", description = "Turns slave mode on. Specifies master URL")
+        String masterUrl = null;
+        @Parameter(names = "--sealed", description = "Turns sealed mode on.")
+        boolean sealed = false;
     }
 
     public static void main(String[] args) throws Exception {
         CliArguments argParser = new CliArguments();
         new JCommander(argParser, args);
-        init(argParser.port, argParser.address);
+        init(argParser.port, argParser.address, argParser.masterUrl,
+                argParser.sealed);
     }
 }

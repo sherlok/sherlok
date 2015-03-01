@@ -16,19 +16,17 @@
 package org.sherlok.utils;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.*;
+import static org.junit.Assume.assumeFalse;
 import static org.sherlok.FileBased.allPipelineDefs;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.sherlok.Controller;
-import org.sherlok.MethodNameLoggerWatcher;
 import org.sherlok.PipelineLoader;
 import org.sherlok.UimaPipeline;
+import org.sherlok.integration.MethodNameLoggerWatcher;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
 import org.sherlok.mappings.PipelineDef.TestAnnotation;
@@ -102,6 +100,7 @@ public class SherlokTestsTest {
         }
     }
 
+    // util to propose tests for pipline that have none
     @Test
     @Ignore
     public void testFillinPipelineTests() throws Exception {

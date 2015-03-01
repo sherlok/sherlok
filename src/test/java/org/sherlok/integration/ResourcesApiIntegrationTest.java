@@ -13,13 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sherlok;
+package org.sherlok.integration;
 
+import static com.google.common.io.Files.write;
+import static com.jayway.restassured.RestAssured.delete;
 import static com.jayway.restassured.RestAssured.get;
+import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.http.ContentType.JSON;
+import static java.io.File.createTempFile;
+import static java.nio.charset.Charset.defaultCharset;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.sherlok.SherlokServer.DEFAULT_IP;
-import static org.sherlok.SherlokServer.STATUS_OK;
+import static org.sherlok.SherlokServer.RUTA_RESOURCES;
+import static org.sherlok.SherlokServer.STATUS_MISSING;
+import static org.sherlok.SherlokServer.*;
+
+import java.io.File;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -27,6 +37,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.sherlok.SherlokServer;
 
 import spark.StopServer;
 
@@ -42,7 +53,7 @@ public class ResourcesApiIntegrationTest {
 
     static final int TEST_PORT = 9610;
     static final String API_URL = "http://localhost:" + TEST_PORT + "/"
-            + SherlokServer.RUTA_RESOURCES;
+            + RUTA_RESOURCES;
 
     @Rule
     public MethodNameLoggerWatcher mdlw = new MethodNameLoggerWatcher();
@@ -50,7 +61,7 @@ public class ResourcesApiIntegrationTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         Thread.sleep(250);
-        SherlokServer.init(TEST_PORT, DEFAULT_IP);
+        SherlokServer.init(TEST_PORT, DEFAULT_IP, null, false);
         Thread.sleep(250);
     }
 
@@ -69,11 +80,39 @@ public class ResourcesApiIntegrationTest {
 
     @Test
     public void test020GetResource() {
-        get(API_URL + "/countries.txt").then().log().everything()//
-                .contentType("application/octet-stream").statusCode(STATUS_OK);
-        // TODO more assertions
+        get(API_URL + "/countries.txt").then().log().everything()
+                .contentType("application/octet-stream").statusCode(STATUS_OK)
+                .body(containsString("Afghanistan"));
     }
 
-    // TODO more tests
+    final static String path = "/test/test030PutResource.txt";
 
+    @Test
+    public void test030PutTestResource() throws Exception {
+
+        File tmpFile = createTempFile("test030PutResource", "txt");
+        write("hello world", tmpFile, defaultCharset());
+
+        given().multiPart(tmpFile)//
+                .when().put(API_URL + path)//
+                .then().log().everything().statusCode(STATUS_OK);
+    }
+
+    @Test
+    public void test031GetTestResource() throws Exception {
+        get(API_URL + path).then().log().everything().statusCode(STATUS_OK)
+                .body(equalTo("hello world"));
+    }
+
+    @Test
+    public void test032DeleteResource() throws Exception {
+        delete(API_URL + path)//
+                .then().log().everything().statusCode(STATUS_OK);
+    }
+
+    @Test
+    public void test033ResourceShouldBeGone() throws Exception {
+        get(API_URL + path).then().log().everything()
+                .statusCode(STATUS_MISSING);
+    }
 }

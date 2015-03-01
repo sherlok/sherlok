@@ -15,11 +15,9 @@
  */
 package org.sherlok;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -31,7 +29,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.utils.ValidationException;
 
-import com.google.common.io.Files;
+import spark.utils.IOUtils;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileBasedTest {
@@ -96,8 +94,9 @@ public class FileBasedTest {
 
     @Test
     public void test03_GetFile() throws Exception {
-        File f = FileBased.getResource("test/" + uploadFile);
-        assertEquals("a test file\n", Files.toString(f, UTF_8));
+        InputStream is = FileBased.getResource("test/" + uploadFile);
+        String txt = IOUtils.toString(is);
+        assertEquals("a test file\n", txt);
     }
 
     @Test

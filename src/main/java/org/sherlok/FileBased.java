@@ -21,11 +21,15 @@ import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
+import static org.sherlok.utils.ValidationException.ERR;
+import static org.sherlok.utils.ValidationException.MSG;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Iterator;
@@ -64,13 +68,14 @@ public class FileBased {
 
     private static final String CONFIG_DIR_PATH = "config/";
 
-    static final String TYPES_PATH = CONFIG_DIR_PATH + "types/";
-    static final String BUNDLES_PATH = CONFIG_DIR_PATH + "bundles/";
-    static final String PIPELINES_PATH = CONFIG_DIR_PATH + "pipelines/";
-    static final String RUTA_RESOURCES_PATH = CONFIG_DIR_PATH + "resources/";
-    static final String RUTA_PIPELINE_CACHE_PATH = RUTA_RESOURCES_PATH
+    public static final String TYPES_PATH = CONFIG_DIR_PATH + "types/";
+    public static final String BUNDLES_PATH = CONFIG_DIR_PATH + "bundles/";
+    public static final String PIPELINES_PATH = CONFIG_DIR_PATH + "pipelines/";
+    public static final String RUTA_RESOURCES_PATH = CONFIG_DIR_PATH
+            + "resources/";
+    public static final String RUTA_PIPELINE_CACHE_PATH = RUTA_RESOURCES_PATH
             + ".pipelines/";
-    static final String RUTA_ENGINE_CACHE_PATH = RUTA_RESOURCES_PATH
+    public static final String RUTA_ENGINE_CACHE_PATH = RUTA_RESOURCES_PATH
             + ".engines/";
 
     /** 50Mb, in bytes */
@@ -325,10 +330,14 @@ public class FileBased {
     }
 
     /** @return this resource's {@link File} */
-    static File getResource(String path) throws ValidationException {
+    static InputStream getResource(String path) throws ValidationException {
         File file = new File(RUTA_RESOURCES_PATH, path);
         validateArgument(file.exists(), "could not find file '" + path + "'");
-        return file;
+        try {
+            return new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new ValidationException(map(MSG, "file not found", ERR, path));
+        }
     }
 
     /** Util to read and rewrite all {@link Def}s */

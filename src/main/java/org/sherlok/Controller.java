@@ -19,9 +19,12 @@ import static org.sherlok.utils.CheckThat.validateId;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.http.Part;
 
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.BundleDef.EngineDef;
@@ -29,14 +32,35 @@ import org.sherlok.mappings.PipelineDef;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
+/**
+ * Controller that CRUD's {@link PipelineDef} and {@link BundleDef} from disk
+ * (using {@link FileBased}).
+ * 
+ * @author renaud@apache.org
+ */
 public class Controller {
-    private static final Logger LOG = getLogger(Controller.class);
+    protected static final Logger LOG = getLogger(Controller.class);
 
-    private Map<String, BundleDef> bundleDefs;
-    private Map<String, EngineDef> engineDefs;
-    private Map<String, PipelineDef> pipelineDefs;
+    protected Map<String, BundleDef> bundleDefs;
+    protected Map<String, EngineDef> engineDefs;
+    protected Map<String, PipelineDef> pipelineDefs;
 
+    /** Loads {@link BundleDef}s and {@link PipelineDef}s from config/ folder */
     public Controller load() throws ValidationException {
+
+        Controller c = _load(FileBased.allBundleDefs(),
+                FileBased.allPipelineDefs());
+
+        LOG.debug(
+                "Done loading from local File store: {} bundles, {} engines, {} pipelines",
+                new Object[] { bundleDefs.size(), engineDefs.size(),
+                        pipelineDefs.size() });
+        return c;
+    }
+
+    /** Loads bundles and pipelines into this controller */
+    protected Controller _load(Collection<BundleDef> bundles,
+            Collection<PipelineDef> pipelines) throws ValidationException {
 
         // BUNDLES AND ENGINES
         bundleDefs = map(); // reinit
@@ -89,10 +113,6 @@ public class Controller {
             }
         }
 
-        LOG.debug(
-                "Done loading from Store: {} bundles, {} engines, {} pipelines",
-                new Object[] { bundleDefs.size(), engineDefs.size(),
-                        pipelineDefs.size() });
         return this;
     }
 
@@ -100,7 +120,6 @@ public class Controller {
     // access API, package visibility
 
     // LIST all /////////////////////////////////////////////////////////////
-
     Collection<BundleDef> listBundles() {
         return bundleDefs.values();
     }
@@ -123,7 +142,6 @@ public class Controller {
     }
 
     // GET by name /////////////////////////////////////////////////////////
-
     BundleDef getBundleDef(String bundleId) {
         return bundleDefs.get(bundleId);
     }
@@ -136,17 +154,27 @@ public class Controller {
         return pipelineDefs.get(pipelineId);
     }
 
+    InputStream getResource(String path) throws ValidationException {
+        return FileBased.getResource(path);
+    }
+
     // PUT /////////////////////////////////////////////////////////////
+    /** @return the put'ed {@link BundleDef}'s id */
     String putBundle(String bundleStr) throws ValidationException {
         BundleDef newBundle = FileBased.putBundle(bundleStr);
         bundleDefs.put(newBundle.getId(), newBundle);
         return newBundle.getId();
     }
 
+    /** @return the put'ed {@link PipelineDef}'s id */
     String putPipeline(String pipelineStr) throws ValidationException {
         PipelineDef newPipeline = FileBased.putPipeline(pipelineStr);
         pipelineDefs.put(newPipeline.getId(), newPipeline);
         return newPipeline.getId();
+    }
+
+    void putResource(String path, Part part) throws ValidationException {
+        FileBased.putResource(path, part);
     }
 
     // DELETE /////////////////////////////////////////////////////////////
@@ -166,4 +194,9 @@ public class Controller {
         FileBased.deletePipeline(pipelineId, domain);
         pipelineDefs.remove(pipelineId);
     }
+
+    void deleteResource(String path) throws ValidationException {
+        FileBased.deleteResource(path);
+    }
+
 }

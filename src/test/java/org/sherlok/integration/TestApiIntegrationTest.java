@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sherlok;
+package org.sherlok.integration;
 
 import static com.jayway.restassured.RestAssured.get;
 import static com.jayway.restassured.RestAssured.given;
@@ -34,6 +34,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.sherlok.FileBased;
+import org.sherlok.SherlokServer;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
 import org.sherlok.mappings.PipelineDef.TestAnnotation;
@@ -59,7 +61,7 @@ public class TestApiIntegrationTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         Thread.sleep(250);
-        SherlokServer.init(TEST_PORT, DEFAULT_IP);
+        SherlokServer.init(TEST_PORT, DEFAULT_IP, null, false);
         Thread.sleep(250);
     }
 

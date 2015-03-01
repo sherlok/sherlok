@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sherlok;
+package org.sherlok.integration;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.when;
 import static com.jayway.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.sherlok.PipelineLoaderIntegrationTest.TEST_TEXT;
 import static org.sherlok.SherlokServer.ANNOTATE;
 import static org.sherlok.SherlokServer.DEFAULT_IP;
 import static org.sherlok.SherlokServer.STATUS_INVALID;
 import static org.sherlok.SherlokServer.STATUS_OK;
+import static org.sherlok.integration.PipelineLoaderIntegrationTest.TEST_TEXT;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -32,6 +32,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.sherlok.SherlokServer;
 
 import spark.StopServer;
 
@@ -57,7 +58,7 @@ public class AnnotationApiIntegrationTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         Thread.sleep(250);
-        SherlokServer.init(TEST_PORT, DEFAULT_IP);
+        SherlokServer.init(TEST_PORT, DEFAULT_IP, null, false);
         Thread.sleep(250);
     }
 

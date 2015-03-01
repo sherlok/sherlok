@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sherlok;
+package org.sherlok.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -22,6 +22,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.sherlok.Controller;
+import org.sherlok.PipelineLoader;
+import org.sherlok.UimaPipeline;
 import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
 import org.sherlok.mappings.PipelineDef.TestAnnotation;
 import org.sherlok.utils.SherlokTests;

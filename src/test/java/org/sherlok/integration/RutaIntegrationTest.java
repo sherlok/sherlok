@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sherlok;
+package org.sherlok.integration;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.http.ContentType.JSON;
@@ -26,6 +26,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.sherlok.SherlokServer;
 
 import spark.StopServer;
 
@@ -47,7 +48,7 @@ public class RutaIntegrationTest {
     // @BeforeClass
     public static void beforeClass() throws Exception {
         Thread.sleep(250);
-        SherlokServer.init(TEST_PORT, DEFAULT_IP);
+        SherlokServer.init(TEST_PORT, DEFAULT_IP, null, false);
         Thread.sleep(250);
     }
 

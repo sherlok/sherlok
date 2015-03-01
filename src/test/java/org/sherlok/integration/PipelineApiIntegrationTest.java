@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sherlok;
+package org.sherlok.integration;
 
 import static com.jayway.restassured.RestAssured.get;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.when;
 import static com.jayway.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.sherlok.SherlokServer.DEFAULT_IP;
 import static org.sherlok.SherlokServer.PIPELINES;
 import static org.sherlok.SherlokServer.STATUS_INVALID;
-import static org.sherlok.SherlokServer.STATUS_MISSING;
 import static org.sherlok.SherlokServer.STATUS_OK;
 
 import org.junit.AfterClass;
@@ -32,6 +32,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.sherlok.FileBased;
+import org.sherlok.SherlokServer;
 import org.sherlok.mappings.PipelineDef;
 
 import spark.StopServer;
@@ -58,7 +60,7 @@ public class PipelineApiIntegrationTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         Thread.sleep(250);
-        SherlokServer.init(TEST_PORT, DEFAULT_IP);
+        SherlokServer.init(TEST_PORT, DEFAULT_IP, null, false);
         Thread.sleep(250);
     }
 
@@ -105,45 +107,6 @@ public class PipelineApiIntegrationTest {
         given().content(FileBased.writeAsString(p))//
                 .when().put(API_URL)//
                 .then().log().everything().statusCode(STATUS_OK);
-    }
-
-    @Test
-    /** Let's put a new test pipeline for TEST_ONLY */
-    public void test031PutPipelineTestOnly() throws JsonProcessingException {
-
-        String name = PipelineApiIntegrationTest.class.getSimpleName()
-                + "_test";
-        PipelineDef pd = (PipelineDef) new PipelineDef().addScriptLine(
-                "DECLARE Dog;").setDomain("test");
-        pd.setName(name);
-        pd.setVersion("1");
-        String pdJson = FileBased.writeAsString(pd);
-
-        given().content(pdJson).when()
-                .put(API_URL + "?" + SherlokServer.TEST_ONLY + "=true")//
-                .then().log().everything().statusCode(STATUS_OK);
-
-        // pipeline should not be here, since PUT was TEST_ONLY
-        get(API_URL + PIPELINES + "/" + name + "/" + 1).then().log()
-                .everything().statusCode(STATUS_MISSING);
-    }
-
-    @Test
-    /** Let's put a FAULTY test pipeline for test */
-    public void test032PutFaultyPipelineTestOnly()
-            throws JsonProcessingException {
-
-        String name = PipelineApiIntegrationTest.class.getSimpleName()
-                + "_test_faulty";
-        PipelineDef pd = (PipelineDef) new PipelineDef().addScriptLine(
-                "DECL_wrong_ARE Dog;").setDomain("test");
-        pd.setName(name);
-        pd.setVersion("1");
-        String pdJson = FileBased.writeAsString(pd);
-
-        given().content(pdJson).when()
-                .put(API_URL + "?" + SherlokServer.TEST_ONLY + "=true")//
-                .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test

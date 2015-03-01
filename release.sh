@@ -14,14 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 #################################
 #   Bash script to create a     #
 #   standalone Sherlok release  #
 #################################
 
-#MAVEN="mvn -Dmaven.test.skip=true"
-MAVEN="mvn clean test"
+MAVEN="mvn -Dmaven.test.skip=true"
+#MAVEN="mvn clean test"
 
 # create release directory
 RELEASE=sherlok_`date +"%Y%m%d"`
