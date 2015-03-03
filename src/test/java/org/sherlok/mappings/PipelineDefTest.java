@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.sherlok.FileBased;
 import org.sherlok.mappings.PipelineDef.PipelineOutput;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
-import org.sherlok.mappings.PipelineDef.TestAnnotation;
 import org.sherlok.utils.ValidationException;
 
 public class PipelineDefTest {
@@ -38,7 +37,7 @@ public class PipelineDefTest {
         PipelineDef p = (PipelineDef) new PipelineDef()
                 .addTests(
                         new PipelineTest().setInput("mytest").setExpected(
-                                map("1", new TestAnnotation().setBegin(1)
+                                map("1", new Annotation().setBegin(1)
                                         .setEnd(2).setType("myType")
                                         .addProperty("myprop", "myValue"))))
                 .addScriptLine("ENGINE opennlp.segmenter.en:1.6.2")
@@ -71,9 +70,9 @@ public class PipelineDefTest {
         assertEquals(1, tests.size());
         PipelineTest test = tests.get(0);
         assertTrue(test.getInput().startsWith("mytest"));
-        Map<String, TestAnnotation> outs = test.getExpected();
+        Map<String, Annotation> outs = test.getExpected();
         assertEquals(1, outs.size());
-        TestAnnotation ta = outs.values().iterator().next();
+        Annotation ta = outs.values().iterator().next();
         assertEquals(1, ta.getBegin());
         assertEquals("myType", ta.getType());
     }

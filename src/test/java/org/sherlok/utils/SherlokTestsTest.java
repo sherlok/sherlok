@@ -27,9 +27,9 @@ import org.sherlok.Controller;
 import org.sherlok.PipelineLoader;
 import org.sherlok.UimaPipeline;
 import org.sherlok.integration.MethodNameLoggerWatcher;
+import org.sherlok.mappings.Annotation;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
-import org.sherlok.mappings.PipelineDef.TestAnnotation;
 import org.slf4j.Logger;
 
 public class SherlokTestsTest {
@@ -39,8 +39,8 @@ public class SherlokTestsTest {
     public MethodNameLoggerWatcher mdlw = new MethodNameLoggerWatcher();
 
     @Test
-    public void testParseTestAnnotation() throws Exception {
-        TestAnnotation a = SherlokTests
+    public void testParseAnnotation() throws Exception {
+        Annotation a = SherlokTests
                 .parse("{\"@type\" : \"Layer\",  \"sofa\" : 1, \"end\" : 21,  \"ontologyId\" : \"HBP_NEUROTRANSMITTER:0000003\" }");
         assertEquals("Layer", a.getType());
         assertEquals(0, a.getBegin());

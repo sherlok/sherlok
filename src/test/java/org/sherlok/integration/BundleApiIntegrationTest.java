@@ -81,14 +81,14 @@ public class BundleApiIntegrationTest {
 
     @Test
     public void test020GetBundle() {
-        get(API_URL + "/dkpro.opennlp.en/1.6.2")
+        get(API_URL + "/dkpro.opennlp.en/1.7.0")
                 .then()
                 .log()
                 .everything()
                 .statusCode(STATUS_OK)
                 .contentType(JSON)
                 .body("name", equalTo("dkpro.opennlp.en"))
-                .body("version", equalTo("1.6.2"))
+                .body("version", equalTo("1.7.0"))
                 .body("repositories.dkpro",
                         equalTo("http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"));
     }
@@ -99,7 +99,7 @@ public class BundleApiIntegrationTest {
         BundleDef e = new BundleDef()
                 .addDependency(new BundleDependency(
                         mvn,
-                        "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.6.2"));
+                        "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"));
         e.setName("test");
         e.setVersion("172");
 
@@ -137,7 +137,7 @@ public class BundleApiIntegrationTest {
                 .body("version", equalTo("172"))
                 .body("dependencies[0].type", equalTo("mvn"))
                 .body("dependencies[0].value",
-                        equalTo("de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.6.2"));
+                        equalTo("de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"));
     }
 
     @Test

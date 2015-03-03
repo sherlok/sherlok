@@ -15,6 +15,7 @@
  */
 package org.sherlok.mappings;
 
+import static java.lang.Character.isLetterOrDigit;
 import static java.util.regex.Pattern.compile;
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
 import static org.sherlok.utils.CheckThat.validateArgument;
@@ -151,6 +152,13 @@ public class BundleDef extends Def {
 
         @JsonIgnore
         public void validate() throws ValidationException {
+
+            validateArgument(isLetterOrDigit(value.charAt(0)),
+                    "'value' should start with a letter or a digit, but was '"
+                            + value + "'");
+            validateArgument(value.split(SEPARATOR).length == 3,
+                    "'value' should contain exactly 3 columns (':'), but was '"
+                            + value + "'");
             validateArgument(
                     VALIDATE_ID.matcher(getGroupId()).matches(),
                     "invalid group id '" + getGroupId() + "' for bundle "

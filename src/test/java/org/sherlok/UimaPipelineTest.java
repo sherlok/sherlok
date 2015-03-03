@@ -15,7 +15,7 @@
  */
 package org.sherlok;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.sherlok.mappings.PipelineDef.PipelineTest.Comparison.atLeast;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
@@ -24,11 +24,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 import java.util.List;
 
 import org.junit.Test;
+import org.sherlok.mappings.Annotation;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
 import org.sherlok.mappings.PipelineDef.PipelineOutput;
-import org.sherlok.mappings.PipelineDef.TestAnnotation;
-import org.sherlok.utils.SherlokResult;
+import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
+import org.sherlok.mappings.SherlokResult;
 import org.sherlok.utils.SherlokTests;
 import org.slf4j.Logger;
 
@@ -40,12 +40,25 @@ public class UimaPipelineTest {
 
         UimaPipeline pipeline = new PipelineLoader(new Controller().load())
                 .resolvePipeline("01.ruta.annotate.dog", null);
-        String result = pipeline.annotate("dog");
-        LOG.debug(result);
+        String json = pipeline.annotate("dog");
+        LOG.debug(json);
         SherlokTests.assertEquals(
                 map("1",
-                        new TestAnnotation().setBegin(0).setEnd(3)
-                                .setType("Dog")), result, Comparison.exact);
+                        new Annotation().setBegin(0).setEnd(3)
+                                .setType("Dog")), json, Comparison.exact);
+    }
+
+    @Test
+    public void testLangdetect() throws Exception {
+
+        UimaPipeline pipeline = new PipelineLoader(new Controller().load())
+                .resolvePipeline("langdetect", null);
+
+        String json = pipeline.annotate("C'est vraiment chouette comme truc.");
+        
+        List<Annotation> doc = SherlokResult.parse(json).get(
+                "DocumentAnnotation");
+        assertEquals("fr", doc.get(0).getProperties().get("language"));
     }
 
     @Test
@@ -53,12 +66,12 @@ public class UimaPipelineTest {
 
         UimaPipeline pipeline = new PipelineLoader(new Controller().load())
                 .resolvePipeline("02.ruta.annotate.countries", null);
-        String result = (pipeline.annotate("Switzerland"));
-        LOG.debug(result);
+        String json = (pipeline.annotate("Switzerland"));
+        LOG.debug(json);
         SherlokTests.assertEquals(
                 map("1",
-                        new TestAnnotation().setBegin(0).setEnd(11)
-                                .setType("Country")), result, Comparison.exact);
+                        new Annotation().setBegin(0).setEnd(11)
+                                .setType("Country")), json, Comparison.exact);
     }
 
     @Test
@@ -66,23 +79,23 @@ public class UimaPipelineTest {
 
         UimaPipeline pipeline = new PipelineLoader(new Controller().load())
                 .resolvePipeline("maltparser.en", null);
-        String result = (pipeline.annotate("The dog walks on the lake."));
-        LOG.debug(result);
+        String json = (pipeline.annotate("The dog walks on the lake."));
+        LOG.debug(json);
         SherlokTests.assertEquals(
                 map("678",
-                        new TestAnnotation().setBegin(0).setEnd(3)
+                        new Annotation().setBegin(0).setEnd(3)
                                 .setType("Dependency")
                                 .addProperty("Dependent", 129)
                                 .addProperty("Governor", 137)
-                                .addProperty("DependencyType", "det")), result,
+                                .addProperty("DependencyType", "det")), json,
                 atLeast);
     }
 
     @Test
     public void testFiltering() throws Exception {
 
-        List<String> scriptLines = list("ENGINE opennlp.segmenter.en:1.6.2;",//
-                "ENGINE opennlp.pos.en:1.6.2;");
+        List<String> scriptLines = list("ENGINE opennlp.segmenter.en:1.7.0;",//
+                "ENGINE opennlp.pos.en:1.7.0;");
 
         PipelineDef pd = (PipelineDef) new PipelineDef()
                 .setScriptLines(scriptLines)

@@ -45,10 +45,10 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
+import org.sherlok.mappings.Annotation;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
-import org.sherlok.mappings.PipelineDef.TestAnnotation;
 import org.sherlok.utils.Create;
 import org.sherlok.utils.SherlokTests;
 import org.sherlok.utils.ValidationException;
@@ -161,7 +161,7 @@ public class SherlokServer {
                         try {
                             String systemStr = uimaPipeline.annotate(test
                                     .getInput());
-                            Map<Integer, TestAnnotation> system = SherlokTests
+                            Map<Integer, Annotation> system = SherlokTests
                                     .assertEquals(test.getExpected(),
                                             systemStr, test.getComparison());
                             passed.put(

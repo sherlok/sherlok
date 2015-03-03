@@ -84,16 +84,16 @@ public class PipelineApiIntegrationTest {
 
     @Test
     public void test020GetPipeline() {
-        get(API_URL + "/opennlp.ners.en/1.6.2")
+        get(API_URL + "/opennlp.ners.en/1.7.0")
                 .then()
                 .log()
                 .everything()
                 .statusCode(STATUS_OK)
                 .contentType(JSON)
                 .body("name", equalTo("opennlp.ners.en"))
-                .body("version", equalTo("1.6.2"))
+                .body("version", equalTo("1.7.0"))
                 .body("script[0]",
-                        equalTo("ENGINE opennlp.segmenter.en:1.6.2;"));
+                        equalTo("ENGINE opennlp.segmenter.en:1.7.0;"));
     }
 
     @Test

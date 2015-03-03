@@ -25,11 +25,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.utils.SherlokResult;
+import org.sherlok.mappings.SherlokResult;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//TODO xLATER use faster test engines than opennlp
 public class RutaTests {
     private static final Logger LOG = LoggerFactory.getLogger(RutaTests.class);
 
@@ -66,7 +67,7 @@ public class RutaTests {
     public void testUimaEngineThenRuta() throws Exception {
 
         List<String> scriptLines = list(
-                "ENGINE opennlp.segmenter.en:1.6.2;",//
+                "ENGINE opennlp.segmenter.en:1.7.0;",//
                 "WORDLIST CountriesList = 'countries.txt';",//
                 "DECLARE Country;",//
                 "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence{-> MARKFAST(Country, CountriesList)};");
@@ -88,7 +89,7 @@ public class RutaTests {
     public void testUimaEngineThenRuta2() throws Exception {
 
         List<String> scriptLines = list(
-                "ENGINE opennlp.segmenter.en:1.6.2;",//
+                "ENGINE opennlp.segmenter.en:1.7.0;",//
                 "DECLARE MySentence;",//
                 "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence{-> MARK(MySentence)};");
 
@@ -115,7 +116,7 @@ public class RutaTests {
                 "\"A\" -> de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;",//
                 "\"sample\" -> de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;",//
                 "\"sentence\" -> de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;",//
-                "ENGINE opennlp.pos.en:1.6.2;");
+                "ENGINE opennlp.pos.en:1.7.0;");
 
         PipelineDef pd = (PipelineDef) new PipelineDef()
                 .setScriptLines(scriptLines).setName("testRutaThenUimaEngines")

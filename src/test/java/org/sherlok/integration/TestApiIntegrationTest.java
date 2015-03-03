@@ -36,9 +36,9 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.FileBased;
 import org.sherlok.SherlokServer;
+import org.sherlok.mappings.Annotation;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
-import org.sherlok.mappings.PipelineDef.TestAnnotation;
 
 import spark.StopServer;
 
@@ -93,7 +93,7 @@ public class TestApiIntegrationTest {
         List<PipelineTest> tests = pipeline.getTests();
         tests.add(new PipelineTest().setInput("another dog").setExpected(
                 map("1",
-                        new TestAnnotation().setBegin(8).setEnd(11)
+                        new Annotation().setBegin(8).setEnd(11)
                                 .setType("Dog"))));
         given().content(FileBased.writeAsString(pipeline))//
                 .when().post(API_URL)//
@@ -102,7 +102,7 @@ public class TestApiIntegrationTest {
         // adding a faulty test makes it fail
         tests.add(new PipelineTest().setInput("a cat").setExpected(
                 map("1",
-                        new TestAnnotation().setBegin(1).setEnd(2)
+                        new Annotation().setBegin(1).setEnd(2)
                                 .setType("Cat"))));
         given().content(FileBased.writeAsString(pipeline))//
                 .when().post(API_URL)//

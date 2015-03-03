@@ -64,7 +64,7 @@ public class BundleCreator {
 
     public static void main(String[] args) throws Exception {
 
-        BundleDef b1 = new BundleDef();
+        BundleDef b1 = (BundleDef) new BundleDef().setName("myname").setVersion("myversion");
         // b1.addRepository(
         // "dkpro",
         // "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/");
@@ -73,15 +73,16 @@ public class BundleCreator {
         // Mallet Sherlok
         // "org.sherlok:sherlok_mallet:0.0.1-SNAPSHOT"
                 // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"));
-                // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.6.2"));
+                // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"));
 
                 // Mallet LDA
                 // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.mallet-asl:1.7.0"
 
                 // MST parser
-                "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.mstparser-asl:1.7.0"
+                //"de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.mstparser-asl:1.7.0"
 
-        //
+                // langdetect
+        "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.langdetect-asl:1.7.0"
         ));
         Set<BundleDef> bundleDefs = set(b1);
 
@@ -104,6 +105,7 @@ public class BundleCreator {
                         AetherResolver.LOCAL_REPO_PATH);
         Map<String, String> repositoriesDefs = map();
         for (BundleDef b : bundleDefs) {
+            b.validate(b.getId());
             for (Entry<String, String> id_url : b.getRepositories().entrySet()) {
                 repositoriesDefs.put(id_url.getKey(), id_url.getValue());
             }

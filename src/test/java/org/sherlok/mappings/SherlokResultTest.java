@@ -1,13 +1,13 @@
-package org.sherlok.utils;
+package org.sherlok.mappings;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.sherlok.mappings.PipelineDef.TestAnnotation;
 
 public class SherlokResultTest {
 
@@ -19,11 +19,10 @@ public class SherlokResultTest {
 
         SherlokResult result = SherlokResult.parse(json);
 
-        Map<Integer, TestAnnotation> annotations = result.getAnnotations();
+        Map<Integer, Annotation> annotations = result.getAnnotations();
         assertEquals(9, annotations.size());
 
-        Map<Integer, TestAnnotation> sentences = result
-                .get("Sentence");
+        List<Annotation> sentences = result.get("Sentence");
         assertEquals(1, sentences.size());
 
         assertEquals(0, result.get("bogus").size());

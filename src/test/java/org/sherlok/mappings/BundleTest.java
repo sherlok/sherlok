@@ -35,23 +35,9 @@ public class BundleTest {
                                 mvn,
                                 "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.6.2"))
                 .addDependency(
-                        new BundleDependency(mvn,
-                                "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-asl:1.6.2"))
-                .addDependency(
-                        new BundleDependency(mvn,
-                                "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-asl:1.6.2"))
-                .addDependency(
-                        new BundleDependency(
-                                mvn,
-                                "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-person:20130624.1"))
-                .addDependency(
                         new BundleDependency(
                                 mvn,
                                 "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-organization:20100907.0"))
-                .addDependency(
-                        new BundleDependency(
-                                mvn,
-                                "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-location:20100907.0"))
                 .addRepository(
                         "dkpro",
                         "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/");

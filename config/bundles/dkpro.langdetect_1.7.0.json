@@ -1,0 +1,31 @@
+{
+  "name" : "dkpro.langdetect",
+  "version" : "1.7.0",
+  "domain" : "dkpro",
+  "dependencies" : [ {
+    "type" : "mvn",
+    "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.langdetect-asl:1.7.0"
+  },{
+    "type" : "mvn",
+    "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.langdetect-model-languageidentifier-any-wikipedia:20141013.1"
+  },{
+    "type" : "mvn",
+    "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.langdetect-model-languageidentifier-any-socialmedia:20141013.1"
+  } ],
+  "repositories" : {
+    "dkpro" : "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"
+  },
+  "engines" : [ {
+    "name" : "languageidentifier",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.langdetect.LangDetectLanguageIdentifier",
+    "parameters" : {
+      "modelVariant" : "wikipedia"
+    }
+  }, {
+    "name" : "languageidentifier.socialmedia",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.langdetect.LangDetectLanguageIdentifier",
+    "parameters" : {
+      "modelVariant" : "socialmedia"
+    }
+  } ]
+}

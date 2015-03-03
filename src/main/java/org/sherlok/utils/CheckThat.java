@@ -17,6 +17,9 @@ package org.sherlok.utils;
 
 import static java.util.regex.Pattern.compile;
 import static org.sherlok.mappings.Def.SEPARATOR;
+import static org.sherlok.utils.Create.map;
+import static org.sherlok.utils.ValidationException.ERR;
+import static org.sherlok.utils.ValidationException.MSG;
 
 import java.util.regex.Pattern;
 
@@ -62,7 +65,7 @@ public class CheckThat {
                     + "' should have the format"//
                     + " {name}:{version}, but no column was found.");
 
-        } else if (id.split(SEPARATOR).length !=2) {
+        } else if (id.split(SEPARATOR).length != 2) {
             throw new ValidationException(context + ": '" + id
                     + "' should have the format"//
                     + " {name}:{version}, but more than one column was found.");
@@ -76,7 +79,7 @@ public class CheckThat {
     public static <T> T validateNotNull(T reference, String errorMessage)
             throws ValidationException {
         if (reference == null) {
-            throw new ValidationException(errorMessage);
+            throw new ValidationException(map(MSG, errorMessage));
         }
         return reference;
     }

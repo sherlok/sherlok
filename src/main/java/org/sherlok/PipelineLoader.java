@@ -26,6 +26,8 @@ import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.Create.set;
+import static org.sherlok.utils.ValidationException.ERR;
+import static org.sherlok.utils.ValidationException.MSG;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
@@ -146,7 +148,8 @@ public class PipelineLoader {
         Set<BundleDef> bundleDefs = set();
         for (String pengineId : pipelineDef.getEnginesFromScript()) {
             EngineDef en = controller.getEngineDef(pengineId);
-            validateNotNull(en, "could not find " + pengineId);
+            validateNotNull(en, "could not find engine '" + pengineId + "' as defined in pipeline '"
+                    + pipelineDef.getId() + "'");
             engineDefs.add(en);
             BundleDef b = en.getBundle();
             LOG.trace("adding engineDef '{}' with bundleDef '{}'", en, b);
@@ -160,7 +163,8 @@ public class PipelineLoader {
             solveDependencies(bundleDefs, pipelineDef.getName(),
                     pipelineDef.getVersion(), engineDefs.size());
         } catch (ArtifactResolutionException e) {
-            throw new ValidationException(e.getMessage(), e);
+            throw new ValidationException(map(MSG, "Failed to load pipeline: "
+                    + e.getMessage(), ERR, pipelineDef.getId()));
         } catch (DependencyCollectionException e) {
             throw new ValidationException("could not collect dependency: "
                     + e.getMessage(), e);

@@ -32,6 +32,7 @@
 * [date parser](http://natty.joestelmach.com/try.jsp)
 * [watson concept insights](http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/doc/concept-insights/)
 * [CLAVIN (Cartographic Location And Vicinity INdexer) open source software package for document geotagging and geoparsing](http://clavin.bericotechnologies.com/)
+
 # DONE
 
 * P3 order of pipelines in right col
@@ -49,6 +50,7 @@ Sentiment:
 * Joshua translation http://joshua-decoder.org/
 * Medex: https://code.google.com/p/medex-uima/
 * Textual Entailment: http://hltfbk.github.io/Excitement-Open-Platform/
+* DkPro WSD https://code.google.com/p/dkpro-wsd/
 
 DkPro
 

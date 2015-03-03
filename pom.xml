@@ -2,14 +2,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.sherlok</groupId>
+  <groupId>io.sherlok</groupId>
   <artifactId>sherlok_core</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1-SNAPSHOT</version>
 
-  <organization>
-    <name>Sherlok</name>
-    <url>https://github.com/renaud/sherlok</url>
-  </organization>
+  <packaging>jar</packaging>
+  <name>Sherlok</name>
+  <description>Distributed restful text mining</description>
+  <url>http://sherlok.io/</url>
   <inceptionYear>2014</inceptionYear>
   <developers>
     <developer>
@@ -17,17 +17,25 @@
       <email>renaud.richardet@gmail.com</email>
     </developer>
   </developers>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
+  <scm>
+    <connection>scm:git:git@github.com:renaud/sherlok</connection>
+    <developerConnection>scm:git:git@github.com:renaud/sherlok</developerConnection>
+    <url>http://github.com/renaud/sherlok</url>
+  </scm>
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
 
   <properties>
     <aetherVersion>1.0.0.v20140518</aetherVersion>
@@ -60,11 +68,16 @@
       <artifactId>uimaj-core</artifactId>
       <version>2.6.1-json</version>
     </dependency>
-
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>ruta-core</artifactId>
       <version>2.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.sherlok</groupId>
+      <artifactId>sherlok_javaclient</artifactId>
+      <version>0.1</version>
     </dependency>
 
     <!-- AETHER TODO: remove some? -->

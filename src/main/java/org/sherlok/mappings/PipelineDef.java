@@ -18,20 +18,14 @@ package org.sherlok.mappings;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateTypeIdentifier;
 import static org.sherlok.utils.Create.list;
-import static org.sherlok.utils.Create.map;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.json.JSONException;
 import org.sherlok.mappings.BundleDef.EngineDef;
-import org.sherlok.utils.Create;
 import org.sherlok.utils.ValidationException;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -114,7 +108,7 @@ public class PipelineDef extends Def {
 
     /**
      * Tests one single input string against a list of expected
-     * {@link TestAnnotation}s
+     * {@link Annotation}s
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -122,14 +116,14 @@ public class PipelineDef extends Def {
     public static class PipelineTest {
 
         public enum Comparison {
-            /** all expected {@link TestAnnotation}s are present in system */
+            /** all expected {@link Annotation}s are present in system */
             atLeast,
-            /** expected and system {@link TestAnnotation}s are exactly equals */
+            /** expected and system {@link Annotation}s are exactly equals */
             exact;
         }
 
         private String input;
-        private Map<String, TestAnnotation> expected;
+        private Map<String, Annotation> expected;
         private Comparison comparison = Comparison.atLeast; // default
 
         public String getInput() {
@@ -141,11 +135,11 @@ public class PipelineDef extends Def {
             return this;
         }
 
-        public Map<String, TestAnnotation> getExpected() {
+        public Map<String, Annotation> getExpected() {
             return expected;
         }
 
-        public PipelineTest setExpected(Map<String, TestAnnotation> expected) {
+        public PipelineTest setExpected(Map<String, Annotation> expected) {
             this.expected = expected;
             return this;
         }
@@ -165,83 +159,7 @@ public class PipelineDef extends Def {
 
     }
 
-    /** Represents an expected UIMA annotation */
-    @JsonPropertyOrder(value = { "begin", "end", "type" }, alphabetic = true)
-    public static class TestAnnotation {
-
-        final public static Set<String> NOT_PROPERTIES = Create.set("begin",
-                "end", "@type", "sofa");
-
-        private int begin = 0;
-        private int end = 0;
-        @JsonProperty("@type")
-        private String type;
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private Map<String, Object> properties = map();
-
-        // "any getter" needed for serialization
-        @JsonAnyGetter
-        public Map<String, Object> any() {
-            return properties;
-        }
-
-        @JsonAnySetter
-        public TestAnnotation addProperty(String name, Object value)
-                throws JSONException {
-            if (!NOT_PROPERTIES.contains(name))
-                properties.put(name, value);
-            return this;
-        }
-
-        public int getBegin() {
-            return begin;
-        }
-
-        public TestAnnotation setBegin(int begin) {
-            this.begin = begin;
-            return this;
-        }
-
-        public int getEnd() {
-            return end;
-        }
-
-        public TestAnnotation setEnd(int end) {
-            this.end = end;
-            return this;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public TestAnnotation setType(String type) {
-            this.type = type;
-            return this;
-        }
-
-        @Override
-        public boolean equals(Object o) { // FIXME test on properties, too
-            if (o instanceof TestAnnotation) {
-                TestAnnotation other = (TestAnnotation) o;
-                if (this.begin == other.begin && //
-                        this.end == other.end && //
-                        this.type.equals(other.type)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return type + "[" + begin + ":" + end + "]";
-        }
-
-        public Map<String, Object> getProperties() {
-            return properties;
-        }
-    }
+   
 
     // Get/Set ////////////////////////////////////////////////////////////////
 

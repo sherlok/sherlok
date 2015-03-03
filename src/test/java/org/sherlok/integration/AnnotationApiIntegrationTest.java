@@ -19,12 +19,15 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.when;
 import static com.jayway.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 import static org.sherlok.SherlokServer.ANNOTATE;
 import static org.sherlok.SherlokServer.DEFAULT_IP;
 import static org.sherlok.SherlokServer.STATUS_INVALID;
 import static org.sherlok.SherlokServer.STATUS_OK;
 import static org.sherlok.integration.PipelineLoaderIntegrationTest.TEST_TEXT;
+import static org.sherlok.mappings.SherlokResult.parse;
+
+import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -33,6 +36,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.SherlokServer;
+import org.sherlok.mappings.Annotation;
+import org.sherlok.mappings.SherlokResult;
 
 import spark.StopServer;
 
@@ -68,29 +73,34 @@ public class AnnotationApiIntegrationTest {
     }
 
     @Test
-    public void test010_GETAnnotate() {
-        given().param("text", TEST_TEXT).when()
+    public void test010_GETAnnotate() throws Exception {
+        String json = given().param("text", TEST_TEXT).when()
                 .get(API_URL + "/opennlp.ners.en").then().log().everything()
                 .statusCode(STATUS_OK).contentType(JSON)
                 .body(containsString(TEST_TEXT))//
-                .body("annotations.1009.value", equalTo("person"));
+                .extract().asString();
+        List<Annotation> ne = SherlokResult.parse(json).get("NamedEntity");
+        assertEquals(3, ne.size());
     }
 
     @Test
-    public void test011_POSTAnnotate() {
-        given().param("text", TEST_TEXT).when()
+    public void test011_POSTAnnotate() throws Exception {
+        String json = given().param("text", TEST_TEXT).when()
                 .post(API_URL + "/opennlp.ners.en")//
                 .then().log().everything()//
                 .statusCode(STATUS_OK)//
                 .contentType(JSON)//
                 .body(containsString(TEST_TEXT))//
-                .body("annotations.1009.value", equalTo("person"));
+                .extract().asString();
+        assertEquals(3, parse(json).get("NamedEntity").size());
+
         // same POST to check multiple calls
-        given().param("text", TEST_TEXT).when()
+        json = given().param("text", TEST_TEXT).when()
                 .post(API_URL + "/opennlp.ners.en").then().log().everything()
                 .statusCode(STATUS_OK).contentType(JSON)
                 .body(containsString(TEST_TEXT))//
-                .body("annotations.1009.value", equalTo("person"));
+                .extract().asString();
+        assertEquals(3, parse(json).get("NamedEntity").size());
     }
 
     @Test

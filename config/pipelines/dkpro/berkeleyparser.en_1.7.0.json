@@ -10,10 +10,10 @@
       "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.PennTree"]
   },
   "script" : [
-    "ENGINE opennlp.segmenter.en:1.6.2;",
-    "ENGINE opennlp.pos.en:1.6.2;",
-    "ENGINE berkeleyparser.en:1.6.2;"
+    "ENGINE opennlp.segmenter.en:1.7.0;",
+    "ENGINE opennlp.pos.en:1.7.0;",
+    "ENGINE berkeleyparser.en:1.7.0;"
   ],
   "tests" : [ {"input": "The blue house of my childhood was bought: what a pity!" } ],
-  "version" : "1.6.2"
+  "version" : "1.7.0"
 }
