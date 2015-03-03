@@ -74,12 +74,6 @@
       <version>2.2.1</version>
     </dependency>
 
-    <dependency>
-      <groupId>io.sherlok</groupId>
-      <artifactId>sherlok_javaclient</artifactId>
-      <version>0.1</version>
-    </dependency>
-
     <!-- AETHER TODO: remove some? -->
     <dependency>
       <groupId>org.eclipse.aether</groupId>
