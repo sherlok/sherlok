@@ -95,7 +95,7 @@ public class BundleApiIntegrationTest {
 
     @Test
     /** Let's put a new test bundle*/
-    public void test030PutBundle() throws JsonProcessingException {
+    public void test030PostBundle() throws JsonProcessingException {
         BundleDef e = new BundleDef()
                 .addDependency(new BundleDependency(
                         mvn,
@@ -104,23 +104,23 @@ public class BundleApiIntegrationTest {
         e.setVersion("172");
 
         given().content(writeAsString(e))//
-                .when().put(API_URL)//
+                .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_OK);
     }
 
     @Test
-    /** Putting a faulty bundle should fail */
-    public void test031PutFaultyBundle() throws JsonProcessingException {
+    /** Postting a faulty bundle should fail */
+    public void test031PostFaultyBundle() throws JsonProcessingException {
         given().content("blah")//
-                .when().put(API_URL)//
+                .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
-    /** Putting a faulty bundle should fail (id is missing) */
-    public void test032PutFaultyBundle() throws JsonProcessingException {
+    /** Postting a faulty bundle should fail (id is missing) */
+    public void test032PostFaultyBundle() throws JsonProcessingException {
         given().content("{  \"name\" : \"blabla\"}")//
-                .when().put(API_URL)//
+                .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
 
@@ -135,7 +135,6 @@ public class BundleApiIntegrationTest {
                 .contentType(JSON)
                 .body("name", equalTo("test"))
                 .body("version", equalTo("172"))
-                .body("dependencies[0].type", equalTo("mvn"))
                 .body("dependencies[0].value",
                         equalTo("de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"));
     }
@@ -161,25 +160,25 @@ public class BundleApiIntegrationTest {
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
 
-    // // TODO
+    // // TODO test adding engines
     // //
     // //
 
     /*-
     @Test
     
-     Putting a faulty engine should fail 
-    public void test031PutFaultyEngine() throws JsonProcessingException {
+     Postting a faulty engine should fail 
+    public void test031PostFaultyEngine() throws JsonProcessingException {
         given().content("blah")//
-                .when().put(API_URL)//
+                .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
-     Putting a faulty engine should fail (id is missing) 
-    public void test032PutFaultyEngine() throws JsonProcessingException {
+     Postting a faulty engine should fail (id is missing) 
+    public void test032PostFaultyEngine() throws JsonProcessingException {
         given().content("{  \"name\" : \"blabla\"}")//
-                .when().put(API_URL)//
+                .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
 

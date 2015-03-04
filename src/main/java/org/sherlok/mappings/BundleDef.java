@@ -17,7 +17,7 @@ package org.sherlok.mappings;
 
 import static java.lang.Character.isLetterOrDigit;
 import static java.util.regex.Pattern.compile;
-import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
+import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
@@ -61,6 +61,7 @@ public class BundleDef extends Def {
     private List<EngineDef> engines = list();
 
     /** A Maven dependency to some external UIMA code. */
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class BundleDependency {
 
         /** Dependencies can only have these formats */
@@ -203,8 +204,19 @@ public class BundleDef extends Def {
 
         // get/set
 
+        /** @return the engine name. Falls back on {@link #classz's simple name} */
         public String getName() {
-            return name;
+            if (name != null)
+                return name;
+            else if (classz != null) {
+                if (classz.contains(".")) {
+                    return classz.substring(classz.lastIndexOf(".") + 1,
+                            classz.length());
+                } else { // no dot in class name --> just return it
+                    return classz;
+                }
+            }
+            return null;
         }
 
         public EngineDef setName(String name) {
@@ -250,7 +262,7 @@ public class BundleDef extends Def {
         }
 
         public boolean validate(String msgName) throws ValidationException {
-            checkOnlyAlphanumDot(name, msgName);
+            checkOnlyAlphanumDotUnderscore(name, msgName);
             return true;
         }
 
@@ -324,7 +336,8 @@ public class BundleDef extends Def {
         return this;
     }
 
-    public boolean validate(String bundleObject) throws ValidationException {
+    @Override
+    public void validate(String bundleObject) throws ValidationException {
         super.validate(bundleObject);
         try {
             // TODO validateArgument(checkOnlyAlphanumDot(domain),
@@ -337,7 +350,6 @@ public class BundleDef extends Def {
             throw new ValidationException("invalid bundle '" + bundleObject
                     + "'", e.getMessage());
         }
-        return true;
     }
 
     // LATER

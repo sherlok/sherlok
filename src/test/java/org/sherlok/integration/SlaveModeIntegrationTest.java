@@ -91,14 +91,14 @@ public class SlaveModeIntegrationTest {
 
     @Test
     /** PUT should return status 400*/
-    public void test030PutPipeline() throws JsonProcessingException {
+    public void test030PostPipeline() throws JsonProcessingException {
         PipelineDef p = (PipelineDef) new PipelineDef().addScriptLine(
                 "ENGINE sample.engine:1").setDomain("test");
         p.setName("test");
         p.setVersion("1");
 
         given().content(FileBased.writeAsString(p))//
-                .when().put(SLAVE_API_URL + PIPELINES)//
+                .when().post(SLAVE_API_URL + PIPELINES)//
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
     /*-

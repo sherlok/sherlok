@@ -18,7 +18,6 @@ package org.sherlok.utils;
 import static java.util.regex.Pattern.compile;
 import static org.sherlok.mappings.Def.SEPARATOR;
 import static org.sherlok.utils.Create.map;
-import static org.sherlok.utils.ValidationException.ERR;
 import static org.sherlok.utils.ValidationException.MSG;
 
 import java.util.regex.Pattern;
@@ -26,7 +25,7 @@ import java.util.regex.Pattern;
 public class CheckThat {
 
     /** Letters, numbers, dots and underscore only */
-    private static final Pattern ALPHANUM_DOT = compile("[^a-zA-Z0-9\\._]");
+    private static final Pattern ALPHANUM_DOT_UNDERSCORE = compile("[^a-zA-Z0-9\\._]");
 
     /**
      * @param test
@@ -37,12 +36,12 @@ public class CheckThat {
      *             if <code>test</code> is empty/null, or contains something
      *             else than letters, numbers or dots.
      */
-    public static void checkOnlyAlphanumDot(String test, String context)
+    public static void checkOnlyAlphanumDotUnderscore(String test, String context)
             throws ValidationException {
         if (test == null || test.length() == 0) {
             throw new ValidationException(context + ": cannot be empty or null");
         }
-        if (ALPHANUM_DOT.matcher(test).find()) {
+        if (ALPHANUM_DOT_UNDERSCORE.matcher(test).find()) {
             throw new ValidationException(context + ": '" + test
                     + "' contains something else than"
                     + " letters, numbers or dots");
@@ -71,8 +70,8 @@ public class CheckThat {
                     + " {name}:{version}, but more than one column was found.");
         } else {
             String[] splits = id.split(SEPARATOR);
-            checkOnlyAlphanumDot(splits[0], context);
-            checkOnlyAlphanumDot(splits[1], context);
+            checkOnlyAlphanumDotUnderscore(splits[0], context);
+            checkOnlyAlphanumDotUnderscore(splits[1], context);
         }
     }
 

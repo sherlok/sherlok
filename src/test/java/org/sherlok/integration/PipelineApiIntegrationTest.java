@@ -19,6 +19,7 @@ import static com.jayway.restassured.RestAssured.get;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.when;
 import static com.jayway.restassured.http.ContentType.JSON;
+import static java.lang.System.currentTimeMillis;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.sherlok.SherlokServer.DEFAULT_IP;
@@ -97,31 +98,45 @@ public class PipelineApiIntegrationTest {
     }
 
     @Test
-    /** Let's put a new test pipeline*/
-    public void test030PutPipeline() throws JsonProcessingException {
+    /** Let's put a new test pipeline. It gets deleted below... */
+    public void test030PostPipeline() throws JsonProcessingException {
         PipelineDef p = (PipelineDef) new PipelineDef().addScriptLine(
-                "ENGINE sample.engine:1").setDomain("test");
+                "ENGINE languageidentifier:1.7.0").setDomain("test");
         p.setName("test");
         p.setVersion("1");
 
         given().content(FileBased.writeAsString(p))//
-                .when().put(API_URL)//
+                .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_OK);
     }
 
     @Test
-    /** Putting a faulty pipeline should fail */
-    public void test031PutFaultyPipeline() throws JsonProcessingException {
+    /** Post'ing a faulty pipeline should fail  */
+    public void test031PostFaultyPipeline() throws JsonProcessingException {
         given().content("blah")//
-                .when().put(API_URL)//
+                .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
 
     @Test
-    /** Putting a faulty pipeline should fail (id is missing) */
-    public void test032PutFaultyPipeline() throws JsonProcessingException {
+    /** Post'ing a faulty pipeline should fail (ENGINE does not exsist) */
+    public void test032PostFaultyPipeline() throws JsonProcessingException {
+        PipelineDef p = (PipelineDef) new PipelineDef()
+                .addScriptLine("ENGINE nonexisting.engine:"
+                        + currentTimeMillis());
+        p.setName("test_" + currentTimeMillis());
+        p.setVersion("1");
+
+        given().content(FileBased.writeAsString(p))//
+                .when().post(API_URL)//
+                .then().log().everything().statusCode(STATUS_INVALID);
+    }
+
+    @Test
+    /** Post'ing a faulty pipeline should fail (id is missing) */
+    public void test033PostFaultyPipeline() throws JsonProcessingException {
         given().content("{  \"name\" : \"opennlp.ners.en\"}")//
-                .when().put(API_URL)//
+                .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_INVALID);
     }
 
@@ -133,7 +148,7 @@ public class PipelineApiIntegrationTest {
                 .contentType(JSON)//
                 .body("name", equalTo("test"))//
                 .body("version", equalTo("1"))//
-                .body("script[0]", equalTo("ENGINE sample.engine:1"));
+                .body("script[0]", equalTo("ENGINE languageidentifier:1.7.0"));
     }
 
     @Test

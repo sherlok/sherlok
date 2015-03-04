@@ -85,16 +85,16 @@ public class ResourcesApiIntegrationTest {
                 .body(containsString("Afghanistan"));
     }
 
-    final static String path = "/test/test030PutResource.txt";
+    final static String path = "/test/test030PostResource.txt";
 
     @Test
-    public void test030PutTestResource() throws Exception {
+    public void test030PostTestResource() throws Exception {
 
-        File tmpFile = createTempFile("test030PutResource", "txt");
+        File tmpFile = createTempFile("test030PostResource", "txt");
         write("hello world", tmpFile, defaultCharset());
 
         given().multiPart(tmpFile)//
-                .when().put(API_URL + path)//
+                .when().post(API_URL + path)//
                 .then().log().everything().statusCode(STATUS_OK);
     }
 

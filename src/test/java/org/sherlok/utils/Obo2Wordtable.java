@@ -34,7 +34,7 @@ import ch.epfl.bbp.uima.obo.Synonym;
 public class Obo2Wordtable {
 
     private static final String OBO_INPUT = "/Volumes/HDD2/ren_data/dev_hdd/bluebrain/git2/ontologies/the_ontologies/";
-    private static final String WORDTABLE_OUTPUT = "/Users/richarde/dev/bluebrain/git/neuroNER/resources/bluima/neuroner";
+    private static final String WORDTABLE_OUTPUT = "/Users/richarde/git2/neuroNER/resources/bluima/neuroner";
 
     @SuppressWarnings("resource")
     public static void main(String[] args) throws IOException {

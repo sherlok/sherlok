@@ -15,7 +15,7 @@
  */
 package org.sherlok.mappings;
 
-import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
+import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.sherlok.utils.ValidationException;
@@ -33,7 +33,7 @@ public abstract class Def {
 
     public static final String SEPARATOR = ":";
 
-    /** a unique name for this bundle. Letters, numbers and underscore only */
+    /** a unique name for this bundle. Letters, numbers, dots and underscore only */
     protected String name,
     /**
      * a unique version id for this bundle. Letters, numbers, dots and
@@ -86,10 +86,9 @@ public abstract class Def {
         return this;
     }
 
-    public boolean validate(String msgName) throws ValidationException {
-        checkOnlyAlphanumDot(name, msgName + " 'name' ");
-        checkOnlyAlphanumDot(version, msgName + " 'version' ");
-        return true;
+    public void validate(String msgName) throws ValidationException {
+        checkOnlyAlphanumDotUnderscore(name, msgName + " 'name' ");
+        checkOnlyAlphanumDotUnderscore(version, msgName + " 'version' ");
     }
 
     /** Creates an id for this def, composed of 'name:version' */

@@ -161,16 +161,21 @@ public class Controller {
     // PUT /////////////////////////////////////////////////////////////
     /** @return the put'ed {@link BundleDef}'s id */
     String putBundle(String bundleStr) throws ValidationException {
-        BundleDef newBundle = FileBased.putBundle(bundleStr);
-        bundleDefs.put(newBundle.getId(), newBundle);
-        return newBundle.getId();
+        BundleDef b = FileBased.putBundle(bundleStr);
+        // update bundles and engines
+        bundleDefs.put(b.getId(), b);
+        for (EngineDef e : b.getEngines()) {
+            e.setBundle(b);
+            engineDefs.put(e.getId(), e);
+        }
+        return b.getId();
     }
 
     /** @return the put'ed {@link PipelineDef}'s id */
     String putPipeline(String pipelineStr) throws ValidationException {
-        PipelineDef newPipeline = FileBased.putPipeline(pipelineStr);
-        pipelineDefs.put(newPipeline.getId(), newPipeline);
-        return newPipeline.getId();
+        PipelineDef p = FileBased.putPipeline(pipelineStr, engineDefs.keySet());
+        pipelineDefs.put(p.getId(), p);
+        return p.getId();
     }
 
     void putResource(String path, Part part) throws ValidationException {

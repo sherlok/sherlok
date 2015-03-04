@@ -39,6 +39,7 @@ public class ValidationException extends Exception {
     public static final String ERR_UNEXPECTED = "unexpected";
     public static final String ERR = "error_value";
     public static final String MSG = "message";
+    public static final String STATUS = "status";
 
     private Map<String, ?> map;
 

@@ -18,7 +18,7 @@ package org.sherlok;
 import static com.google.common.io.Files.createTempDir;
 import static java.lang.System.currentTimeMillis;
 import static org.sherlok.mappings.Def.createId;
-import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
+import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.map;
@@ -26,6 +26,7 @@ import static org.sherlok.utils.ValidationException.ERR;
 import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
 import static org.sherlok.utils.ValidationException.EXPECTED;
 import static org.sherlok.utils.ValidationException.MSG;
+import static org.sherlok.utils.ValidationException.STATUS;
 import static org.sherlok.utils.ValidationException.SYSTEM;
 import static org.slf4j.LoggerFactory.getLogger;
 import static spark.Spark.delete;
@@ -37,7 +38,6 @@ import static spark.Spark.setIpAddress;
 import static spark.Spark.setPort;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -199,7 +199,7 @@ public class SherlokServer {
                 resp.type(JSON);
 
                 try { // test
-                    checkOnlyAlphanumDot(pipelineName,
+                    checkOnlyAlphanumDotUnderscore(pipelineName,
                             "'pipeline' req parameter");
 
                     UimaPipeline pipeline = pipelineLoader.resolvePipeline(
@@ -272,19 +272,20 @@ public class SherlokServer {
                 }
             }
         });
-        put(new Route("/" + PIPELINES, JSON) { // PUT
+        post(new JsonRoute("/" + PIPELINES) { // POST
             @Override
             public Object handle(Request req, Response resp) {
                 try {
                     String newId = controller.putPipeline(req.body());
                     pipelineLoader.removeFromCache(newId);
                     resp.status(STATUS_OK);
-                    return newId;
+                    resp.type(JSON);
+                    return map(STATUS, "created", "pipeline_id", newId);
                 } catch (ValidationException ve) {
-                    return invalid("PUT pipeline '" + req.body() + "'", ve,
+                    return invalid("POST pipeline '" + req.body() + "'", ve,
                             resp);
                 } catch (Exception e) {
-                    return error("PUT '" + req.body(), e, resp);
+                    return error("POST '" + req.body(), e, resp);
                 }
             }
         });
@@ -297,7 +298,9 @@ public class SherlokServer {
                     String id = check(name, version);
                     controller.deletePipelineDef(id);
                     pipelineLoader.removeFromCache(id);
-                    return "";
+                    resp.status(STATUS_OK);
+                    resp.type(JSON);
+                    return map(STATUS, "deleted", "pipeline_id", id);
                 } catch (ValidationException ve) {
                     return invalid("DELETE pipeline '" + name + "'", ve, resp);
                 } catch (Exception e) {
@@ -340,17 +343,18 @@ public class SherlokServer {
                 }
             }
         });
-        put(new Route("/" + BUNDLES, JSON) { // PUT
+        post(new JsonRoute("/" + BUNDLES) { // POST
             @Override
             public Object handle(Request req, Response resp) {
                 try {
                     String newId = controller.putBundle(req.body());
                     resp.status(STATUS_OK);
-                    return newId;
+                    resp.type(JSON);
+                    return map(STATUS, "created", "bundle_id", newId);
                 } catch (ValidationException ve) {
-                    return invalid("PUT bundle '" + req.body() + "'", ve, resp);
+                    return invalid("POST bundle '" + req.body() + "'", ve, resp);
                 } catch (Exception e) {
-                    return error("PUT '" + req.body(), e, resp);
+                    return error("POST '" + req.body(), e, resp);
                 }
             }
         });
@@ -362,7 +366,9 @@ public class SherlokServer {
                 try {
                     String id = check(name, version);
                     controller.deleteBundleDef(id);
-                    return "";
+                    resp.status(STATUS_OK);
+                    resp.type(JSON);
+                    return map(STATUS, "deleted", "bundle_id", id);
                 } catch (ValidationException ve) {
                     return invalid("DELETE bundle '" + name + "'", ve, resp);
                 } catch (Exception e) {
@@ -394,8 +400,8 @@ public class SherlokServer {
                     resp.type("application/octet-stream");
                     resp.header("Content-Disposition",
                             "attachment; filename=\"" + name + "\"");
-                    InputStream is = controller.getResource(path);
-                    IOUtils.copy(is, resp.raw().getOutputStream());
+                    IOUtils.copy(controller.getResource(path), //
+                            resp.raw().getOutputStream());
                     return "";
                 } catch (ValidationException ve) {
                     resp.status(STATUS_MISSING);
@@ -406,7 +412,7 @@ public class SherlokServer {
                 }
             }
         });
-        put(new Route("/" + RUTA_RESOURCES + "/*", JSON) { // PUT
+        post(new Route("/" + RUTA_RESOURCES + "/*", JSON) { // POST
             @Override
             public Object handle(Request req, Response resp) {
                 try {
@@ -416,12 +422,13 @@ public class SherlokServer {
                     Part part = req.raw().getPart("file");
                     controller.putResource(path, part);
                     resp.status(STATUS_OK);
-                    return "OK";
+                    resp.type(JSON);
+                    return map(STATUS, "created", "resource_path", path);
                 } catch (ValidationException ve) {
-                    return invalid("PUT resource '" + req.body() + "'", ve,
+                    return invalid("POST resource '" + req.body() + "'", ve,
                             resp);
                 } catch (Exception e) {
-                    return error("PUT '" + req.body(), e, resp);
+                    return error("POST '" + req.body(), e, resp);
                 }
             }
         });
@@ -432,7 +439,8 @@ public class SherlokServer {
                     String path = req.splat()[0];
                     controller.deleteResource(path);
                     resp.status(STATUS_OK);
-                    return "OK";
+                    resp.type(JSON);
+                    return map(STATUS, "deleted", "resource_path", path);
                 } catch (ValidationException ve) {
                     return invalid("DELETE resource '" + req.body() + "'", ve,
                             resp);
@@ -453,12 +461,12 @@ public class SherlokServer {
                 return map(MSG, "not found", ERR, req.splat()[0]);
             }
         }); */
-        put(new Route("/*", JSON) { // PUT
+        post(new Route("/*", JSON) { // POST
             @Override
             public Object handle(Request req, Response resp) {
                 resp.status(STATUS_MISSING);
                 resp.type(JSON);
-                return map(MSG, "invalid PUT url", ERR, req.splat()[0]);
+                return map(MSG, "invalid POST url", ERR, req.splat()[0]);
             }
         });
         delete(new Route("/*", JSON) { // DELETE
@@ -466,7 +474,15 @@ public class SherlokServer {
             public Object handle(Request req, Response resp) {
                 resp.status(STATUS_MISSING);
                 resp.type(JSON);
-                return map(MSG, "not found", ERR, req.splat()[0]);
+                return map(MSG, "invalid DELETE url", ERR, req.splat()[0]);
+            }
+        });
+        put(new Route("/*", JSON) { // PUT -> ask to redirect to POST
+            @Override
+            public Object handle(Request req, Response resp) {
+                resp.type(JSON);
+                resp.status(STATUS_INVALID);
+                return map(MSG, "please use POST instead of PUT");
             }
         });
 
@@ -479,7 +495,7 @@ public class SherlokServer {
         String version = req.queryParams("version");
         String text = req.queryParams("text");
         try {
-            checkOnlyAlphanumDot(pipelineName, "'pipeline' req parameter");
+            checkOnlyAlphanumDotUnderscore(pipelineName, "'pipeline' req parameter");
             validateNotNull(text, "'text' req parameter should not be null");
             validateArgument(text.length() > 0,
                     "'text' req parameter should not be empty");
@@ -557,8 +573,8 @@ public class SherlokServer {
 
     private static String check(String name, String version)
             throws ValidationException {
-        checkOnlyAlphanumDot(name, "'name'");
-        checkOnlyAlphanumDot(version, "'version'");
+        checkOnlyAlphanumDotUnderscore(name, "'name'");
+        checkOnlyAlphanumDotUnderscore(version, "'version'");
         return createId(name, version);
     }
 

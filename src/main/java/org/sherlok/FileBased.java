@@ -34,6 +34,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.Part;
 
@@ -85,7 +86,6 @@ public class FileBased {
             new JsonFactory());
     static {
         MAPPER.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        // TODO indent json output does not work, is important for readability
         MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
         MAPPER.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     }
@@ -115,18 +115,22 @@ public class FileBased {
     }
 
     /**
-     * PUTs (writes) this pipeline to disk.
+     * PUTs (writes) this pipeline to disk. First, validates it.
      * 
-     * @param bundleStr
+     * @param pipelineStr
      *            a {@link PipelineDef} as a String
+     * @param engineIds
+     *            the engine ids of the controller, used to
+     *            {@link PipelineDef#validateEngines(Set)}.
      * @return the {@link PipelineDef}, for convenience
      */
-    public static PipelineDef putPipeline(String pipelineStr)
-            throws ValidationException {
+    public static PipelineDef putPipeline(String pipelineStr,
+            Set<String> engineIds) throws ValidationException {
         try {
-            PipelineDef pipelineDef = parsePipeline(pipelineStr);
-            writePipeline(pipelineDef);
-            return pipelineDef;
+            PipelineDef p = parsePipeline(pipelineStr);
+            p.validateEngines(engineIds);
+            writePipeline(p);
+            return p;
         } catch (Exception e) {
             throw new ValidationException(e);// TODO validate better
         }
@@ -183,19 +187,18 @@ public class FileBased {
 
     private static void writeBundle(BundleDef b) throws ValidationException {
         b.validate(b.toString());
-        File esFile = new File(BUNDLES_PATH + b.getName() + "_"
-                + b.getVersion() + ".json");
-        esFile.getParentFile().mkdirs();
-        write(esFile, b);
+        File bFile = new File(BUNDLES_PATH + b.getName() + "_" + b.getVersion()
+                + ".json");
+        bFile.getParentFile().mkdirs();
+        write(bFile, b);
     }
 
-    private static void writePipeline(PipelineDef def)
-            throws ValidationException {
-        def.validate(def.toString());
-        File defFile = new File(PIPELINES_PATH + def.getDomain() + "/"
-                + def.getName() + "_" + def.getVersion() + ".json");
+    private static void writePipeline(PipelineDef p) throws ValidationException {
+        p.validate(p.toString());
+        File defFile = new File(PIPELINES_PATH + p.getDomain() + "/"
+                + p.getName() + "_" + p.getVersion() + ".json");
         defFile.getParentFile().mkdirs();
-        write(defFile, def);
+        write(defFile, p);
     }
 
     /**

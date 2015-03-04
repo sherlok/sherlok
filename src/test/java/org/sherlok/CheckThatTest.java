@@ -15,7 +15,7 @@
  */
 package org.sherlok;
 
-import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDot;
+import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
 import static org.sherlok.utils.CheckThat.validateId;
 
 import org.junit.Test;
@@ -26,17 +26,17 @@ public class CheckThatTest {
 
     @Test(expected = ValidationException.class)
     public void testStar() throws Exception {
-        checkOnlyAlphanumDot("*_", "");
+        checkOnlyAlphanumDotUnderscore("*_", "");
     }
 
     @Test(expected = ValidationException.class)
     public void testParenthesis() throws Exception {
-        checkOnlyAlphanumDot("(asd)", "");
+        checkOnlyAlphanumDotUnderscore("(asd)", "");
     }
 
     @Test
     public void test() throws Exception {
-        checkOnlyAlphanumDot("abAC09.32no__in23", "");
+        checkOnlyAlphanumDotUnderscore("abAC09.32no__in23", "");
     }
 
     @Test
