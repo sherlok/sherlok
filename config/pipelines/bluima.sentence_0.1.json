@@ -1,0 +1,7 @@
+{
+  "name" : "bluima.sentence",
+  "version" : "0.1",
+  "description" : "sentence splitter",
+  "domain" : "bluima",
+  "script": ["ENGINE SentenceAnnotator:0.1;"]
+}
