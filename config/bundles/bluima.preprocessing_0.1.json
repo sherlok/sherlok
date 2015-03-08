@@ -32,7 +32,7 @@
         "name" : "SentenceAnnotator",
         "class" : "ch.epfl.bbp.uima.ae.SentenceAnnotator",
         "parameters" : {
-          "model" : [ "ch.epfl.bbp.nlp.GeniaResource" ]
+          "model" : [ "ch.epfl.bbp.nlp.res.sentence.GeniaResource" ]
         }
       }, {
         "name" : "TokenAnnotator",
