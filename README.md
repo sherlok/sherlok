@@ -22,14 +22,16 @@ Sherlok is a flexible and powerful open source, distributed, real-time text-mini
 
 #### Annotate neuron mentions from Python:
 
-    >>> import sherlok
-    >>> annotations = sherlok.annotate('neurons', 'tufted pyramidal cell')
-    >>> print list(annotations)
-    [(0,  21, u'NeuronEntity'), 
-     (0,   6, u'Morphology', 'tufted'), 
-     (7,  16, u'Morphology', 'pyramidal'),
-     (17, 21, u'Neuron',     'cell')
-    ]
+    pip install --upgrade sherlok
+
+    >>> from sherlok import Sherlok
+    >>> print list(Sherlok().annotate('neuroner', 'layer 4 neuron'))
+
+    [(0, 14, 'layer 4 neuron', u'Neuron', {}),
+     (8, 14, 'neuron',  u'Neuron', {}),
+     (8, 14, 'neuron',  u'NeuronTrigger', {}),
+     (0, 7,  'layer 4', u'Layer', {u'ontologyId': u'HBP_LAYER:0000004'})]
+
 
 #### Tag persons and locations with Javascript:
 
