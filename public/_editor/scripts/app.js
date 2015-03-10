@@ -125,7 +125,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
   };
 
   $scope.savePipe = function() {
-    $http.put('/pipelines', postProcess($scope.activePipe)).success(function (data) {
+    $http.post('/pipelines', postProcess($scope.activePipe)).success(function (data) {
       toast($mdToast, 'pipeline \''+$scope.activePipe.name+'\' saved!');
       // refresh and set activePipe
       var name = $scope.activePipe.name;
@@ -148,15 +148,17 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     $scope.testing = true;
     $http.post('/test', postProcess($scope.activePipe)).success(function (data) {
       toast($mdToast, 'all tests passed!');
+      // update ok/fail counts
       $scope.activePipe.testsOk = $scope.activePipe.tests.length;
       $scope.activePipe.testsFailed = 0;
+      // update actual field
       var p = data.passed;
       for (var id in p) {
         if (p.hasOwnProperty(id)) {
           $scope.activePipe.tests[id].actual = p[id].system;
         }
       }
-      $scope.testing = false;
+      $scope.testing = false; // reactivates button
     }).error(function (testResults, status) {
       toast($mdToast, 'some tests failed');
       console.log(testResults);

@@ -21,29 +21,6 @@ var Sherlok = {
     });
   },
 
-  // annotateElement_old: function (txt, annotations, success) {
-  //   // transform to array & filter annotations
-  //   var annots = $.map(annotations, function(an, idx) {
-  //     if (Sherlok.blacklist.indexOf(an["@type"]) == -1) {
-  //       return [an];
-  //     }
-  //   });
-  //   //console.log(annots);
-
-  //   // highlight text (add spans)
-  //   var newTxt = "";
-  //   var last = txt.length + 1;
-  //   $.each(annots.sort(predicatBy("end")), function(index3, a){
-  //     //console.log("ANNOT: " + a.begin);
-  //     if (a.end < last){
-  //       newTxt = '<span class="inline-a np_'+ a['@type'].toLowerCase() + '" title="'+a['@type']+'">' + txt.substring(a.begin, a.end) + '</span>' +  txt.substring(a.end, last) + newTxt;
-  //       last = a.begin;
-  //     }
-  //   });
-  //   var res = txt.substring(0, last) + newTxt;
-  //   success(res.replace(/(?:\r\n|\r|\n)/g, '<br />'));
-  // },
-
   annotateElement: function (txt, annotations, success) {
 
     // an array, each position represents a char from txt
@@ -52,27 +29,31 @@ var Sherlok = {
     for (var i = 0; i < txt.length; i++) {
       charTypes[i] = new Array();
     }
-    // to index types
+    // types to index
     var types = [];
 
-    // transform to array & filter annotations
-    $.map(annotations, function(an, idx) {
-      if (Sherlok.blacklist.indexOf(an["@type"]) == -1) {
-        // "index" type
-        var type = an["@type"];
-        if (types.indexOf(type) == -1){
-          types.push(type);
-        }
-        for (var i = an.begin; i < an.end; i++) {
-          var typeId = types.indexOf(type);
-          if (charTypes[i].indexOf(typeId) == -1){
-            charTypes[i].push(typeId);
+    // transform to above charTypes array & filter annotations
+    for (var type in annotations) {
+        if (annotations.hasOwnProperty(type)) {
+          if (Sherlok.blacklist.indexOf(type) == -1) {
+            // "index" type
+            if (types.indexOf(type) == -1){
+              types.push(type);
+            }
+            var typeId = types.indexOf(type);
+            // update charTypes
+            annotations[type].map( function(an) {
+              for (var i = an.begin; i < an.end; i++) {
+                if (charTypes[i].indexOf(typeId) == -1){
+                  charTypes[i].push(typeId);
+                }
+              }
+            });
           }
         }
       }
-    });
-    //console.log(types);
-    //console.log(charTypes);
+    // console.log(types);
+    // console.log(charTypes);
 
     getTypes = function(typesMappings, types){
       var ret = "";
@@ -81,7 +62,6 @@ var Sherlok = {
       })
       return ret;
     }
-
 
     var html = "";
     var lastTypes = [];
@@ -139,7 +119,7 @@ var Sherlok = {
 
 /*
 Sherlok.annotateElement('the green cat\nnewline',
-  {"1": {"begin": 4, "end": 9, "@type": "Color"} }, function(data){ console.log(data); });
+  {"Color": [{"begin": 4, "end": 9}] }, function(data){ console.log(data); });
 Sherlok.annotateElement('green cat',
   {"2": {"begin": 0, "end": 5, "@type": "Green"}, "1": {"begin": 0, "end": 5, "@type": "Color"}}, function(data){ console.log(data); });
 Sherlok.annotateElement('abcd',

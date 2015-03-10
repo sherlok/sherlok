@@ -5,9 +5,9 @@
     -moz-border-right-colors: none;
     -moz-border-top-colors: none;
     border-color: gray;
-    background-color: lightgray;
+    /*background-color: lightgray;*/
     border-image: none;
-    border-radius: 1px;
+    border-radius: 2px;
     border-style: solid solid dotted;
     border-width: 1px;
     display: inline-block;

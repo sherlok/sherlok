@@ -72,8 +72,8 @@
           </h2>
         </md-toolbar>
         <textarea class="max-wide" ng-model="annotate.text" rows="4"></textarea>
-        <div layout="row">
-          <div data-ng-bind-html="annotate.html"></div>
+        <div layout="row" style="margin-top:15px;">
+          <div data-ng-bind-html="annotate.html" layout-fill></div>
           <div style="margin-top:15px;">
             <div ng-repeat="type in annotate.types">
               <md-checkbox ng-model="type.activated" ng-click="toggleType(type)" aria-label="type_{{type}}">
