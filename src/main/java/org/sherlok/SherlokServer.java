@@ -22,7 +22,6 @@ import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.map;
-import static org.sherlok.utils.ValidationException.ERR;
 import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
 import static org.sherlok.utils.ValidationException.EXPECTED;
 import static org.sherlok.utils.ValidationException.MSG;
@@ -33,20 +32,20 @@ import static spark.Spark.delete;
 import static spark.Spark.externalStaticFileLocation;
 import static spark.Spark.get;
 import static spark.Spark.post;
-import static spark.Spark.put;
 import static spark.Spark.setIpAddress;
 import static spark.Spark.setPort;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
-import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.BundleDef;
+import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
 import org.sherlok.utils.Create;
@@ -93,7 +92,8 @@ public class SherlokServer {
 
     // LOGO http://www.kammerl.de/ascii/AsciiSignature.php font 'thin'
     private static final String LOGO = "\n,---.|              |         |    \n`---.|---.,---.,---.|    ,---.|__/ \n    ||   ||---'|    |    |   ||  \\ \n`---'`   '`---'`    `---'`---'`   `\n\n";
-    private static final String VERSION = "Sherlok Server          version 0.1\n";
+    private static final String VERSION = "Sherlok Server        v. "
+            + getGitCommitId();
     static {
         System.out.println(LOGO + VERSION);
     }
@@ -460,7 +460,7 @@ public class SherlokServer {
                 resp.type(JSON);
                 return map(MSG, "not found", ERR, req.splat()[0]);
             }
-        }); */
+        }); 
         post(new Route("/*", JSON) { // POST
             @Override
             public Object handle(Request req, Response resp) {
@@ -485,6 +485,7 @@ public class SherlokServer {
                 return map(MSG, "please use POST instead of PUT");
             }
         });
+         */
 
         return pipelineLoader;
     }
@@ -495,7 +496,8 @@ public class SherlokServer {
         String version = req.queryParams("version");
         String text = req.queryParams("text");
         try {
-            checkOnlyAlphanumDotUnderscore(pipelineName, "'pipeline' req parameter");
+            checkOnlyAlphanumDotUnderscore(pipelineName,
+                    "'pipeline' req parameter");
             validateNotNull(text, "'text' req parameter should not be null");
             validateArgument(text.length() > 0,
                     "'text' req parameter should not be empty");
@@ -624,6 +626,19 @@ public class SherlokServer {
         String outStr = out.toString("UTF-8");
         return outStr;
     }*/
+
+    /** Using git-commit-id-plugin maven plugin */
+    public static final String getGitCommitId() {
+        try {
+            Properties properties = new Properties();
+            properties.load(SherlokServer.class.getClassLoader()
+                    .getResourceAsStream("git.properties"));
+
+            return properties.get("git.commit.id").toString().substring(0, 10);
+        } catch (Exception e) {
+            return "";
+        }
+    }
 
     // MAIN stuff (to start Sherlok server)
     // ////////////////////////////////////////////////////////////////////////////

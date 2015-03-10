@@ -100,7 +100,6 @@
 , "NeuronProperty (ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)}(Neuron|NeuronTrigger);"
 , "NeuronProperty (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)}(Neuron|NeuronTrigger);"
 , "NeuronProperty (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)}(Neuron|NeuronTrigger);"
-, ""
  ],
   "output" : {
     "include_annotations" : [ "neuroner.*" ]
@@ -108,51 +107,51 @@
   "tests" : [ {
     "input" : "layer V and layer iii large pyramidal neurons",
     "expected" : {
-      "Layer" : [{
+      "Layer" : [ {
         "begin" : 0,
         "end" : 7,
         "properties" : {
           "ontologyId" : "HBP_LAYER:0000005"
         },
         "ontologyId" : "HBP_LAYER:0000005"
-      },
-      {
+      }, {
         "begin" : 12,
         "end" : 21,
         "properties" : {
           "ontologyId" : "HBP_LAYER:0000003"
         },
         "ontologyId" : "HBP_LAYER:0000003"
-      }],
-      "Size" : [{
+      } ],
+      "Size" : [ {
         "begin" : 22,
         "end" : 27
-      }],
-      "BrainRegionProp" : [{
+      } ],
+      "BrainRegionProp" : [ {
         "begin" : 0,
         "end" : 7
-      },
-      {
+      }, {
         "begin" : 12,
         "end" : 21
-      }]
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 45
+      } ]
     }
   }, {
     "input" : "slowly adapting stretch receptor neuron",
     "expected" : {
-      "Function" : [
-      {
+      "Function" : [ {
         "begin" : 0,
         "end" : 23
-      },
-      {
+      }, {
         "begin" : 24,
         "end" : 32
-      }],
-      "Neuron" : [{
-        "begin" : 33,
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
         "end" : 39
-      }]
+      } ]
     }
   } ]
 }

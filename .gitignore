@@ -3,6 +3,7 @@ local_repo
 config/resources/.pipelines/*
 config/resources/.engines/*
 config/resources/test/*
+src/main/resources/git.properties
 
 # Maven          #
 ##################
