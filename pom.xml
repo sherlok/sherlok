@@ -294,6 +294,10 @@
               <mainClass>org.sherlok.SherlokServer</mainClass>
               <name>sherlok</name>
             </program>
+            <program>
+              <mainClass>org.sherlok.utils.BundleCreatorUtil</mainClass>
+              <name>create_bundle</name>
+            </program>
           </programs>
         </configuration>
       </plugin>

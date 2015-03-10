@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.sherlok;
+package org.sherlok.utils;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.sherlok.mappings.BundleDef.BundleDependency.DependencyType.mvn;
 import static org.sherlok.utils.AetherResolver.LOCAL_REPO_PATH;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
@@ -45,50 +46,46 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.sherlok.FileBased;
 import org.sherlok.PipelineLoader.ClassPathHack;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.BundleDef.BundleDependency;
-import org.sherlok.mappings.BundleDef.BundleDependency.DependencyType;
 import org.sherlok.mappings.BundleDef.EngineDef;
-import org.sherlok.utils.AetherResolver;
-import org.sherlok.utils.MavenPom;
 import org.slf4j.Logger;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
 
 /**
- * Util to generate bundle JSON from Maven artifacts
+ * Util to generate bundle JSON from Maven artifacts. Uses lots of reflection
+ * and magic to achieve its goal...
+ * 
+ * @author renaud@apache.org
  */
-public class BundleCreator {
-    private static Logger LOG = getLogger(BundleCreator.class);
+public class BundleCreatorUtil {
+    private static Logger LOG = getLogger(BundleCreatorUtil.class);
 
     public static void main(String[] args) throws Exception {
 
-        BundleDef b1 = (BundleDef) new BundleDef().setName("myname").setVersion("myversion");
-        // b1.addRepository(
-        // "dkpro",
+        if (args == null || args.length == 0) {// USAGE
+            System.out
+                    .println("usage: create_bundle bundle1 bundle2 bundle3"
+                            + " ...\nwhere bundles have the format groupId:artifactId:version");
+        }
+
+        BundleDef b = (BundleDef) new BundleDef().setName("placeholdername")
+                .setVersion("placeholderversion");
+
+        // b1.addRepository( "dkpro",
         // "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/");
-        b1.addDependency(new BundleDependency(DependencyType.mvn,
 
-        // Mallet Sherlok
-        // "org.sherlok:sherlok_mallet:0.0.1-SNAPSHOT"
-                // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"));
-                // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"));
+        for (String dep : args) {
+            b.addDependency(new BundleDependency(mvn, dep));
+        }
 
-                // Mallet LDA
-                // "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.mallet-asl:1.7.0"
-
-                // MST parser
-                //"de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.mstparser-asl:1.7.0"
-
-                // langdetect
-        "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.langdetect-asl:1.7.0"
-        ));
-        Set<BundleDef> bundleDefs = set(b1);
-
-        createBundle(bundleDefs);
+        createBundle(set(b));
     }
 
+    // most of this code comes from PipelineLoader...
     private static void createBundle(Set<BundleDef> bundleDefs)
             throws Exception {
 
@@ -174,7 +171,7 @@ public class BundleCreator {
                             Class<?> clazz = Class.forName(entry.getName()
                                     .replace('/', '.').replace(".class", ""));
 
-                            // all uimafit AnnotationEngines
+                            // scan for all uimafit AnnotationEngines
                             if (JCasAnnotator_ImplBase.class
                                     .isAssignableFrom(clazz)) {
                                 LOG.debug("AnnotationEngine: {}",
