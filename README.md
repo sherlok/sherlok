@@ -1,6 +1,6 @@
 # Sherlok
 
-[![Build Status](https://travis-ci.org/renaud/sherlok.svg?branch=master)](https://travis-ci.org/renaud/sherlok)
+[![Build Status](https://travis-ci.org/sherlok/sherlok.svg?branch=master)](https://travis-ci.org/sherlok/sherlok)
 
 _Distributed restful text mining._
 

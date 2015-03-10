@@ -15,36 +15,35 @@
  */
 package org.sherlok.utils;
 
-import static java.lang.Integer.parseInt;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
-import static org.sherlok.utils.ValidationException.ERR_UNEXPECTED;
 import static org.sherlok.utils.ValidationException.EXPECTED;
 import static org.sherlok.utils.ValidationException.SYSTEM;
 
-import java.util.Iterator;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.sherlok.mappings.Annotation;
+import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
+import org.sherlok.mappings.SherlokResult;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class SherlokTests {
 
-    public static Map<Integer, Annotation> assertEquals(
-            Map<String, Annotation> expecteds, String systemString,
+    public static Map<String, List<JsonAnnotation>> assertEquals(
+            Map<String, List<JsonAnnotation>> expecteds, String systemString,
             Comparison comparison) throws ValidationException, JSONException,
             JsonProcessingException {
 
         // parse
-        Map<Integer, Annotation> systems = null;
+        Map<String, List<JsonAnnotation>> systems = null;
         try {
-            systems = parseRaw(systemString);
-        } catch (JSONException e) {
+            systems = SherlokResult.parse(systemString).getAnnotations();
+        } catch (IOException e) {
             throw new ValidationException("could not parse systemAnnots "
                     + systemString, e);
         }
@@ -52,70 +51,49 @@ public class SherlokTests {
         // validate
         switch (comparison) {
         case atLeast:
-            for (Annotation exp : expecteds.values()) {
-                if (!systems.values().contains(exp)) {
-                    throw new ValidationException(map(ERR_NOTFOUND, exp,
+        case exact:// FIXME
+            for (Entry<String, List<JsonAnnotation>> exp : expecteds.entrySet()) {
+                String eType = exp.getKey();
+                if (!systems.containsKey(eType)) {
+                    throw new ValidationException(map(ERR_NOTFOUND, eType,
                             EXPECTED, expecteds, SYSTEM, systems));
+                } else {
+                    for (JsonAnnotation a : exp.getValue()) {
+                        boolean found = false;
+                        for (JsonAnnotation sa : systems.get(eType)) {
+                            if (sa.equals(a)) {
+                                found = true;break;
+                            }
+                        }
+                        if (!found) {
+                            throw new ValidationException(map(ERR_NOTFOUND, a,
+                                    EXPECTED, expecteds, SYSTEM, systems));
+                        }
+                    }
                 }
             }
             break;
 
-        case exact: // compare 2-ways; give explicit error msg
-            for (Annotation exp : expecteds.values()) {
-                if (!systems.values().contains(exp)) {
-                    throw new ValidationException(map(ERR_NOTFOUND, exp,
+        /*-
+        // compare 2-ways; give explicit error msg
+        for (Entry<String, List<Annotation>> exp : expecteds.entrySet()) {
+            if (!systems.values().contains(exp)) {
+                throw new ValidationException(map(ERR_NOTFOUND, exp,
+                        EXPECTED, expecteds, SYSTEM, systems));
+            }
+        }
+        for (List<Annotation> sysAs : systems.values()) {
+            for (Annotation sysa : sysAs) {
+                if (!expecteds.values().contains(sysa)) {
+                    throw new ValidationException(map(ERR_UNEXPECTED, sysa,
                             EXPECTED, expecteds, SYSTEM, systems));
                 }
             }
-            for (Annotation sys : systems.values()) {
-                if (!expecteds.values().contains(sys)) {
-                    throw new ValidationException(map(ERR_UNEXPECTED, sys,
-                            EXPECTED, expecteds, SYSTEM, systems));
-                }
-            }
-            break;
+        }
+        break;
+         */
         }
         return systems;
     }
 
-    public static Annotation parse(String jsonStr) throws JSONException {
-        JSONObject json = new JSONObject(jsonStr);
-
-        Annotation t = new Annotation();
-
-        t.setBegin(json.optInt("begin", 0));// happens if =0
-        t.setEnd(json.optInt("end", 0));// happens for Sofa
-        t.setType(json.getString("@type"));
-
-        // parse remaining properties
-        Iterator<?> keys = json.keys();
-        while (keys.hasNext()) {
-            String key = keys.next().toString();
-            t.addProperty(key, json.getString(key));
-        }
-        return t;
-    }
-
-    /**
-     * @param jsonStr
-     *            the raw json string returned by uimaPipeline.annotate()
-     * @return a {@link List} of the parsed {@link Annotation}s
-     */
-    public static Map<Integer, Annotation> parseRaw(String jsonStr)
-            throws JSONException {
-        Map<Integer, Annotation> ret = map();
-        JSONObject annots = new JSONObject(jsonStr)
-                .getJSONObject("annotations");
-        Iterator<?> keys = annots.keys();
-        while (keys.hasNext()) {
-            String key = keys.next().toString();
-            Annotation a = parse(annots.getString(key));
-            // skip Sofa and DocumentAnnotation
-            if (!a.getType().equals("Sofa")
-                    && !a.getType().equals("DocumentAnnotation"))
-                ret.put(parseInt(key), a);
-        }
-        return ret;
-
-    }
 }

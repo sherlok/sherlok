@@ -45,7 +45,7 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
-import org.sherlok.mappings.Annotation;
+import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
@@ -161,7 +161,7 @@ public class SherlokServer {
                         try {
                             String systemStr = uimaPipeline.annotate(test
                                     .getInput());
-                            Map<Integer, Annotation> system = SherlokTests
+                            Map<String, List<JsonAnnotation>> system = SherlokTests
                                     .assertEquals(test.getExpected(),
                                             systemStr, test.getComparison());
                             passed.put(
@@ -523,10 +523,10 @@ public class SherlokServer {
             // remove last '}' of json, append some stats
             StringBuilder sb = new StringBuilder(json.substring(0,
                     json.length() - 1));
-            sb.append(",\n  \"stats\" : {\n" //
-                    + "    \"pipeline_resolution\": " + resolve
+            sb.append(",\n  \"_stats\" : {\n" //
+                    + "    \"_pipeline_resolution\": " + resolve
                     + ",\n"
-                    + "    \"annotation\": " + annotate + "\n  }\n}");
+                    + "    \"_annotation\": " + annotate + "\n  }\n}");
 
             return sb.toString();
 

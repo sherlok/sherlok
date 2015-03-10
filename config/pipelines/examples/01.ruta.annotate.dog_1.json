@@ -14,7 +14,7 @@
     "comparison" : "exact",
     "input" : "This is a very good dog!",
     "expected" : {
-      "1" : { "begin" : 20, "end" : 23, "@type" : "Dog" }
+      "Dog" : [{ "begin" : 20, "end" : 23 }]
     }
   } ]
 }

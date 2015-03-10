@@ -15,7 +15,6 @@
  */
 package org.sherlok.utils;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeFalse;
 import static org.sherlok.FileBased.allPipelineDefs;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -27,7 +26,6 @@ import org.sherlok.Controller;
 import org.sherlok.PipelineLoader;
 import org.sherlok.UimaPipeline;
 import org.sherlok.integration.MethodNameLoggerWatcher;
-import org.sherlok.mappings.Annotation;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
 import org.slf4j.Logger;
@@ -37,17 +35,6 @@ public class SherlokTestsTest {
 
     @Rule
     public MethodNameLoggerWatcher mdlw = new MethodNameLoggerWatcher();
-
-    @Test
-    public void testParseAnnotation() throws Exception {
-        Annotation a = SherlokTests
-                .parse("{\"@type\" : \"Layer\",  \"sofa\" : 1, \"end\" : 21,  \"ontologyId\" : \"HBP_NEUROTRANSMITTER:0000003\" }");
-        assertEquals("Layer", a.getType());
-        assertEquals(0, a.getBegin());
-        assertEquals(21, a.getEnd());
-        assertEquals("HBP_NEUROTRANSMITTER:0000003",
-                a.getProperties().get("ontologyId"));
-    }
 
     @Test
     public void testAnnotateDogs() throws Exception {
@@ -78,24 +65,38 @@ public class SherlokTestsTest {
         for (PipelineDef pipelineDef : allPipelineDefs()) {
             LOG.debug("testing {}", pipelineDef);
 
-            UimaPipeline pipeline = pipelineLoader.resolvePipeline(
-                    pipelineDef.getName(), pipelineDef.getVersion());
-
-            for (PipelineTest test : pipeline.getPipelineDef().getTests()) {
-
-                if (test.getExpected() != null
-                        && !test.getExpected().toString().isEmpty()) {
-                    String systemOut = pipeline.annotate(test.getInput());
-                    SherlokTests.assertEquals(test.getExpected(), systemOut,
-                            test.getComparison());
-                } else {
-                    LOG.debug("  no output for {}", test.getInput());
+            boolean hasExpectations = false;
+            for (PipelineTest t : pipelineDef.getTests()) {
+                if (!t.getExpected().isEmpty()) {
+                    hasExpectations = true;
+                    break;
                 }
             }
 
-            for (int i = 0; i < 5; i++) {
-                System.gc();
-                Thread.currentThread().yield();
+            if (hasExpectations) {
+
+                UimaPipeline pipeline = pipelineLoader.resolvePipeline(
+                        pipelineDef.getName(), pipelineDef.getVersion());
+
+                for (PipelineTest test : pipeline.getPipelineDef().getTests()) {
+
+                    if (test.getExpected() != null
+                            && !test.getExpected().toString().isEmpty()) {
+                        String systemOut = pipeline.annotate(test.getInput());
+                        SherlokTests.assertEquals(test.getExpected(),
+                                systemOut, test.getComparison());
+                    } else {
+                        LOG.debug("  no output for {}", test.getInput());
+                    }
+                }
+
+                LOG.debug("+++passed                                      ");
+                for (int i = 0; i < 5; i++) {
+                    System.gc();
+                    Thread.currentThread().yield();
+                }
+            } else {
+                LOG.debug("---no tests                                      ");
             }
         }
     }

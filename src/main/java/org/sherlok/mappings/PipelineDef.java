@@ -113,7 +113,7 @@ public class PipelineDef extends Def {
 
     /**
      * Tests one single input string against a list of expected
-     * {@link Annotation}s
+     * {@link JsonAnnotation}s
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -128,7 +128,7 @@ public class PipelineDef extends Def {
         }
 
         private String input;
-        private Map<String, Annotation> expected;
+        private Map<String, List<JsonAnnotation>> expected = map();
         private Comparison comparison = Comparison.atLeast; // default
 
         public String getInput() {
@@ -140,11 +140,11 @@ public class PipelineDef extends Def {
             return this;
         }
 
-        public Map<String, Annotation> getExpected() {
+        public Map<String, List<JsonAnnotation>> getExpected() {
             return expected;
         }
 
-        public PipelineTest setExpected(Map<String, Annotation> expected) {
+        public PipelineTest setExpected(Map<String, List<JsonAnnotation>> expected) {
             this.expected = expected;
             return this;
         }
@@ -212,7 +212,7 @@ public class PipelineDef extends Def {
         return this;
     }
 
-    public PipelineDef addTests(PipelineTest test) {
+    public PipelineDef addTest(PipelineTest test) {
         this.tests.add(test);
         return this;
     }
@@ -341,4 +341,5 @@ public class PipelineDef extends Def {
             jgen.writeEndArray();
         }
     }
+
 }

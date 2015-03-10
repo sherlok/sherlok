@@ -35,11 +35,14 @@ public class PipelineDefTest {
 
     public static PipelineDef getOpennlp_ners() throws Exception {
         PipelineDef p = (PipelineDef) new PipelineDef()
-                .addTests(
-                        new PipelineTest().setInput("mytest").setExpected(
-                                map("1", new Annotation().setBegin(1)
-                                        .setEnd(2).setType("myType")
-                                        .addProperty("myprop", "myValue"))))
+                .addTest(
+                        new PipelineTest().setInput("myinput").setExpected(
+                                map("MyAnnot",
+                                        list(new JsonAnnotation()
+                                                .setBegin(1)
+                                                .setEnd(2)
+                                                .addProperty("myprop",
+                                                        "myValue")))))
                 .addScriptLine("ENGINE opennlp.segmenter.en:1.6.2")
                 .addScriptLine("ENGINE opennlp.pos.en:1.6.2")
                 .setOutput(
@@ -69,12 +72,12 @@ public class PipelineDefTest {
         List<PipelineTest> tests = p2.getTests();
         assertEquals(1, tests.size());
         PipelineTest test = tests.get(0);
-        assertTrue(test.getInput().startsWith("mytest"));
-        Map<String, Annotation> outs = test.getExpected();
+        assertTrue(test.getInput().startsWith("myinput"));
+        Map<String, List<JsonAnnotation>> outs = test.getExpected();
         assertEquals(1, outs.size());
-        Annotation ta = outs.values().iterator().next();
+        JsonAnnotation ta = outs.get("MyAnnot").get(0);
         assertEquals(1, ta.getBegin());
-        assertEquals("myType", ta.getType());
+        assertEquals("myValue", ta.getProperty("myprop"));
     }
 
     /** Should not have includes and filters at the same time */

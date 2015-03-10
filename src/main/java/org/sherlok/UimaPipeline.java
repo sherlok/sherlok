@@ -50,13 +50,14 @@ import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.impl.FilteringTypeSystem;
-import org.apache.uima.cas.impl.XmiCasSerializer;
+import org.apache.uima.cas.impl.TypeSystemImpl;
 import org.apache.uima.fit.component.NoOpAnnotator;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.apache.uima.json.JsonCasSerializer;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeDescription;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
@@ -97,7 +98,7 @@ public class UimaPipeline {
     private TypeSystemDescription tsd;
     private CasPool casPool;
     /** JSON serializer */
-    private XmiCasSerializer xcs;
+    private JsonCasSerializer jsonSerializer;
 
     /**
      * @param pipelineId
@@ -119,7 +120,7 @@ public class UimaPipeline {
         initScript(list(pipelineDef.getScriptLines()) /* a copy */, engineDefs);
         initEngines();
         casPool = initCasPool(tsd);
-        xcs = filterAnnots(pipelineDef.getOutput().getAnnotationIncludes(),
+        jsonSerializer = filterAnnots(pipelineDef.getOutput().getAnnotationIncludes(),
                 pipelineDef.getOutput().getAnnotationFilters(), casPool);
 
         if (pipelineDef.isWarmup()) {
@@ -143,7 +144,7 @@ public class UimaPipeline {
      *         filtering is performed (it just uses all the annotations from the
      *         {@link TypeSystem}).
      */
-    static XmiCasSerializer filterAnnots(List<String> includes,
+    static JsonCasSerializer filterAnnots(List<String> includes,
             List<String> filters, CasPool casPool) {
 
         CAS cas = casPool.getCas();
@@ -209,9 +210,8 @@ public class UimaPipeline {
         casPool.releaseCas(cas);
 
         // initialize JSON writer with filter
-        XmiCasSerializer xcs_ = new XmiCasSerializer(filteredTs);
-        xcs_.setPrettyPrint(true);
-        return xcs_;
+        return new JsonCasSerializer().setFilterTypes(
+                (TypeSystemImpl) filteredTs).setPrettyPrint(true);
     }
 
     private void initEngines() throws UIMAException, ValidationException {
@@ -332,7 +332,7 @@ public class UimaPipeline {
             }
 
             StringWriter sw = new StringWriter();
-            xcs.serializeJson(cas, sw);
+            jsonSerializer.serialize(cas, sw);
 
             String json = sw.toString();
             // rename JSON field, for readibility
@@ -347,7 +347,7 @@ public class UimaPipeline {
             } else {
                 throw aepe;
             }
-        } catch (SAXException se) {
+        } catch (IOException se) {
             throw new ValidationException(se);
         } finally {
             casPool.releaseCas(cas);

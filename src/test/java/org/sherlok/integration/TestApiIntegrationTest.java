@@ -23,10 +23,10 @@ import static org.sherlok.SherlokServer.DEFAULT_IP;
 import static org.sherlok.SherlokServer.STATUS_INVALID;
 import static org.sherlok.SherlokServer.STATUS_OK;
 import static org.sherlok.SherlokServer.TEST;
+import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 
 import java.io.File;
-import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -36,7 +36,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.FileBased;
 import org.sherlok.SherlokServer;
-import org.sherlok.mappings.Annotation;
+import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
 
@@ -90,20 +90,18 @@ public class TestApiIntegrationTest {
                 .then().log().everything().statusCode(STATUS_OK);
 
         // adding an OK test is OK
-        List<PipelineTest> tests = pipeline.getTests();
-        tests.add(new PipelineTest().setInput("another dog").setExpected(
-                map("1",
-                        new Annotation().setBegin(8).setEnd(11)
-                                .setType("Dog"))));
+
+        pipeline.addTest(new PipelineTest().setInput("another dog")
+                .setExpected(
+                        map("Dog",
+                                list(new JsonAnnotation().setBegin(8).setEnd(11)))));
         given().content(FileBased.writeAsString(pipeline))//
                 .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_OK);
 
         // adding a faulty test makes it fail
-        tests.add(new PipelineTest().setInput("a cat").setExpected(
-                map("1",
-                        new Annotation().setBegin(1).setEnd(2)
-                                .setType("Cat"))));
+        pipeline.addTest(new PipelineTest().setInput("a cat").setExpected(
+                map("Cat", list(new JsonAnnotation().setBegin(1).setEnd(2)))));
         given().content(FileBased.writeAsString(pipeline))//
                 .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_INVALID);

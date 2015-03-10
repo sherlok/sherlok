@@ -11,9 +11,11 @@
   "tests" : [ {
     "input" : "Jack Burton (born April 29, 1954 in El Paso), also known as Jake Burton, is an American snowboarder and founder of Burton Snowboards.",
     "expected" : {
-      "1": {"@type" : "NamedEntity", "end" : 11,  "value" : "person" },
-      "2": {"@type" : "NamedEntity", "begin" : 60,  "end" : 71,  "value" : "person" },
-      "3": {"@type" : "NamedEntity", "begin" : 36,  "end" : 43,  "value" : "location" }
+      "NamedEntity": [
+        {"begin" : 0, "end" : 11,  "value" : "person" },
+        {"begin" : 60,  "end" : 71,  "value" : "person" },
+        {"begin" : 36,  "end" : 43,  "value" : "location" }
+      ]
     }
   } ],
   "version" : "1.7.0"

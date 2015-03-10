@@ -36,7 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.SherlokServer;
-import org.sherlok.mappings.Annotation;
+import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.SherlokResult;
 
 import spark.StopServer;
@@ -79,7 +79,7 @@ public class AnnotationApiIntegrationTest {
                 .statusCode(STATUS_OK).contentType(JSON)
                 .body(containsString(TEST_TEXT))//
                 .extract().asString();
-        List<Annotation> ne = SherlokResult.parse(json).get("NamedEntity");
+        List<JsonAnnotation> ne = SherlokResult.parse(json).get("NamedEntity");
         assertEquals(3, ne.size());
     }
 

@@ -1,0 +1,81 @@
+{"_context" : {
+    "_types" : {
+      "DocumentAnnotation" : {"_id" : "uima.tcas.DocumentAnnotation", 
+        "_feature_types" : {"sofa" : "_ref" } }, 
+      "FRAG" : {"_id" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.FRAG", 
+        "_feature_types" : {"sofa" : "_ref",  "parent" : "_ref",  "children" : "_ref" } }, 
+      "FSArray" : {"_id" : "uima.cas.FSArray" }, 
+      "NP" : {"_id" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.NP", 
+        "_feature_types" : {"sofa" : "_ref",  "parent" : "_ref",  "children" : "_ref" } }, 
+      "PP" : {"_id" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.PP", 
+        "_feature_types" : {"sofa" : "_ref",  "parent" : "_ref",  "children" : "_ref" } }, 
+      "PennTree" : {"_id" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.PennTree", 
+        "_feature_types" : {"sofa" : "_ref" } }, 
+      "ROOT" : {"_id" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.ROOT", 
+        "_feature_types" : {"sofa" : "_ref",  "parent" : "_ref",  "children" : "_ref" } }, 
+      "S" : {"_id" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.S", 
+        "_feature_types" : {"sofa" : "_ref",  "parent" : "_ref",  "children" : "_ref" } }, 
+      "Sofa" : {"_id" : "uima.cas.Sofa", 
+        "_feature_types" : {"sofaArray" : "_ref" } }, 
+      "VP" : {"_id" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.VP", 
+        "_feature_types" : {"sofa" : "_ref",  "parent" : "_ref",  "children" : "_ref" } }, 
+      "X" : {"_id" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.X", 
+        "_feature_types" : {"sofa" : "_ref",  "parent" : "_ref",  "children" : "_ref" } }, 
+      "Annotation" : {"_id" : "uima.tcas.Annotation", 
+        "_feature_types" : {"sofa" : "_ref" }, 
+        "_subtypes" : ["DocumentAnnotation",  "Constituent",  "PennTree" ] }, 
+      "AnnotationBase" : {"_id" : "uima.cas.AnnotationBase", 
+        "_feature_types" : {"sofa" : "_ref" }, 
+        "_subtypes" : ["Annotation" ] }, 
+      "TOP" : {"_id" : "uima.cas.TOP", 
+        "_subtypes" : ["AnnotationBase",  "ArrayBase",  "Sofa" ] }, 
+      "Constituent" : {"_id" : "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.Constituent", 
+        "_feature_types" : {"sofa" : "_ref",  "parent" : "_ref",  "children" : "_ref" }, 
+        "_subtypes" : ["FRAG",  "NP",  "PP",  "ROOT",  "S",  "VP",  "X" ] }, 
+      "ArrayBase" : {"_id" : "uima.cas.ArrayBase", 
+        "_subtypes" : ["FSArray" ] } } }, 
+  "_views" : {
+    "_InitialView" : {
+      "DocumentAnnotation" : [
+        {"sofa" : 1,  "begin" : 0,  "end" : 55,  "language" : "en" } ], 
+      "PennTree" : [
+        {"sofa" : 1,  "begin" : 0,  "end" : 55,  "PennTree" : "(ROOT (S (S (NP (NP (DT The) (JJ blue) (NN house)) (PP (IN of) (NP (PRP$ my) (NN childhood)))) (VP (VBD was) (VP (VBN bought)))) (: :) (FRAG (X (WP what)) (NP (DT a) (NN pity))) (. !)))" } ], 
+      "FRAG" : [755 ], 
+      "NP" : [679,  687,  708,  774 ], 
+      "PP" : [700 ], 
+      "ROOT" : [655 ], 
+      "S" : [663,  671 ], 
+      "VP" : [728,  736 ], 
+      "X" : [763 ] } }, 
+  "_referenced_fss" : {
+    "1" : {"_type" : "Sofa",  "sofaNum" : 1,  "sofaID" : "_InitialView",  "mimeType" : "text",  "sofaString" : "The blue house of my childhood was bought: what a pity!" }, 
+    "671" : {"_type" : "S",  "sofa" : 1,  "begin" : 0,  "end" : 41,  "constituentType" : "S",  "parent" : 663,  "children" : [679,  728 ] }, 
+    "687" : {"_type" : "NP",  "sofa" : 1,  "begin" : 0,  "end" : 14,  "constituentType" : "NP",  "parent" : 679,  "children" : [
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 0,  "end" : 3 }, 
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 4,  "end" : 8 }, 
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 9,  "end" : 14 } ] }, 
+    "700" : {"_type" : "PP",  "sofa" : 1,  "begin" : 15,  "end" : 30,  "constituentType" : "PP",  "parent" : 679,  "children" : [
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 15,  "end" : 17 },  708 ] }, 
+    "679" : {"_type" : "NP",  "sofa" : 1,  "begin" : 0,  "end" : 30,  "constituentType" : "NP",  "parent" : 671,  "children" : [687,  700 ] }, 
+    "755" : {"_type" : "FRAG",  "sofa" : 1,  "begin" : 43,  "end" : 54,  "constituentType" : "FRAG",  "parent" : 663,  "children" : [763,  774 ] }, 
+    "708" : {"_type" : "NP",  "sofa" : 1,  "begin" : 18,  "end" : 30,  "constituentType" : "NP",  "parent" : 700,  "children" : [
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 18,  "end" : 20 }, 
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 21,  "end" : 30 } ] }, 
+    "736" : {"_type" : "VP",  "sofa" : 1,  "begin" : 35,  "end" : 41,  "constituentType" : "VP",  "parent" : 728,  "children" : [
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 35,  "end" : 41 } ] }, 
+    "728" : {"_type" : "VP",  "sofa" : 1,  "begin" : 31,  "end" : 41,  "constituentType" : "VP",  "parent" : 671,  "children" : [
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 31,  "end" : 34 },  736 ] }, 
+    "655" : {"_type" : "ROOT",  "sofa" : 1,  "begin" : 0,  "end" : 55,  "constituentType" : "ROOT",  "children" : [663 ] }, 
+    "663" : {"_type" : "S",  "sofa" : 1,  "begin" : 0,  "end" : 55,  "constituentType" : "S",  "parent" : 655,  "children" : [671, 
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 41,  "end" : 42 },  755, 
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 54,  "end" : 55 } ] }, 
+    "763" : {"_type" : "X",  "sofa" : 1,  "begin" : 43,  "end" : 47,  "constituentType" : "X",  "parent" : 755,  "children" : [
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 43,  "end" : 47 } ] }, 
+    "774" : {"_type" : "NP",  "sofa" : 1,  "begin" : 48,  "end" : 54,  "constituentType" : "NP",  "parent" : 755,  "children" : [
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 48,  "end" : 49 }, 
+        {"_type" : "Token",  "sofa" : 1,  "begin" : 50,  "end" : 54 } ] } } ,
+  "_stats" : {
+    "_pipeline_resolution": 4953,
+    "_annotation": 13458
+  }
+}

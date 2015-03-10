@@ -16,7 +16,7 @@
 package org.sherlok;
 
 import static org.junit.Assert.assertEquals;
-import static org.sherlok.mappings.PipelineDef.PipelineTest.Comparison.atLeast;
+import static org.junit.Assert.assertNull;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -24,11 +24,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 import java.util.List;
 
 import org.junit.Test;
-import org.sherlok.mappings.Annotation;
+import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineOutput;
 import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
 import org.sherlok.mappings.SherlokResult;
+import org.sherlok.utils.Create;
 import org.sherlok.utils.SherlokTests;
 import org.slf4j.Logger;
 
@@ -43,9 +44,8 @@ public class UimaPipelineTest {
         String json = pipeline.annotate("dog");
         LOG.debug(json);
         SherlokTests.assertEquals(
-                map("1",
-                        new Annotation().setBegin(0).setEnd(3)
-                                .setType("Dog")), json, Comparison.exact);
+                map("Dog", list(new JsonAnnotation().setBegin(0).setEnd(3))),
+                json, Comparison.exact);
     }
 
     @Test
@@ -55,8 +55,8 @@ public class UimaPipelineTest {
                 .resolvePipeline("langdetect", null);
 
         String json = pipeline.annotate("C'est vraiment chouette comme truc.");
-        
-        List<Annotation> doc = SherlokResult.parse(json).get(
+
+        List<JsonAnnotation> doc = SherlokResult.parse(json).get(
                 "DocumentAnnotation");
         assertEquals("fr", doc.get(0).getProperties().get("language"));
     }
@@ -69,9 +69,8 @@ public class UimaPipelineTest {
         String json = (pipeline.annotate("Switzerland"));
         LOG.debug(json);
         SherlokTests.assertEquals(
-                map("1",
-                        new Annotation().setBegin(0).setEnd(11)
-                                .setType("Country")), json, Comparison.exact);
+                map("Country", Create.list(new JsonAnnotation().setBegin(0)
+                        .setEnd(11))), json, Comparison.exact);
     }
 
     @Test
@@ -80,15 +79,13 @@ public class UimaPipelineTest {
         UimaPipeline pipeline = new PipelineLoader(new Controller().load())
                 .resolvePipeline("maltparser.en", null);
         String json = (pipeline.annotate("The dog walks on the lake."));
-        LOG.debug(json);
-        SherlokTests.assertEquals(
-                map("678",
-                        new Annotation().setBegin(0).setEnd(3)
-                                .setType("Dependency")
-                                .addProperty("Dependent", 129)
-                                .addProperty("Governor", 137)
-                                .addProperty("DependencyType", "det")), json,
-                atLeast);
+        SherlokResult result = SherlokResult.parse(json);
+        LOG.debug(result.toString());
+        List<JsonAnnotation> deps = result.get("Dependency");
+
+        assertEquals(6, deps.size());
+        JsonAnnotation dep = deps.get(0);
+        assertEquals("det", dep.getProperty("DependencyType"));
     }
 
     @Test
@@ -114,7 +111,7 @@ public class UimaPipelineTest {
         assertEquals("should have 1 article", 1, result.get("ART").size());
         assertEquals("should have 2 nouns", 2, result.get("NN").size());
         assertEquals("should have 1 punctuation", 1, result.get("PUNC").size());
-        assertEquals("should have no more TagDescription", 0,
-                result.get("TagDescription").size());
+        assertNull("should have no more TagDescription",
+                result.get("TagDescription"));
     }
 }

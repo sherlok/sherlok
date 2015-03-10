@@ -25,8 +25,9 @@ import org.junit.Test;
 import org.sherlok.Controller;
 import org.sherlok.PipelineLoader;
 import org.sherlok.UimaPipeline;
-import org.sherlok.mappings.Annotation;
+import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
+import org.sherlok.utils.Create;
 import org.sherlok.utils.SherlokTests;
 import org.sherlok.utils.Strings;
 import org.slf4j.Logger;
@@ -66,10 +67,9 @@ public class PipelineLoaderIntegrationTest {
         LOG.debug(result);
 
         SherlokTests.assertEquals(
-                map("1",
-                        new Annotation().setBegin(0).setEnd(11)
-                                .setType("NamedEntity")
-                                .addProperty("value", "person")), result,
+                map("NamedEntity",
+                        Create.list(new JsonAnnotation().setBegin(0).setEnd(11)
+                                .addProperty("value", "person"))), result,
                 Comparison.atLeast);
     }
 }
