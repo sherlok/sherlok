@@ -1,5 +1,6 @@
 {
   "name" : "bluima.preprocessing",
+  "domain" : "bluima",
   "version" : "0.1",
   "dependencies" : [
       {
