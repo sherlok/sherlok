@@ -41,16 +41,6 @@
         "parameters" : {
           "modelFile" : [ "TODO" ]
         }
-      }, {
-        "name" : "PosTagAnnotator",
-        "class" : "de.julielab.jules.ae.opennlp.PosTagAnnotator",
-        "parameters" : {
-          "tagDict" : [ "pear_resources/models/postag/tagdict-genia" ],
-          "modelFile" : [ "pear_resources/models/postag/Tagger_Genia.bin.gz" ],
-          "tagset" : [ "de.julielab.jules.types.GeniaPOSTag" ],
-          "caseSensitive" : [ "false" ],
-          "useTagdict" : [ "true" ]
-        }
       }
   ]
 }
