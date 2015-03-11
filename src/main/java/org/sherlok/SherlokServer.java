@@ -412,7 +412,7 @@ public class SherlokServer {
                 }
             }
         });
-        post(new Route("/" + RUTA_RESOURCES + "/*", JSON) { // POST
+        post(new JsonRoute("/" + RUTA_RESOURCES + "/*") { // POST
             @Override
             public Object handle(Request req, Response resp) {
                 try {
@@ -432,7 +432,7 @@ public class SherlokServer {
                 }
             }
         });
-        delete(new Route("/" + RUTA_RESOURCES + "/*", JSON) { // DELETE
+        delete(new JsonRoute("/" + RUTA_RESOURCES + "/*") { // DELETE
             @Override
             public Object handle(Request req, Response resp) {
                 try {
@@ -449,43 +449,6 @@ public class SherlokServer {
                 }
             }
         });
-
-        // ROUTES: CATCHALLS
-        // ////////////////////////////////////////////////////////////////////////////
-        /*- TODO else GET annotate fails...
-        get(new JsonRoute("/*") { // GET
-            @Override
-            public Object handle(Request req, Response resp) {
-                resp.status(STATUS_MISSING);
-                resp.type(JSON);
-                return map(MSG, "not found", ERR, req.splat()[0]);
-            }
-        }); 
-        post(new Route("/*", JSON) { // POST
-            @Override
-            public Object handle(Request req, Response resp) {
-                resp.status(STATUS_MISSING);
-                resp.type(JSON);
-                return map(MSG, "invalid POST url", ERR, req.splat()[0]);
-            }
-        });
-        delete(new Route("/*", JSON) { // DELETE
-            @Override
-            public Object handle(Request req, Response resp) {
-                resp.status(STATUS_MISSING);
-                resp.type(JSON);
-                return map(MSG, "invalid DELETE url", ERR, req.splat()[0]);
-            }
-        });
-        put(new Route("/*", JSON) { // PUT -> ask to redirect to POST
-            @Override
-            public Object handle(Request req, Response resp) {
-                resp.type(JSON);
-                resp.status(STATUS_INVALID);
-                return map(MSG, "please use POST instead of PUT");
-            }
-        });
-         */
 
         return pipelineLoader;
     }

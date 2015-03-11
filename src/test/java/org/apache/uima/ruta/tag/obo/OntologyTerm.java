@@ -1,19 +1,4 @@
-/**
- * Copyright (C) 2014-2015 Renaud Richardet
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package ch.epfl.bbp.uima.obo;
+package org.apache.uima.ruta.tag.obo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,9 +11,6 @@ import java.util.regex.Pattern;
 
 /**
  * A term in an OBO ontology.
- * 
- * @author ptc24
- *
  */
 public final class OntologyTerm {
 
@@ -36,41 +18,31 @@ public final class OntologyTerm {
     private String name;
     private String def;
     private String defSrc;
-    private List<Synonym> synonyms;
-    private Set<String> isA;
-    private Set<String> isTypeOf;
-    private Set<String> altID;
-    private Map<String, Set<String>> relationships;
+    private List<Synonym> synonyms = new ArrayList<>();
+    private Set<String> isA = new HashSet<>();
+    private Set<String> isTypeOf = new HashSet<>();
+    private Set<String> altID = new HashSet<>();
+    private Map<String, Set<String>> relationships = new HashMap<>();
 
-    private static Pattern tagValuePattern = Pattern
+    private static final Pattern tagValuePattern = Pattern
             .compile("([a-z_]+):\\s+(\\S.*)");
-    private static Pattern quotValPattern = Pattern
+    private static final Pattern quotValPattern = Pattern
             .compile("\"(.*?)(?<!\\\\)\"\\s+(.*)");
-    private static Pattern commentPattern = Pattern
+    private static final Pattern commentPattern = Pattern
             .compile("(.*?)\\s*(?<!\\\\)!\\s*(.+)");
-    private static Pattern synonymQualPattern = Pattern
+    private static final Pattern synonymQualPattern = Pattern
             .compile("\\s*(.*?)\\s*\\[(.*)\\]");
-    private static Pattern relationshipPattern = Pattern
+    private static final Pattern relationshipPattern = Pattern
             .compile("(\\S+)\\s+(\\S+)");
 
-    private OntologyTerm() {
-        altID = new HashSet<String>();
-        isA = new HashSet<String>();
-        isTypeOf = new HashSet<String>();
-        synonyms = new ArrayList<Synonym>();
-        relationships = new HashMap<String, Set<String>>();
-    }
-
     public OntologyTerm(String id, String name) {
-        this();
         this.name = name;
         this.id = id;
     }
 
-    OntologyTerm(List<String> lines) {
-        this();
+    public OntologyTerm(List<String> lines) {
         for (String line : lines) {
-        	//System.out.println(line);
+            // System.out.println(line);
             if (!line.contains(":") || line.startsWith("!"))
                 continue;
             Matcher m = tagValuePattern.matcher(line);
@@ -127,29 +99,17 @@ public final class OntologyTerm {
         }
     }
 
-    /**
-     * Gets the ontology ID of the term.
-     * 
-     * @return The ontology ID of the term.
-     */
+    /** @return The ontology ID of the term */
     public String getId() {
         return id;
     }
 
-    /**
-     * Gets the name of the term.
-     * 
-     * @return The name of the term.
-     */
+    /** @return The name of the term */
     public String getName() {
         return name;
     }
 
-    /**
-     * Gets the synonyms for the term.
-     * 
-     * @return The synonyms for the term.
-     */
+    /** @return The synonyms for the term */
     public List<Synonym> getSynonyms() {
         return synonyms;
     }
@@ -158,7 +118,7 @@ public final class OntologyTerm {
         synonyms.add(new Synonym(synonym, null, null));
     }
 
-    Set<String> getIsA() {
+    public Set<String> getIsA() {
         return isA;
     }
 
@@ -166,7 +126,7 @@ public final class OntologyTerm {
         isA.add(termId);
     }
 
-    Set<String> getIsTypeOf() {
+    public Set<String> getIsTypeOf() {
         return isTypeOf;
     }
 
@@ -174,23 +134,15 @@ public final class OntologyTerm {
         isTypeOf.add(termId);
     }
 
-    /**
-     * Gets the definition of the term.
-     * 
-     * @return The definition of the term.
-     */
+    /** @return The definition of the term */
     public String getDef() {
         return def;
     }
 
-    Map<String, Set<String>> getRelationships() {
+    public Map<String, Set<String>> getRelationships() {
         return relationships;
     }
 
-    /**
-     * A string representation of the term.
-     * 
-     */
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -215,17 +167,4 @@ public final class OntologyTerm {
         sb.append("]");
         return sb.toString();
     }
-
-    /*
-     * public String toOBOString() { StringBuffer sb = new StringBuffer();
-     * sb.append("[Term]\n"); sb.append("id: " + id + "\n"); sb.append("name: "
-     * + name + "\n"); for(Synonym synonym : synonyms) { sb.append("synonym: \""
-     * + synonym.getSyn() + "\" "); if(synonym.getType() != null)
-     * sb.append(synonym.getType() + " "); if(synonym.getSource() != null) {
-     * sb.append("[" + synonym.getSource() + "]\n"); } else { sb.append("[]\n");
-     * } } for(String isa : isA) { sb.append("is_a: " + isa + "\n"); }
-     * 
-     * return sb.toString(); }
-     */
-
 }
