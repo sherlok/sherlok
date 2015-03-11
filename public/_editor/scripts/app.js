@@ -1,4 +1,4 @@
-//'use strict';
+'use strict';
 var app = angular.module('sherlok_editor', [
   'ngSanitize',
   'ngCookies',
@@ -6,24 +6,27 @@ var app = angular.module('sherlok_editor', [
   'ngMaterial',
   'ngRoute',
   'ui.codemirror',
- // 'http-post-fix'
-  ])
-  .filter('joinBy', function () {
-    return function (input, delimiter) {
-      return (input || []).join(delimiter || ',').trim();
-    };
-  });
+  'treeControl',
+  'angularFileUpload',
+  ]);
 
+// ROUTES
 app.config(function ($routeProvider) {
-  $routeProvider.when('/', {
+  $routeProvider.when('/pipelines', {
     templateUrl: 'views/pipelines.html',
     controller: 'pipelines'
-  // }).when('/pipelines/create', {
-  //   templateUrl: 'views/pipelines/create.html',
-  //   controller: 'pipelines-create'
+  }).when('/resources', {
+    templateUrl: 'views/resources.html',
+    controller: 'resources'
   }).otherwise({
-    redirectTo: '/'
+    redirectTo: '/pipelines'
   })
+});
+
+// THEMES
+app.config(function($mdThemingProvider) {
+  $mdThemingProvider.theme('yellow')
+  .primaryPalette('yellow');
 });
 
 app.directive('renderAnnotations', function($compile) {
@@ -42,22 +45,22 @@ app.directive('renderAnnotations', function($compile) {
 });
 // Binds a (JSON) object to a textarea. Otherwise, displays [object - Object]
 app.directive('jsonText', function() {
-    return {
-        restrict: 'A',
-        require: 'ngModel',
-        link: function(scope, element, attr, ngModel) {
-          function into(input) {
-            if (input){
-              return JSON.parse(input);
-            }
-          }
-          function out(data) {
-            return JSON.stringify(data);
-          }
-          ngModel.$parsers.push(into);
-          ngModel.$formatters.push(out);
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function(scope, element, attr, ngModel) {
+      function into(input) {
+        if (input){
+          return JSON.parse(input);
         }
-    };
+      }
+      function out(data) {
+        return JSON.stringify(data);
+      }
+      ngModel.$parsers.push(into);
+      ngModel.$formatters.push(out);
+    }
+  };
 });
 
 app.controller('pipelines', function PipelineController($scope, $http, $location, $mdToast, $mdDialog, $cookies) {
@@ -69,7 +72,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
   $scope.annotate.types = [];
 
   // PIPELINE
-  loadPipelines = function(){
+  var loadPipelines = function(){
     $http.get('/pipelines').success(function (data) {
       $scope.pipelines = data;
       // open last viewed pipeline
@@ -81,7 +84,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
   }
   loadPipelines();
 
-  preProcess = function(p){
+  var preProcess = function(p){
     // transform json string array & add a few linefeeds
     p.scriptString = p.script.join('\n') + '\n\n\n';
     p.testsOk = 0;
@@ -93,8 +96,8 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     return p;
   }
 
-  postProcess = function(p){
-    pCopy = angular.copy(p);
+  var postProcess = function(p){
+    var pCopy = angular.copy(p);
     pCopy.script = p.scriptString.trim().split('\n');
     delete pCopy.scriptString;
     delete pCopy.testsOk;
@@ -126,7 +129,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
 
   $scope.savePipe = function() {
     $http.post('/pipelines', postProcess($scope.activePipe)).success(function (data) {
-      toast($mdToast, 'pipeline \''+$scope.activePipe.name+'\' saved!');
+      toast($mdToast, 'pipeline \'' + $scope.activePipe.name + '\' saved!');
       // refresh and set activePipe
       var name = $scope.activePipe.name;
       var version = $scope.activePipe.version;
@@ -188,7 +191,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
 
   // copies current pipeline, and set as first test the text to annotate
   $scope.annotateText = function(){
-     $scope.annotate.annotating = true;
+    $scope.annotate.annotating = true;
     var txt = $scope.annotate.text;
     var p = angular.copy(postProcess($scope.activePipe));
     p.tests = {"expected" : {}, "input" : txt};
@@ -205,7 +208,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     }).error(function (testResults, status) {
       alert("could not annotate text: ", testResults.failed);
       console.log(testResults);
-       $scope.annotate.annotating = false;
+      $scope.annotate.annotating = false;
     })
   };
   $scope.$watch('annotate.text', function() {
@@ -213,15 +216,12 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
   });
 
   $scope.toggleType = function(type){
-    console.log(type);
-
     if (!type.activated){// --> reactivate
       $("._inactive" + type.name)
        //.toggleClass("inline-a")
        .toggleClass("np_" + type.name)
        .toggleClass("_inactive" + type.name);
-      type.activated = false;
-
+       type.activated = false;
     } else {              // --> deactivate
       $(".np_" + type.name)
       .toggleClass("_inactive" + type.name)
@@ -233,23 +233,140 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
 
   // RUTA EDITOR
   $scope.editorOptions = {
-        lineNumbers: true,
-        mode: 'ruta',
+    lineNumbers: true,
+    mode: 'ruta',
   };
+}); ////////////////////////////////////////////////////////////////////////////////////////////////
+
+app.controller('resources', function ResourceController($scope, $route, $http, $location, $mdToast, FileUploader, $mdDialog) {
+
+  $scope.uploader = new FileUploader();
+  $scope.uploader.onErrorItem = function(fileItem, response, status, headers) {
+    console.info('onErrorItem', fileItem, response, status, headers);
+  };
+  $scope.uploader.onCompleteAll = function() {
+    loadResources();
+    toast($mdToast, 'resource sucessfully uploaded');
+  };
+
+  var toTree = function(flat){
+    var tree = {'children':[]};
+    for (var i = 0; i < flat.length; i++) {
+      var path = flat[i];
+      var t =    path.split('/');
+      var name    = t.slice(-1)[0];
+      var parents = t.slice(0, -1);
+      var runningNode = tree; // start at 'root'
+      for (var j = 0; j < parents.length; j++) { // iterate the parents down the path
+        var pName = parents[j];
+        // iterating on children and matching on name
+        var found = false;
+        for (var k = 0; !found & k < runningNode['children'].length; k++) {
+          if (runningNode['children'][k]['name'] == pName){
+            found = true;
+            runningNode = runningNode['children'][k];
+          }
+        };
+        if (!found) { // -> create new folder parent
+          runningNode['children'].push({'children':[], 'name': pName, 'isFolder':true});
+        }
+      }
+      // add new node to parent (=runningNode)
+      runningNode['children'].push({'path':'/' + path, 'name': name, 'isFolder':false});
+    }
+    return tree;
+  }
+
+  var loadResources = function(){
+    $http.get('/resources').success(function (rs) {
+      $scope.resources = rs;
+      $scope.resourcesTree = toTree(rs);
+    }).error(function (data, status) {
+      alert(JSON.stringify(data));
+    })
+  }
+  loadResources();
+
+  $scope.showResource = function(node){
+    $scope.resource = node;
+    if (!node.isFolder) {
+      $http.get('/resources' + node.path).success(function (rs) {
+        $scope.resource.content = rs;
+      }).error(function (data, status) {
+        alert(JSON.stringify(data));
+      })
+    }
+  }
+
+  $scope.deleteResource = function(){
+    var r = $scope.resource;
+    if (confirm('Delete resource '+r.name+'?')){
+      $http.delete('/resources/'+ r.path).success(function (data) {
+        toast($mdToast, 'resource \''+r.name+'\' deleted!');
+        $scope.resource = undefined;
+        loadResources();
+      }).error(function (data, status) {
+        alert('Could not delete resource, '+ JSON.stringify(data));
+      })
+    }
+  }
+
+  $scope.updateResource = function(){
+    $http({
+      method: 'POST',
+      url: '/resources/'+ $scope.resource.path,
+      headers: {'Content-Type': undefined}, //multipart/form-data fails...
+      transformRequest: function (data) {
+        var formData = new FormData();
+        formData.append("file", data);
+        return formData;
+      },
+      data: $scope.resource.content
+    }).success(function (data) {
+      toast($mdToast, 'resource \''+$scope.resource.name+'\' updated');
+    }).error(function (data, status) {
+      alert('Could not update resource, '+ JSON.stringify(data));
+      loadResources(); // refresh
+    })
+  }
+
+  $scope.showUploadDialog = function(ev) {
+    var up = $scope.uploader;
+    var parentPath = '';
+    if  (typeof $scope.resource === 'undefined'){ // no resource selected -> use root
+      parentPath = '/';
+    } else if (!$scope.resource.isFolder) { // a file -> use parent path
+      parentPath = $scope.resource.path.substring(0, $scope.resource.path.lastIndexOf("/"));
+    } else {
+      parentPath = $scope.resource.path;
+    }
+    if (parentPath.length == 0){
+      parentPath = '/';
+    }
+    $mdDialog.show({
+      controller: function ($scope, $mdDialog, $route) {
+        $scope.parentPath = parentPath;
+        $scope.up = up;
+        $scope.cancel = function() {
+          $mdDialog.cancel();
+        };
+        $scope.uploadResource = function() {
+          var f = up.queue[0];
+          f.url = '/resources/' + parentPath + '/' + f.file.name;
+          up.uploadAll();
+          $mdDialog.hide();
+        };
+      },
+      templateUrl: 'views/upload.html',
+    });
+  };
+
 });
 
-
-toast = function(toaster, msg){
+var toast = function(toaster, msg){
   toaster.show({
     template: '<md-toast>'+msg+'</md-toast>',
     hideDelay: 3000,
     position: 'bottom right'
   });
 }
-
-$("body").on("focus", ".CodeMirror", function(e){
-  // $(".CodeMirror").css("height", "auto");
-  // var myTextArea = document.getElementById('myText');
-  //   var myCodeMirror = CodeMirror.fromTextArea(myTextArea);
-  //   myCodeMirror.setSize(500, 300);
-});

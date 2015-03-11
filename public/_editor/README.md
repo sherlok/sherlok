@@ -4,14 +4,8 @@
 
 https://github.com/angular/bower-material/blob/master/README.md
 
-
-    #npm install --save-dev grunt-wiredep
-    #add bower.json
-
     bower install --save
 
-    #add <!-- bower:js --> and <!-- endbower --> in index.html
-    #grunt wiredep
 
 ## Material Design
 

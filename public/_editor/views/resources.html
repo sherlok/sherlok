@@ -1,0 +1,38 @@
+<div layout="row" md-theme="yellow">
+
+  <!-- RESOURCES LIST -->
+  <div flex=20 layout-fill>
+    <!-- <md-toolbar>
+      <h2 class="md-toolbar-tools">
+        <span>Pipelines</span>
+        <span flex></span>
+      </h2>
+    </md-toolbar> -->
+    <md-toolbar >
+      <h2 class="md-toolbar-tools">
+        <span>Resources</span>
+        <span flex></span>
+        <md-button ng-click="showUploadDialog()" aria-label="new resource">New</md-button>
+      </h2>
+    </md-toolbar>
+    <div treecontrol class="tree-classic" tree-model="resourcesTree" on-selection="showResource(node)">
+      {{node.name}}
+    </div>
+  </div>
+
+  <!-- ACTIVE RESOURCE -->
+  <div flex style="border-left: 1px solid grey;">
+    <!-- TITLE -->
+    <md-toolbar>
+      <h2 class="md-toolbar-tools">
+        <span>Resource '{{resource.name}}'</span>
+        <span flex></span>
+        <md-button ng-click="deleteResource()" ng-hide="resource.isFolder" aria-label="delete resource">delete</md-button>
+        <md-button ng-click="updateResource()" ng-hide="resource.isFolder" aria-label="save resource">update</md-button>
+      </h2>
+    </md-toolbar>
+    <md-content>
+      <textarea class="max-wide"  ng-model="resource.content" rows="100"></textarea>
+    </md-content>
+  </div>
+</div>
