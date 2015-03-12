@@ -1,0 +1,115 @@
+<div layout="row" md-theme="teal">
+
+  <!-- BUNDLES LIST -->
+  <div flex=20 layout-fill>
+    <md-toolbar >
+      <h2 class="md-toolbar-tools">
+        <md-select class="title-select" ng-model="someVal" placeholder="Bundles">
+          <md-option value="0" ><a class="no-format" href="#/">Pipelines</a></md-option>
+          <md-option value="1" ><a class="no-format" href="#/resources">Resources</a></md-option>
+          <md-option value="2" ><a class="no-format" href="#/bundles">Bundles</a></md-option>
+        </md-select>
+        <md-button ng-click="newBundle()" aria-label="new bundle">New</md-button>
+      </h2>
+    </md-toolbar>
+    <md-content>
+      <md-list "overflow:scroll">
+        <md-item ng-repeat="b in bundles | orderBy:'name'">
+          <md-item-content class="thin bundle_open_{{(bundle === b)}}" ng-click="openBundle(b)">
+            <div class="md-tile-content">
+              <h3>{{b.name}}</h3>
+              <h4>version {{b.version}}</h4>
+              <p>{{b.description | limitTo : 40}}</p>
+            </div>
+          </md-item-content>
+          <md-divider ng-if="!$last"></md-divider>
+        </md-item>
+      </md-list>
+    </md-content>
+  </div>
+
+  <!-- ACTIVE BUNDLE -->
+  <div flex style="border-left: 1px solid grey;" ng-show="bundle">
+    <md-toolbar>
+      <h2 class="md-toolbar-tools">
+        <span>Bundle '{{bundle.name}}'</span>
+        <span flex></span>
+        <md-button ng-click="jsonVisible=!jsonVisible">{{jsonVisible ? "hide json" : "show json"}}</md-button>
+        <md-button ng-click="deleteBundle()"aria-label="delete bundle">delete</md-button>
+        <md-button ng-click="saveBundle()" aria-label="save bundle">save</md-button>
+      </h2>
+    </md-toolbar>
+    <div ng-show="jsonVisible">
+      <textarea class="max-wide" json-text ng-model="bundle" rows="50"></textarea>
+    </div>
+    <div ng-hide="jsonVisible">
+      <div layout="row" layout-padding>
+        <md-input-container>
+          <label>Bundle Name</label>
+          <input class="wide" ng-model="bundle.name" required type="text">
+        </md-input-container>
+        <md-input-container>
+          <label>Version Name</label>
+          <input class="wide" ng-model="bundle.version" required type="text">
+        </md-input-container>
+        <md-input-container>
+          <label>Domain</label>
+          <input class="wide" ng-model="bundle.domain" type="text">
+        </md-input-container>
+      </div>
+      <div layout="row" layout-padding>
+        <md-input-container tabindex="-1" ng-model="bundle.description" label="Description" class="ng-isolate-scope md-default-theme md-input-has-value ng-valid" aria-invalid="false">
+          <label for="p_desc" class="ng-binding">Description</label>
+          <textarea rows="2" cols="60" id="p_desc" aria-disabled="false"
+            ng-model="bundle.description"></textarea>
+        </md-input-container>
+      </div>
+
+      <!-- ENGINES -->
+      <md-toolbar class="thin">
+        <h2 class="md-toolbar-tools">
+          <span flex>Engines</span>
+          <span flex></span>
+          <md-button ng-click="newEngine()" aria-label="new engine">New</md-button>
+        </h2>
+      </md-toolbar>
+      <md-content class="md-padding fat-bottom" ng-repeat="e in bundle.engines | orderBy:'name'">
+        <form>
+          <div layout layout-sm="column">
+            <md-input-container style="width:45%">
+              <label>Engine Name</label>
+              <input ng-model="e.name" type="text">
+            </md-input-container>
+            <md-input-container flex>
+              <label>Engine Class</label>
+              <input ng-model="e.class" required type="text">
+            </md-input-container>
+          </div>
+        </form>
+      </md-content>
+
+      <!-- DEPENDENCIES -->
+      <md-toolbar class="thin">
+        <h2 class="md-toolbar-tools">
+          <span flex>Dependencies</span>
+          <span flex></span>
+          <md-button ng-click="newDep()" aria-label="new dep">New</md-button>
+        </h2>
+      </md-toolbar>
+      <md-content class="md-padding fat-bottom" ng-repeat="d in bundle.dependencies | orderBy:'name'">
+        <form>
+          <div layout layout-sm="column">
+            <md-input-container style="width:85%">
+              <label>Dependency Value</label>
+              <input ng-model="d.value" required type="text">
+            </md-input-container>
+            <md-input-container flex>
+              <label>Dependency Type</label>
+              <input ng-model="d.type" type="text">
+            </md-input-container>
+          </div>
+        </form>
+      </md-content>
+    </div>
+  </div>
+</div>

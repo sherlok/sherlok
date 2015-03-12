@@ -10,6 +10,15 @@ md-input-group.wide > input {
     width: 280px;
 }
 
+/* less padding */
+md-content.md-padding {
+    padding: 8px;
+}
+
+md-content.fat-bottom.md-teal-theme {
+    border-bottom: 3px rgb(0, 150, 136) solid;
+}
+
 /* thinner toolbar */
 md-toolbar.thin {
     min-height: 35px;
@@ -27,6 +36,11 @@ md-item-content.thin div.md-tile-content {
 /* active pipe in list is blue */
 md-item-content.pipe_open_true div.md-tile-content {
     background-color: #3f51b5;
+    color: white;
+}
+/* active bundle in list is teal */
+md-item-content.bundle_open_true div.md-tile-content {
+    background-color: rgb(0, 150, 136);
     color: white;
 }
 
@@ -83,6 +97,27 @@ md-checkbox {
 }
 md-checkbox.md-default-theme.md-checked div.md-icon {
     background-color: gray;
+}
+
+.100p-height {
+    height:100%;
+}
+
+
+/* dropdown menu on topleft */
+md-select.title-select md-select-label span {
+    color: white;
+    font-size: 21px;
+}
+md-toolbar.md-yellow-theme md-select-label span {
+    color: black;
+}
+md-select.title-select {
+    padding-bottom: 20px;
+}
+a.no-format{
+    text-decoration: none;
+    color: black;
 }
 
 /* toast with different color */

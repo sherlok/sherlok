@@ -2,15 +2,13 @@
 
   <!-- RESOURCES LIST -->
   <div flex=20 layout-fill>
-    <!-- <md-toolbar>
-      <h2 class="md-toolbar-tools">
-        <span>Pipelines</span>
-        <span flex></span>
-      </h2>
-    </md-toolbar> -->
     <md-toolbar >
       <h2 class="md-toolbar-tools">
-        <span>Resources</span>
+        <md-select class="title-select" ng-model="someVal" placeholder="Resources">
+          <md-option value="0" ><a class="no-format" href="#/">Pipelines</a></md-option>
+          <md-option value="1" ><a class="no-format" href="#/resources">Resources</a></md-option>
+          <md-option value="2" ><a class="no-format" href="#/bundles">Bundles</a></md-option>
+        </md-select>
         <span flex></span>
         <md-button ng-click="showUploadDialog()" aria-label="new resource">New</md-button>
       </h2>
@@ -22,17 +20,17 @@
 
   <!-- ACTIVE RESOURCE -->
   <div flex style="border-left: 1px solid grey;">
-    <!-- TITLE -->
     <md-toolbar>
-      <h2 class="md-toolbar-tools">
+      <h2 class="md-toolbar-tools" ng-show="resource">
         <span>Resource '{{resource.name}}'</span>
         <span flex></span>
+        <md-button ng-href="/resources{{resource.path}}" ng-hide="resource.isFolder" aria-label="download resource">download</md-button>
         <md-button ng-click="deleteResource()" ng-hide="resource.isFolder" aria-label="delete resource">delete</md-button>
         <md-button ng-click="updateResource()" ng-hide="resource.isFolder" aria-label="save resource">update</md-button>
       </h2>
     </md-toolbar>
     <md-content>
-      <textarea class="max-wide"  ng-model="resource.content" rows="100"></textarea>
+      <textarea class="max-wide 100p-height" ng-model="resource.content" rows="100"></textarea>
     </md-content>
   </div>
 </div>

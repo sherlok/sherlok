@@ -5,7 +5,7 @@ div.CodeMirror {
 
 .CodeMirror-code pre {
   font-size: 15px;
-  font-family: 'Inconsolata', 'courier';
+  font-family: 'Source Code Pro', 'courier';
 }
 
 .cm-s-default .cm-comment     {color: #3f7f5f;}

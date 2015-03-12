@@ -18,6 +18,9 @@ app.config(function ($routeProvider) {
   }).when('/resources', {
     templateUrl: 'views/resources.html',
     controller: 'resources'
+  }).when('/bundles', {
+    templateUrl: 'views/bundles.html',
+    controller: 'bundles'
   }).otherwise({
     redirectTo: '/pipelines'
   })
@@ -27,6 +30,8 @@ app.config(function ($routeProvider) {
 app.config(function($mdThemingProvider) {
   $mdThemingProvider.theme('yellow')
   .primaryPalette('yellow');
+  $mdThemingProvider.theme('teal')
+  .primaryPalette('teal');
 });
 
 app.directive('renderAnnotations', function($compile) {
@@ -54,8 +59,8 @@ app.directive('jsonText', function() {
           return JSON.parse(input);
         }
       }
-      function out(data) {
-        return JSON.stringify(data);
+      function out(obj) {
+        return angular.toJson(obj, 2);
       }
       ngModel.$parsers.push(into);
       ngModel.$formatters.push(out);
@@ -65,6 +70,7 @@ app.directive('jsonText', function() {
 
 app.controller('pipelines', function PipelineController($scope, $http, $location, $mdToast, $mdDialog, $cookies) {
   $scope.tabsSelectedIndex = 0;
+  $scope.jsonVisible = false;
 
   $scope.annotate = {};
   $scope.annotate.annotating = false;
@@ -250,10 +256,10 @@ app.controller('resources', function ResourceController($scope, $route, $http, $
   };
 
   var toTree = function(flat){
-    var tree = {'children':[]};
+    var tree = { 'children':[], 'path':''};
     for (var i = 0; i < flat.length; i++) {
-      var path = flat[i];
-      var t =    path.split('/');
+      var path    = flat[i];
+      var t       = path.split('/');
       var name    = t.slice(-1)[0];
       var parents = t.slice(0, -1);
       var runningNode = tree; // start at 'root'
@@ -263,17 +269,24 @@ app.controller('resources', function ResourceController($scope, $route, $http, $
         var found = false;
         for (var k = 0; !found & k < runningNode['children'].length; k++) {
           if (runningNode['children'][k]['name'] == pName){
-            found = true;
-            runningNode = runningNode['children'][k];
+            found = true; // already one node for this folder
+            runningNode = runningNode['children'][k]; // update runningNode
           }
-        };
-        if (!found) { // -> create new folder parent
-          runningNode['children'].push({'children':[], 'name': pName, 'isFolder':true});
+        }
+        if (!found) { // -> create new folder for this parent
+          runningNode['children'].push({
+            'children' : [],
+            'name': pName,
+            'isFolder' : true,
+            'path': runningNode['path'] + '/' + pName
+          });
+          runningNode = runningNode['children'].slice(-1)[0];// last (that we just added)
         }
       }
       // add new node to parent (=runningNode)
       runningNode['children'].push({'path':'/' + path, 'name': name, 'isFolder':false});
     }
+    console.log(tree);
     return tree;
   }
 
@@ -338,7 +351,7 @@ app.controller('resources', function ResourceController($scope, $route, $http, $
     } else if (!$scope.resource.isFolder) { // a file -> use parent path
       parentPath = $scope.resource.path.substring(0, $scope.resource.path.lastIndexOf("/"));
     } else {
-      parentPath = $scope.resource.path;
+      parentPath = $scope.resource.path || '';
     }
     if (parentPath.length == 0){
       parentPath = '/';
@@ -355,12 +368,55 @@ app.controller('resources', function ResourceController($scope, $route, $http, $
           f.url = '/resources/' + parentPath + '/' + f.file.name;
           up.uploadAll();
           $mdDialog.hide();
+
         };
       },
       templateUrl: 'views/upload.html',
     });
   };
+});
 
+app.controller('bundles', function BundleController($scope, $http, $mdToast) {
+
+  $scope.jsonVisible = true;
+
+  var loadBundles = function(){
+    $http.get('/bundles').success(function (data) {
+      $scope.bundles = data;
+    }).error(function (data, status) {
+      alert(JSON.stringify(data));
+    })
+  }
+  loadBundles();
+
+  $scope.openBundle = function(b){
+    $scope.bundle = b;
+  };
+
+  $scope.newBundle = function() {
+    $scope.bundle = {};
+  };
+
+  $scope.deleteBundle = function() {
+    var name = $scope.bundle.name;
+    if (confirm('Delete bundle '+name+'?')){
+      $http.delete('/bundles/'+ $scope.bundle.name+'/'+$scope.bundle.version).success(function (data) {
+        toast($mdToast, 'bundle \''+$scope.bundle.name+'\' deleted!');
+        $scope.bundle = undefined;
+        loadBundles();
+      }).error(function (data, status) {
+        alert('Could not delete bundle, '+ JSON.stringify(data));
+      })
+    }
+  };
+
+  $scope.saveBundle = function() {
+    $http.post('/bundles', $scope.bundle).success(function (data) {
+      toast($mdToast, 'bundle \'' + $scope.bundle.name + '\' saved!');
+    }).error(function (data, status) {
+      alert('could not save bundle, '+  JSON.stringify(data));
+    })
+  };
 });
 
 var toast = function(toaster, msg){
