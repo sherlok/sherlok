@@ -1,0 +1,46 @@
+{
+  "name" : "bluima.preprocessing",
+  "domain" : "bluima",
+  "version" : "0.1",
+  "dependencies" : [
+      {
+        "value" : "ch.epfl.bbp.nlp:bluima_opennlp:0.1"
+      }, {
+        "value" : "ch.epfl.bbp.nlp:bluima_sentence_detector_genia:0.1"
+      }, {
+        "value" : "ch.epfl.bbp.nlp:bluima_sentence_detector_pennbio:0.1"
+      }
+  ],
+  "engines" : [
+      {
+        "name" : "ChunkAnnotator",
+        "class" : "ch.epfl.bbp.uima.ae.ChunkAnnotator",
+        "parameters" : {
+          "posTagSetPreference" : [ "de.julielab.jules.types.GeniaPOSTag" ],
+          "modelFile" : [ "" ]
+        }
+      }, {
+        "name" : "PosTagAnnotator",
+        "class" : "ch.epfl.bbp.uima.ae.PosTagAnnotator",
+        "parameters" : {
+          "tagDict" : [ "pear_resources/models/postag/tagdict-genia" ],
+          "modelFile" : [ "pear_resources/models/postag/Tagger_Genia.bin.gz" ],
+          "tagset" : [ "de.julielab.jules.types.GeniaPOSTag" ],
+          "caseSensitive" : [ "false" ],
+          "useTagdict" : [ "true" ]
+        }
+      }, {
+        "name" : "SentenceAnnotator",
+        "class" : "ch.epfl.bbp.uima.ae.SentenceAnnotator",
+        "parameters" : {
+          "model" : [ "ch.epfl.bbp.nlp.res.sentence.GeniaResource" ]
+        }
+      }, {
+        "name" : "TokenAnnotator",
+        "class" : "ch.epfl.bbp.uima.ae.TokenAnnotator",
+        "parameters" : {
+          "modelFile" : [ "TODO" ]
+        }
+      }
+  ]
+}
