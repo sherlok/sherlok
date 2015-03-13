@@ -1,0 +1,7 @@
+{
+  "name" : "bluima.token",
+  "version" : "0.1",
+  "description" : "tokenizer",
+  "domain" : "bluima",
+  "script": ["ENGINE TokenAnnotator:0.1;"]
+}

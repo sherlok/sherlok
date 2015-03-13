@@ -1,0 +1,7 @@
+{
+  "name" : "bluima.chunk",
+  "version" : "0.1",
+  "description" : "tokenizer",
+  "domain" : "bluima",
+  "script": ["ENGINE ChunkAnnotator:0.1;"]
+}

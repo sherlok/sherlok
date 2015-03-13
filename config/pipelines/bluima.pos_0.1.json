@@ -1,0 +1,7 @@
+{
+  "name" : "bluima.pos",
+  "version" : "0.1",
+  "description" : "tokenizer",
+  "domain" : "bluima",
+  "script": ["ENGINE PosTagAnnotator:0.1;"]
+}
