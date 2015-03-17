@@ -6,9 +6,17 @@
       {
         "value" : "ch.epfl.bbp.nlp:bluima_opennlp:0.1"
       }, {
+        "value" : "ch.epfl.bbp.nlp:bluima_chunker_genia:0.1"
+      }, {
+        "value" : "ch.epfl.bbp.nlp:bluima_postagger_genia:0.1"
+      }, {
         "value" : "ch.epfl.bbp.nlp:bluima_sentence_detector_genia:0.1"
       }, {
         "value" : "ch.epfl.bbp.nlp:bluima_sentence_detector_pennbio:0.1"
+      }, {
+        "value" : "ch.epfl.bbp.nlp:bluima_tagdict_genia:0.1"
+      }, {
+        "value" : "ch.epfl.bbp.nlp:bluima_tokenizer_genia:0.1"
       }
   ],
   "engines" : [
@@ -17,14 +25,14 @@
         "class" : "ch.epfl.bbp.uima.ae.ChunkAnnotator",
         "parameters" : {
           "posTagSetPreference" : [ "de.julielab.jules.types.GeniaPOSTag" ],
-          "modelFile" : [ "" ]
+          "model" : [ "ch.epfl.bbp.nlp.res.chunk.GeniaResource" ]
         }
       }, {
         "name" : "PosTagAnnotator",
         "class" : "ch.epfl.bbp.uima.ae.PosTagAnnotator",
         "parameters" : {
-          "tagDict" : [ "pear_resources/models/postag/tagdict-genia" ],
-          "modelFile" : [ "pear_resources/models/postag/Tagger_Genia.bin.gz" ],
+          "tagDict" : [ "ch.epfl.bbp.nlp.res.tag.dict.GeniaResource" ],
+          "model" : [ "ch.epfl.bbp.nlp.res.tag.GeniaResource" ],
           "tagset" : [ "de.julielab.jules.types.GeniaPOSTag" ],
           "caseSensitive" : [ "false" ],
           "useTagdict" : [ "true" ]
@@ -39,7 +47,7 @@
         "name" : "TokenAnnotator",
         "class" : "ch.epfl.bbp.uima.ae.TokenAnnotator",
         "parameters" : {
-          "modelFile" : [ "TODO" ]
+          "model" : [ "ch.epfl.bbp.nlp.res.token.GeniaResource" ]
         }
       }
   ]
