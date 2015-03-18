@@ -1,23 +1,12 @@
 var Sherlok = {
 
-  blacklist : ["Sofa", "DocumentAnnotation","BrainRegionProp"], // TODO remove BrainRegionProp
+  blacklist : ["Sofa", "DocumentAnnotation", "BrainRegionProp"], // TODO remove BrainRegionProp
 
   annotate: function (pipelineId, version, text, success) {
-    $.post("/annotate/" + pipelineId, {"text": text, "version": version}, function(annotated_json) {
-      // collect annotations
-      var annots = [];
-      annotated_json["@cas_views"]["1"].map(function(fs){
-        var a = annotated_json["annotations"][fs];
-        if (Sherlok.blacklist.indexOf(a["@type"]) == -1) {
-          a["begin"] = a["begin"] || 0;
-          annots[annots.length] = a;
-        }
-      });
-      success(annots);
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-      console.log("error",jqXHR);
-      alert("Error: " + jqXHR.responseJSON.errorMessage);
+    post("/annotate/" + pipelineId, {"text": text, "version": version}, success,
+    function(status, responseText) {
+      console.log("error",status,responseText);
+      alert("Error: " + responseText);
     });
   },
 
@@ -98,7 +87,7 @@ var Sherlok = {
           closeSpan();
           html += '<br/>';
           openSpan(types, c);
-        }else{
+        } else {
           html += '<br/>';
         }
       } else {
@@ -146,3 +135,35 @@ function predicatBy(prop) { // sort by inverse predicate
     } else {                        return 0;}
   }
 }
+
+function post (url, data, success, error) {
+  var request = new XMLHttpRequest();
+  request.open('POST', url, true);
+  request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+  request.onreadystatechange = function() {
+    if (this.readyState === 4) {
+      if (this.status >= 200 && this.status < 400) {
+        success(JSON.parse(this.responseText));
+      } else {
+        error(this.status, this.responseText);
+      }
+    }
+  };
+  var transformRequest =  function(obj) {
+    var str = [];
+    for(var p in obj)
+    str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+      return str.join("&");
+  };
+  request.send(transformRequest(data));
+  request = null;
+}
+
+/*
+Sherlok.annotate('02.ruta.annotate.countries', null, 'I &love Italy.', function(data){
+  console.log(data);
+  Sherlok.annotateElement('I &love Italy.', data["_views"]["_InitialView"], function(an){
+    console.log(an);
+  });
+}, function(data){ console.log(data); });
+*/

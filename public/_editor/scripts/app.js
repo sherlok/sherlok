@@ -98,14 +98,16 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     for (var i = p.tests.length - 1; i >= 0; i--) {
       p.tests[i].visible = false;
       p.tests[i].actual = p.tests[i].expected;
-    };
+    }
     return p;
   }
 
   var postProcess = function(p){
     var pCopy = angular.copy(p);
-    pCopy.script = p.scriptString.trim().split('\n');
-    delete pCopy.scriptString;
+    if (pCopy.scriptString){
+      pCopy.script = p.scriptString.trim().split('\n');
+      delete pCopy.scriptString;
+    }
     delete pCopy.testsOk;
     delete pCopy.testsFailed;
     return pCopy;
@@ -113,11 +115,13 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
 
   $scope.openPipe = function(p){
     $scope.activePipe = preProcess(p);
+    $scope.annotate.annotating = false;
+    $scope.testing = false;
     $cookies.lastPipeline = $scope.pipelines.indexOf(p);
   };
 
   $scope.newPipe = function() {
-    $scope.activePipe = {};
+    $scope.activePipe = { 'script': '', 'tests': {}};
   };
 
   $scope.deletePipe = function() {
@@ -140,8 +144,8 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
       var name = $scope.activePipe.name;
       var version = $scope.activePipe.version;
       loadPipelines();
-      for (pid in $scope.pipelines){
-        p = $scope.pipelines[pid];
+      for (var pid in $scope.pipelines){
+        var p = $scope.pipelines[pid];
         if (p.name == name && p.version == version){
           $scope.activePipe = p;
           $scope.activePipe.scriptString = $scope.activePipe.script.join('\n');
@@ -154,6 +158,10 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
 
   // TESTS
   $scope.runAllTests = function(){
+    if ($scope.activePipe.tests.length == 0){
+      toast($mdToast, 'no tests for this pipeline!');
+      return;
+    }
     $scope.testing = true;
     $http.post('/test', postProcess($scope.activePipe)).success(function (data) {
       toast($mdToast, 'all tests passed!');

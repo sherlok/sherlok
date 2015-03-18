@@ -18,11 +18,11 @@
 
 * P1 should work offline, too
 
-* P2 spinning wheel while running tests
 
 
 * P3 p not highlighted anymore when save
 
+* .NET client, e.g. http://blog.anthonybaker.me/2013/05/how-to-consume-json-rest-api-in-net.html?m=1 or https://msdn.microsoft.com/en-us/magazine/ee309509.aspx
 
 # OTHERS
 
@@ -36,6 +36,7 @@
 # DONE
 
 * P3 order of pipelines in right col
+* P2 spinning wheel while running tests
 
 
 # TO IMPLEMENT

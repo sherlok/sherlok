@@ -1,3 +1,12 @@
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Source Code Pro'),
+       local('SourceCodePro-Regular'),
+       url(SourceCodePro.woff2) format('woff2'),
+       url(SourceCodePro.woff) format('woff');
+}
 
 /* more compact */
 md-input-group, .md-input-group {
