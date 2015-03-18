@@ -2,6 +2,7 @@
 
   <!-- LOGBACK logging config file, see http://logback.qos.ch/manual/joran.html -->
 
+
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <!-- http://logback.qos.ch/manual/layouts.html#ClassicPatternLayout -->
@@ -11,8 +12,8 @@
     </encoder>
   </appender>
 
-  <!-- set to DEBUG, INFO, etc. -->
-  <root level="debug">
+  <!-- set to TRACE, DEBUG, INFO, etc. -->
+  <root level="DEBUG">
     <appender-ref ref="STDOUT" />
   </root>
 
@@ -28,10 +29,6 @@
   <logger name="org.eclipse.jetty.server" level="WARN" />
   <logger name="spark" level="INFO" />
   <logger name="de.tudarmstadt.ukp.dkpro.core.api.resources.ResourceObjectProviderBase" level="WARN" />
-
-
   <logger name="org.eclipse.aether.internal.impl" level="WARN" />
-  <logger name="de.tudarmstadt.ukp.dkpro.core.api.resources.ResourceObjectProviderBase" level="WARN" />
-
 
 </configuration>

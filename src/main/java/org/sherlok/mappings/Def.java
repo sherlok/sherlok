@@ -33,7 +33,7 @@ public abstract class Def {
 
     public static final String SEPARATOR = ":";
 
-    /** a unique name for this bundle. Letters, numbers, dots and underscore only */
+    /** unique name for this bundle. Letters, numbers, dots and underscore only */
     protected String name,
     /**
      * a unique version id for this bundle. Letters, numbers, dots and
@@ -41,12 +41,14 @@ public abstract class Def {
      */
     version,
     /** (optional) */
-    description,
+    description = "",
     /**
      * Useful to group engine sets together. Letters, numbers, slashes and
-     * underscore only
+     * underscore only. If empty (""), then defaults to no domain, meaning that
+     * pipeline is stored on disk at the root of
+     * {@link FileBased#PIPELINES_PATH}.
      */
-    domain;
+    domain = "";
 
     // get/set
 
@@ -86,11 +88,13 @@ public abstract class Def {
         return this;
     }
 
+    @JsonIgnore
     public void validate(String msgName) throws ValidationException {
         checkOnlyAlphanumDotUnderscore(name, msgName + " 'name' ");
         checkOnlyAlphanumDotUnderscore(version, msgName + " 'version' ");
     }
 
+    @JsonIgnore
     /** Creates an id for this def, composed of 'name:version' */
     public static String createId(String name, String version) {
         return name + SEPARATOR + (version == null ? "null" : version);

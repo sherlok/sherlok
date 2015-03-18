@@ -15,6 +15,8 @@
  */
 package org.sherlok.mappings;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateTypeIdentifier;
 import static org.sherlok.utils.Create.list;
@@ -52,7 +54,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 // ensure property output order
 @JsonPropertyOrder(value = { "name", "version", "description", "language",
         "domain", "loadOnStartup", "scriptLines", "output", "tests" }, alphabetic = true)
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonInclude(NON_DEFAULT)
 public class PipelineDef extends Def {
 
     /** Which language this pipeline works for (ISO code). Defaults to 'en' */
@@ -66,6 +68,7 @@ public class PipelineDef extends Def {
     private PipelineOutput output = new PipelineOutput();
 
     /** Embedded (integration) tests */
+    @JsonInclude(ALWAYS)
     private List<PipelineTest> tests = list();
 
     /** Whether to run this pipeline when it is loaded. Defaults true */
@@ -116,14 +119,14 @@ public class PipelineDef extends Def {
      * {@link JsonAnnotation}s
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    @JsonInclude(NON_DEFAULT)
     @JsonPropertyOrder(value = { "input", "expected", "comparison" }, alphabetic = true)
     public static class PipelineTest {
 
         public enum Comparison {
-            /** all expected {@link Annotation}s are present in system */
+            /** all expected {@link JsonAnnotation}s are present in system */
             atLeast,
-            /** expected and system {@link Annotation}s are exactly equals */
+            /** expected and system {@link JsonAnnotation}s are exactly equals */
             exact;
         }
 
