@@ -107,7 +107,7 @@ public class SherlokServer {
     public static final String TEST_TEXT = "Using this calibration procedure, we find that mature granule cells (doublecortin-) contain approximately 40 microm, and newborn granule cells (doublecortin+) contain 0-20 microm calbindin-D28k. U.S. employers added the largest number of workers in nearly three years in October and wages increased, which could bring the Federal Reserve closer to raising interest rates. Nonfarm payrolls surged by 321,000 last month, the most since January of 2012, the Labor Department said on Friday. The unemployment rate held steady at a six-year low of 5.8 percent. Data for September and October were revised to show 44,000 more jobs created than previously reported. Economists polled by Reuters had forecast payrolls increasing by only 230,000 last month. November marked the 10th straight month that job growth has exceeded 200,000, the longest stretch since 1994, and further confirmed the economy is weathering slowdowns in China and the euro zone, as well as a recession in Japan.";
 
     /** Called at server startup. Registers all {@link Route}s */
-    public static PipelineLoader init(int port, String ip, String masterUrl,
+    public static void init(int port, String ip, String masterUrl,
             boolean sealed) throws ValidationException {
 
         // CONFIG
@@ -333,9 +333,10 @@ public class SherlokServer {
                     if (b != null) {
                         resp.type(JSON);
                         return b;
-                    } else
+                    } else {
                         throw new ValidationException(map(MSG, "bundle id",
                                 ERR_NOTFOUND, id));
+                    }
                 } catch (ValidationException ve) {
                     return invalid("GET bundle '" + name + "'", ve, resp);
                 } catch (Exception e) {
@@ -378,14 +379,14 @@ public class SherlokServer {
         });
 
         // ROUTES: RUTA RESOURCES
-        // ////////////////////////////////////////////////////////////////////////////
+        // ////////////////////////////////////////////////////////////////////
         get(new JsonRoute("/" + RUTA_RESOURCES) { // LIST
             @Override
             public Object handle(Request req, Response resp) {
                 try {
                     resp.type(JSON);
                     return controller.listResources();
-                } catch (Exception e) {// this error should not happen
+                } catch (Exception e) { // this error should not happen
                     return error("LIST resources", e, resp);
                 }
             }
@@ -419,10 +420,19 @@ public class SherlokServer {
                     String path = req.splat()[0];
                     req.raw().setAttribute("org.eclipse.multipartConfig",
                             RUTA_RESOURCES_UPLOAD_CONFIG);
-                    Part part = req.raw().getPart("file");
+                    resp.type(JSON);
+
+                    Part part;
+                    try {
+                        part = req.raw().getPart("file");
+                    } catch (Exception e) {
+                        return invalid(
+                                "POST resource: Invalid part 'file'",
+                                new ValidationException(map("error",
+                                        e.getMessage())), resp);
+                    }
                     controller.putResource(path, part);
                     resp.status(STATUS_OK);
-                    resp.type(JSON);
                     return map(STATUS, "created", "resource_path", path);
                 } catch (ValidationException ve) {
                     return invalid("POST resource '" + req.body() + "'", ve,
@@ -449,8 +459,6 @@ public class SherlokServer {
                 }
             }
         });
-
-        return pipelineLoader;
     }
 
     protected static Object annotateRequest(Request req, Response resp,

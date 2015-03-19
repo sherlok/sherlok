@@ -228,7 +228,7 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Add git revision number -->
+      <!-- Add git revision number, used to display it at startup -->
       <plugin>
         <groupId>pl.project13.maven</groupId>
         <artifactId>git-commit-id-plugin</artifactId>
@@ -245,7 +245,7 @@
           <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
         </configuration>
       </plugin>
-      <!-- LICENSE -->
+      <!-- add licence at top of each file, run it with 'mvn license:format'-->
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
@@ -304,9 +304,11 @@
   </build>
 
   <profiles>
-    <!-- TEST COVERAGE REPORTS -->
+    <!-- TEST COVERAGE REPORTS, run it like:
+      mvn clean test jacoco:report -P test_coverage
+      then open target/site/jacoco/index.html -->
     <profile>
-      <id>test coverage</id>
+      <id>test_coverage</id>
       <build>
         <plugins>
           <plugin>

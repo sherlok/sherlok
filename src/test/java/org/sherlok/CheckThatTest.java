@@ -16,6 +16,7 @@
 package org.sherlok;
 
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
+import static org.sherlok.utils.CheckThat.validateDomain;
 import static org.sherlok.utils.CheckThat.validateId;
 
 import org.junit.Test;
@@ -23,6 +24,16 @@ import org.sherlok.utils.CheckThat;
 import org.sherlok.utils.ValidationException;
 
 public class CheckThatTest {
+
+    @Test(expected = ValidationException.class)
+    public void testNull() throws Exception {
+        checkOnlyAlphanumDotUnderscore(null, "");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testEmpty() throws Exception {
+        checkOnlyAlphanumDotUnderscore("", "");
+    }
 
     @Test(expected = ValidationException.class)
     public void testStar() throws Exception {
@@ -38,6 +49,40 @@ public class CheckThatTest {
     public void test() throws Exception {
         checkOnlyAlphanumDotUnderscore("abAC09.32no__in23", "");
     }
+
+    // DOMAIN
+
+    @Test(expected = ValidationException.class)
+    public void testDomainNull() throws Exception {
+        validateDomain(null, "");
+    }
+
+    @Test
+    public void testDomainEmpty() throws Exception {
+        validateDomain("", "");// this is OK!
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testDomainStar() throws Exception {
+        validateDomain("*_", "");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testDomainDotDot() throws Exception {
+        validateDomain("a..b", "");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testDomainParenthesis() throws Exception {
+        validateDomain("(asd)", "");
+    }
+
+    @Test
+    public void testDomain() throws Exception {
+        validateDomain("abAC/09.32/no__in23", "");
+    }
+
+    // ID
 
     @Test
     public void testValidId() throws Exception {

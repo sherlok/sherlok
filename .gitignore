@@ -18,6 +18,7 @@ release.properties
 ###################
 .project
 .metadata
+.checkstyle
 *.tmp
 local.properties
 .classpath

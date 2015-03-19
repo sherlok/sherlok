@@ -89,6 +89,7 @@ public class PipelineDefTest {
         p.setName("n");
         p.setVersion("v");
         p.validate("");
+        assertEquals("n:v", p.toString());
     }
 
 }

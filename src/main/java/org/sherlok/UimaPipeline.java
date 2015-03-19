@@ -120,8 +120,9 @@ public class UimaPipeline {
         initScript(list(pipelineDef.getScriptLines()) /* a copy */, engineDefs);
         initEngines();
         casPool = initCasPool(tsd);
-        jsonSerializer = filterAnnots(pipelineDef.getOutput().getAnnotationIncludes(),
-                pipelineDef.getOutput().getAnnotationFilters(), casPool);
+        jsonSerializer = filterAnnots(pipelineDef.getOutput()
+                .getAnnotationIncludes(), pipelineDef.getOutput()
+                .getAnnotationFilters(), casPool);
 
         if (pipelineDef.isWarmup()) {
             // ensures Ruta errors can be catched, at last
@@ -225,13 +226,11 @@ public class UimaPipeline {
 
         try {
             // initialize Engines
-            if (aes == null) { // not initialized yet
-                aes = createEngines(aeds
-                        .toArray(new AnalysisEngineDescription[aeds.size()]));
-            }
+            aes = createEngines(aeds.toArray(new AnalysisEngineDescription[aeds
+                    .size()]));
         } finally { // so that we restore Sysout in any case
 
-            // catching Ruta script outputs (these contain errors) and errors
+            // catching Ruta script outputs (these contain errors)
             String maybeOut = baosOut.toString();
             System.setOut(origOut); // restore
             String maybeErr = baosErr.toString();

@@ -19,8 +19,8 @@
 #   standalone Sherlok release  #
 #################################
 
-MAVEN="mvn -Dmaven.test.skip=true"
-#MAVEN="mvn clean test"
+#MAVEN="mvn -Dmaven.test.skip=true"
+MAVEN="mvn clean test"
 
 # create release directory
 RELEASE=sherlok_`date +"%Y%m%d"`
@@ -29,6 +29,8 @@ if [ -e "$RELEASE" ]; then
 	echo "Release '$RELEASE' already exists, exiting."; exit;
 fi
 mkdir "$RELEASE"
+
+mv local_repo /tmp/. # start with a fresh local_repo
 
 # package sherlok module with appassembler
 $MAVEN package appassembler:assemble

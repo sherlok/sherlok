@@ -20,6 +20,8 @@ import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
 import static org.sherlok.utils.CheckThat.validateArgument;
+import static org.sherlok.utils.CheckThat.validateId;
+import static org.sherlok.utils.CheckThat.validatePath;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.ValidationException.ERR;
@@ -42,6 +44,7 @@ import org.apache.commons.io.FileUtils;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.Def;
 import org.sherlok.mappings.PipelineDef;
+import org.sherlok.utils.CheckThat;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -218,10 +221,11 @@ public class FileBased {
             return MAPPER.readValue(new FileInputStream(f), clazz);
 
         } catch (FileNotFoundException io) {
-            throw new ValidationException("pipeline does not exsist", io
-                    .getMessage().replaceFirst(PIPELINES_PATH, "")
-                    .replaceFirst(//
-                            "\\(No such file or directory\\)", ""));
+            throw new ValidationException(clazz.getSimpleName().replaceAll(
+                    "Def$", "")
+                    + " does not exist", io.getMessage()
+                    .replaceFirst(PIPELINES_PATH, "").replaceFirst(//
+                            "\\(No such file or directory\\)", "").trim());
         } catch (UnrecognizedPropertyException upe) {
             String msg = "Unrecognized field \"" + upe.getPropertyName()
                     + "\" in file '" + f.getName() + "',  "
@@ -308,6 +312,7 @@ public class FileBased {
 
     public static boolean deleteBundle(String bundleId)
             throws ValidationException {
+        validateId(bundleId, "BundleId not valid: ");
         File defFile = new File(BUNDLES_PATH + getName(bundleId) + "_"
                 + getVersion(bundleId) + ".json");
         if (!defFile.exists())
@@ -318,6 +323,7 @@ public class FileBased {
 
     public static boolean deletePipeline(String pipelineId, String domain)
             throws ValidationException {
+        validateId(pipelineId, "PipelineId not valid: ");
         File defFile = new File(PIPELINES_PATH + domain + "/"
                 + getName(pipelineId) + "_" + getVersion(pipelineId) + ".json");
         if (!defFile.exists())
@@ -328,6 +334,7 @@ public class FileBased {
     }
 
     public static void deleteResource(String path) throws ValidationException {
+        validatePath(path, path);
         File file = new File(RUTA_RESOURCES_PATH, path);
         validateArgument(file.exists(), "could not find file '" + path + "'");
         validateArgument(file.delete(), "could not delete file '" + path + "'");
@@ -335,6 +342,7 @@ public class FileBased {
 
     /** @return this resource's {@link File} */
     static InputStream getResource(String path) throws ValidationException {
+        validatePath(path, path);
         File file = new File(RUTA_RESOURCES_PATH, path);
         validateArgument(file.exists(), "could not find file '" + path + "'");
         try {

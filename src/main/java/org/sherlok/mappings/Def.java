@@ -16,6 +16,7 @@
 package org.sherlok.mappings;
 
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
+import static org.sherlok.utils.CheckThat.validateDomain;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.sherlok.utils.ValidationException;
@@ -25,15 +26,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Abstract class for definitions.
- * 
+ *
  * @author renaud@apache.org
  */
 public abstract class Def {
     protected static final Logger LOG = getLogger(Def.class);
 
+    /** separates name from id. */
     public static final String SEPARATOR = ":";
 
-    /** unique name for this bundle. Letters, numbers, dots and underscore only */
+    /** unique name for this bundle. Letters, numbers, dots and '_' only. */
     protected String name,
     /**
      * a unique version id for this bundle. Letters, numbers, dots and
@@ -43,7 +45,7 @@ public abstract class Def {
     /** (optional) */
     description = "",
     /**
-     * Useful to group engine sets together. Letters, numbers, slashes and
+     * Useful to group engine sets together. Letters, numbers, dots, slashes and
      * underscore only. If empty (""), then defaults to no domain, meaning that
      * pipeline is stored on disk at the root of
      * {@link FileBased#PIPELINES_PATH}.
@@ -92,6 +94,7 @@ public abstract class Def {
     public void validate(String msgName) throws ValidationException {
         checkOnlyAlphanumDotUnderscore(name, msgName + " 'name' ");
         checkOnlyAlphanumDotUnderscore(version, msgName + " 'version' ");
+        validateDomain(domain, msgName + " 'domain' ");
     }
 
     @JsonIgnore

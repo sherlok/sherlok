@@ -37,6 +37,7 @@ import org.junit.runners.MethodSorters;
 import org.sherlok.SherlokServer;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.BundleDef.BundleDependency;
+import org.sherlok.mappings.BundleDef.EngineDef;
 
 import spark.StopServer;
 
@@ -96,14 +97,15 @@ public class BundleApiIntegrationTest {
     @Test
     /** Let's put a new test bundle*/
     public void test030PostBundle() throws JsonProcessingException {
-        BundleDef e = new BundleDef()
+        BundleDef b = new BundleDef()
                 .addDependency(new BundleDependency(
                         mvn,
                         "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"));
-        e.setName("test");
-        e.setVersion("172");
+        b.setName("test");
+        b.setVersion("172");
+        b.addEngine(new EngineDef().setName("myE"));
 
-        given().content(writeAsString(e))//
+        given().content(writeAsString(b))//
                 .when().post(API_URL)//
                 .then().log().everything().statusCode(STATUS_OK);
     }

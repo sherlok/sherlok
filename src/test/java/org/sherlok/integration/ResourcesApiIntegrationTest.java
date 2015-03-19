@@ -17,7 +17,7 @@ package org.sherlok.integration;
 
 import static com.google.common.io.Files.write;
 import static com.jayway.restassured.RestAssured.delete;
-import static com.jayway.restassured.RestAssured.get;
+import static com.jayway.restassured.RestAssured.*;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.http.ContentType.JSON;
 import static java.io.File.createTempFile;
@@ -99,19 +99,47 @@ public class ResourcesApiIntegrationTest {
     }
 
     @Test
-    public void test031GetTestResource() throws Exception {
+    public void test031PostWrongTestResourceWithDots() throws Exception {
+
+        File tmpFile = createTempFile("test031PostWrongTestResource", "txt");
+        write("hello world", tmpFile, defaultCharset());
+
+        given().multiPart(tmpFile)//
+                .when().post(API_URL + "/.." + path)//
+                .then().log().everything().statusCode(STATUS_INVALID);
+    }
+
+    @Test
+    public void test032PostWrongEmptyTestResource() throws Exception {
+
+        File tmpFile = createTempFile("test032PostWrongEmptyTestResource",
+                "txt");
+
+        given().multiPart(tmpFile)//
+                .when().post(API_URL + "/.." + path)//
+                .then().log().everything().statusCode(STATUS_INVALID);
+    }
+
+    @Test
+    public void test033PostWrongNoTestResource() throws Exception {
+        post(API_URL + "/.." + path)//
+                .then().log().everything().statusCode(STATUS_INVALID);
+    }
+
+    @Test
+    public void test040GetTestResource() throws Exception {
         get(API_URL + path).then().log().everything().statusCode(STATUS_OK)
                 .body(equalTo("hello world"));
     }
 
     @Test
-    public void test032DeleteResource() throws Exception {
+    public void test050DeleteResource() throws Exception {
         delete(API_URL + path)//
                 .then().log().everything().statusCode(STATUS_OK);
     }
 
     @Test
-    public void test033ResourceShouldBeGone() throws Exception {
+    public void test060ResourceShouldBeGone() throws Exception {
         get(API_URL + path).then().log().everything()
                 .statusCode(STATUS_MISSING);
     }

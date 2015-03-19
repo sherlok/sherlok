@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 
 /**
  * Controller that CRUD's {@link PipelineDef} and {@link BundleDef} from disk
- * (using {@link FileBased}).
+ * (using {@link FileBased}). This the controller for master mode.
  * 
  * @author renaud@apache.org
  */
@@ -203,5 +203,4 @@ public class Controller {
     void deleteResource(String path) throws ValidationException {
         FileBased.deleteResource(path);
     }
-
 }

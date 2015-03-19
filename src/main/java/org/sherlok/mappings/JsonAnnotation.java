@@ -60,12 +60,12 @@ public class JsonAnnotation {
     /** "any getter" needed for serialization */
     @JsonAnyGetter
     public Map<String, Object> any() {
-        return properties;
+        // empty map: force all fields beyond begin/end to be in 'properties'
+        return new HashMap<>();
     }
 
     @JsonAnySetter
-    public JsonAnnotation addProperty(String name, Object value)
-            throws JSONException {
+    public JsonAnnotation addProperty(String name, Object value) {
         if (!NOT_PROPERTIES.contains(name))
             properties.put(name, value);
         return this;
@@ -100,7 +100,7 @@ public class JsonAnnotation {
                     for (Entry<String, Object> p : this.properties.entrySet()) {
                         Object op = other.getProperty(p.getKey());
                         // should work fine for str, int,...
-                        if (!op.equals(p.getValue())) {
+                        if (op ==null || !op.equals(p.getValue())) {
                             return false;
                         }
                     }

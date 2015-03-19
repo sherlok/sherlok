@@ -72,4 +72,7 @@ public class PipelineLoaderIntegrationTest {
                                 .addProperty("value", "person"))), result,
                 Comparison.atLeast);
     }
+
+    // FIXME test when resolvePipeline -> solveDependencies fails
+    // FIXME test when resolvePipeline -> version == null
 }

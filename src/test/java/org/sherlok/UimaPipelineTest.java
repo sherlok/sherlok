@@ -91,14 +91,14 @@ public class UimaPipelineTest {
     @Test
     public void testFiltering() throws Exception {
 
-        List<String> scriptLines = list("ENGINE opennlp.segmenter.en:1.7.0;",//
+        List<String> scriptLines = list("ENGINE opennlp.segmenter.en:1.7.0;", //
                 "ENGINE opennlp.pos.en:1.7.0;");
 
         PipelineDef pd = (PipelineDef) new PipelineDef()
                 .setScriptLines(scriptLines)
                 .setOutput(
-                        new PipelineOutput()
-                                .setAnnotationFilters(list("de.tudarmstadt.ukp.dkpro.core.api.metadata.type.TagDescription")))
+                        new PipelineOutput().setAnnotationFilters(list( //
+                                "de.tudarmstadt.ukp.dkpro.core.api.metadata.type.TagDescription")))
                 .setName("testUseUimaEngines").setVersion("0.1");
 
         UimaPipeline up = new PipelineLoader(new Controller().load()).load(pd);

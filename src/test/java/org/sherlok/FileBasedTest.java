@@ -15,18 +15,21 @@
  */
 package org.sherlok;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static java.util.UUID.randomUUID;
+import static org.junit.Assert.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.UUID;
 
 import javax.servlet.http.Part;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.sherlok.mappings.PipelineDef;
 import org.sherlok.utils.ValidationException;
 
 import spark.utils.IOUtils;
@@ -109,4 +112,41 @@ public class FileBasedTest {
     public void test05_DeleteFile() throws Exception {
         FileBased.deleteResource("test/" + uploadFile);
     }
+
+    // not orderered
+
+    @Test
+    public void testReadNonexistentFile() throws Exception {
+        String name = randomUUID().toString();
+        try {
+            FileBased.read(new File(name), PipelineDef.class);
+        } catch (ValidationException ve) {
+            assertEquals("Pipeline does not exist",//
+                    ve.getMap().get("message").toString());
+            assertEquals(name,//
+                    ve.getMap().get("error_value").toString());
+            return;
+        }
+        throw new RuntimeException("should return; above!");
+    }
+
+    @Test
+    public void testReadEmptyFile() throws Exception {
+        File tmp = File.createTempFile("testReadEmptyFile", null);
+        String name = tmp.getAbsolutePath();
+
+        try {
+            FileBased.read(new File(name), PipelineDef.class);
+        } catch (ValidationException ve) {
+            assertTrue(ve.getMessage().startsWith("cannot read "));
+            return;
+        }
+        throw new RuntimeException("should return; above!");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testDeleteInexistingBundle() throws Exception {
+        FileBased.deleteBundle(randomUUID().toString());
+    }
+
 }

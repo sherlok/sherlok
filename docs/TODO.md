@@ -39,6 +39,8 @@
 * P2 spinning wheel while running tests
 
 
+---
+
 # TO IMPLEMENT
 
 Sentiment:
@@ -60,6 +62,8 @@ mvn urls: http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-mode
 
 Parsers speed http://nlp.stanford.edu/software/stanford-dependencies.shtml#Methods
 
+---
+
 License
 * http://www.gnu.org/licenses/gpl-faq.html#NFUseGPLPlugins
     * If the program dynamically links plug-ins, and they make function calls to each other and share data structures, we **believe** they form a single program, which must be treated as an extension of both the main program and the plug-ins. 
@@ -72,31 +76,13 @@ License
 
 # Notes
 
-
 Spark framework
 
 * http://www.sparkjava.com/documentation.html
 * http://www.taywils.me/2013/11/05/javasparkframeworktutorial.html
 * https://github.com/perwendel/spark-template-engines/tree/master/spark-template-freemarker
 
-    cp sherlok-1.pom local_repo/sherlok/sherlok/1/
-
 Integration testing:
 
 * https://code.google.com/p/rest-assured/
 * http://rest-assured.googlecode.com/svn/tags/2.3.4/apidocs/com/jayway/restassured/path/json/JsonPath.html
-
-Jacoco Reports:
-
-    mvn clean test jacoco:report
-
-License
-
-    mvn license:format
-
-Gitstats Reports:
-
-    cd /Users/richarde/dev_hdd/sources/gitstats
-    git clone git://repo.or.cz/gitstats.git
-    ./gitstats ../../uima/sherlok/sherlok_core ../../uima/sherlok/sherlok_core/target/gitstats
-    open ../../uima/sherlok/sherlok_core/target/gitstats/index.html

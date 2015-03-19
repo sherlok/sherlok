@@ -17,6 +17,7 @@ package org.sherlok.mappings;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
+import static org.sherlok.utils.CheckThat.validateDomain;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateTypeIdentifier;
 import static org.sherlok.utils.Create.list;
@@ -31,6 +32,7 @@ import java.util.Set;
 
 import org.sherlok.Controller;
 import org.sherlok.mappings.BundleDef.EngineDef;
+import org.sherlok.utils.CheckThat;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -82,7 +84,6 @@ public class PipelineDef extends Def {
         private List<String> annotationFilters = list();
         @JsonProperty("include_annotations")
         private List<String> annotationIncludes = list();
-        private List<String> payloads = list();
 
         public List<String> getAnnotationFilters() {
             return annotationFilters;
@@ -101,15 +102,6 @@ public class PipelineDef extends Def {
         public PipelineOutput setAnnotationIncludes(
                 List<String> annotationIncludes) {
             this.annotationIncludes = annotationIncludes;
-            return this;
-        }
-
-        public List<String> getPayloads() {
-            return payloads;
-        }
-
-        public PipelineOutput setPayloads(List<String> payloads) {
-            this.payloads = payloads;
             return this;
         }
     }
@@ -147,7 +139,8 @@ public class PipelineDef extends Def {
             return expected;
         }
 
-        public PipelineTest setExpected(Map<String, List<JsonAnnotation>> expected) {
+        public PipelineTest setExpected(
+                Map<String, List<JsonAnnotation>> expected) {
             this.expected = expected;
             return this;
         }
@@ -201,11 +194,6 @@ public class PipelineDef extends Def {
         return this;
     }
 
-    public PipelineDef addOutputPayload(String payload) {
-        this.output.payloads.add(payload);
-        return this;
-    }
-
     public List<PipelineTest> getTests() {
         return tests;
     }
@@ -237,11 +225,7 @@ public class PipelineDef extends Def {
             validateArgument(language != null, "'language' can not be null");
             validateArgument(language.length() > 0,
                     "'language' can not be empty");
-            if (domain != null) {
-                validateArgument(domain.indexOf("..") == -1,
-                        "'domain' can not contain double dots: '" + domain
-                                + "'");
-            }
+            validateDomain(domain, errorMsg);
 
             // output
             validateArgument(

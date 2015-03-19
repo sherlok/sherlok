@@ -17,6 +17,7 @@ package org.sherlok.utils;
 
 import static java.util.regex.Pattern.compile;
 import static org.sherlok.mappings.Def.SEPARATOR;
+import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.ValidationException.MSG;
 
@@ -26,6 +27,7 @@ public class CheckThat {
 
     /** Letters, numbers, dots and underscore only */
     private static final Pattern ALPHANUM_DOT_UNDERSCORE = compile("[^a-zA-Z0-9\\._]");
+    private static final Pattern ALPHANUM_DOT_UNDERSCORE_SLASH = compile("[^a-zA-Z0-9\\._/]");
 
     /**
      * @param test
@@ -36,8 +38,8 @@ public class CheckThat {
      *             if <code>test</code> is empty/null, or contains something
      *             else than letters, numbers or dots.
      */
-    public static void checkOnlyAlphanumDotUnderscore(String test, String context)
-            throws ValidationException {
+    public static void checkOnlyAlphanumDotUnderscore(String test,
+            String context) throws ValidationException {
         if (test == null || test.length() == 0) {
             throw new ValidationException(context + ": cannot be empty or null");
         }
@@ -45,6 +47,40 @@ public class CheckThat {
             throw new ValidationException(context + ": '" + test
                     + "' contains something else than"
                     + " letters, numbers or dots");
+        }
+    }
+
+    /**
+     * @param domain
+     *            the domain to validate
+     * @param context
+     *            text is prepended to exception
+     * @throws ValidationException
+     *             if <code>test</code> is null (empty is ok), or contains '..'
+     *             or something else than letters, numbers, dots or forward
+     *             slashes.
+     */
+    public static void validateDomain(String domain, String context)
+            throws ValidationException {
+        if (domain == null) {
+            throw new ValidationException(context + ": cannot be null");
+        }
+
+        validatePath(domain, context);
+
+        if (ALPHANUM_DOT_UNDERSCORE_SLASH.matcher(domain).find()) {
+            throw new ValidationException(context + ": '" + domain
+                    + "' contains something else than"
+                    + " letters, numbers or dots");
+        }
+    }
+
+    /** Forbids to access the whole computer through... */
+    public static void validatePath(String path, String context)
+            throws ValidationException {
+        if (path.indexOf("..") != -1) {
+            throw new ValidationException(context
+                    + " can not contain double dots: '" + path + "'");
         }
     }
 

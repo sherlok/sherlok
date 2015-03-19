@@ -1,22 +1,40 @@
 {
+  "name" : "opennlp.ners.en",
+  "version" : "1.7.0",
   "description" : "annotates English persons and locations using OpenNLP models",
   "domain" : "dkpro",
-  "language" : "en",
-  "warmup" : false,
-  "name" : "opennlp.ners.en",
+  "script" : [
+ "ENGINE opennlp.segmenter.en:1.7.0;"
+, "ENGINE opennlp.pos.en:1.7.0;"
+, "ENGINE opennlp.ner.person.en:1.7.0;"
+, "ENGINE opennlp.ner.location.en:1.7.0;"
+ ],
   "output" : {
     "include_annotations" : [ "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity" ]
   },
-  "script" : [ "ENGINE opennlp.segmenter.en:1.7.0;", "ENGINE opennlp.pos.en:1.7.0;", "ENGINE opennlp.ner.person.en:1.7.0;", "ENGINE opennlp.ner.location.en:1.7.0;" ],
   "tests" : [ {
     "input" : "Jack Burton (born April 29, 1954 in El Paso), also known as Jake Burton, is an American snowboarder and founder of Burton Snowboards.",
     "expected" : {
-      "NamedEntity": [
-        {"begin" : 0, "end" : 11,  "value" : "person" },
-        {"begin" : 60,  "end" : 71,  "value" : "person" },
-        {"begin" : 36,  "end" : 43,  "value" : "location" }
-      ]
+      "NamedEntity" : [ {
+        "begin" : 0,
+        "end" : 11,
+        "properties" : {
+          "value" : "person"
+        }
+      }, {
+        "begin" : 60,
+        "end" : 71,
+        "properties" : {
+          "value" : "person"
+        }
+      }, {
+        "begin" : 36,
+        "end" : 43,
+        "properties" : {
+          "value" : "location"
+        }
+      } ]
     }
   } ],
-  "version" : "1.7.0"
+  "warmup" : false
 }

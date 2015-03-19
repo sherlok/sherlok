@@ -16,19 +16,23 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * The JSON response from Sherlok server, mapped as a Java object.
- * 
+ * Mapped JSON response from Sherlok server, and methods to access the
+ * annotations.
+ *
  * @author renaud@apache.org
  */
 public class SherlokResult {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    /** UIMA's 'default' view */
+    public static final String INITIAL_VIEW = "_InitialView";
+
     @JsonProperty("_referenced_fss")
     private Map<Integer, JsonAnnotation> referencedFss;
 
     @JsonProperty("_views")
-    /** k: view-name, v: (k: annot-name, v: list of annot or ids)*/
+    /** k: view-name, v: (k: annot-name, v: list of annot or ids). */
     private Map<String, Map<String, List<Object>>> views;
 
     @JsonProperty("_context")
@@ -54,11 +58,13 @@ public class SherlokResult {
         return MAPPER.readValue(json, SherlokResult.class);
     }
 
-    @JsonIgnore
-    public List<JsonAnnotation> get(String type) {
-        return getAnnotations().get(type);
-    }
-
+    /**
+     * Low level API: this is usually not necessary, because we use the
+     * {@link #INITIAL_VIEW}.
+     *
+     * @return {@link JsonAnnotation}s from that specific view.
+     * @see SherlokResult#getAnnotations()
+     */
     @JsonIgnore
     public Map<String, List<JsonAnnotation>> getAnnotations(String view) {
         Map<String, List<JsonAnnotation>> ret = map();
@@ -78,11 +84,26 @@ public class SherlokResult {
         return ret;
     }
 
+    /**
+     * @return all annotations as a map (key: annotation-type, value: a list of
+     *         all {@link JsonAnnotation}s for that annotation-type)
+     */
     @JsonIgnore
     public Map<String, List<JsonAnnotation>> getAnnotations() {
-        return getAnnotations("_InitialView");
+        return getAnnotations(INITIAL_VIEW);
     }
 
+    /**
+     * @param type
+     *            the Annotation type
+     * @return only {@link JsonAnnotation}s of that type
+     */
+    @JsonIgnore
+    public List<JsonAnnotation> get(String type) {
+        return getAnnotations().get(type);
+    }
+
+    /** @return the text that was annotated. */
     @JsonIgnore
     public String getText() {
         return referencedFss.get(1).getProperty("sofaString").toString();
@@ -92,7 +113,7 @@ public class SherlokResult {
     public String toString() {
         try {
             return MAPPER.writeValueAsString(this);
-        } catch (JsonProcessingException e) {// should not happen...
+        } catch (JsonProcessingException e) { // should not happen...
             return getText();
         }
     }

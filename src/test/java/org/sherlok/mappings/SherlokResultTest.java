@@ -14,7 +14,7 @@ import org.junit.Test;
 public class SherlokResultTest {
 
     @Test
-    public void test() throws Exception {
+    public void testParseResults() throws Exception {
 
         String json = IOUtils.toString(SherlokResultTest.class
                 .getResourceAsStream("SherlokResult.json"), UTF_8);
@@ -37,9 +37,9 @@ public class SherlokResultTest {
         assertNull(result.get("bogus"));
     }
 
-    /** This one has references */
+    /** These results have references. */
     @Test
-    public void testBerkleyparser() throws Exception {
+    public void testParseResultsFromBerkleyparser() throws Exception {
 
         String json = IOUtils.toString(SherlokResultTest.class
                 .getResourceAsStream("SherlokResult2.json"), UTF_8);
