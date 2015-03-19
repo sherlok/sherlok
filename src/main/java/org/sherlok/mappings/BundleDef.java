@@ -181,6 +181,8 @@ public class BundleDef extends Def {
         private String classz;
 
         /** UIMA parameters. To overwrite default parameters */
+        // TODO serialize without [ ], by creating custom 
+        // serializer, see Def.LineSerializer
         private Map<String, List<String>> parameters = map();
 
         /** TRANSITIVE (JsonIgnore), dynamically set by the bundle. */

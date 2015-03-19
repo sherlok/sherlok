@@ -15,6 +15,7 @@
  */
 package org.sherlok;
 
+import static java.lang.String.format;
 import static org.sherlok.utils.CheckThat.validateId;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -29,6 +30,7 @@ import javax.servlet.http.Part;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
+import org.sherlok.utils.AetherResolver;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
@@ -41,19 +43,24 @@ import org.slf4j.Logger;
 public class Controller {
     protected static final Logger LOG = getLogger(Controller.class);
 
+    // these act as caching:
     protected Map<String, BundleDef> bundleDefs;
     protected Map<String, EngineDef> engineDefs;
     protected Map<String, PipelineDef> pipelineDefs;
 
-    /** Loads {@link BundleDef}s and {@link PipelineDef}s from config/ folder */
+    /**
+     * Loads {@link BundleDef}s and {@link PipelineDef}s from
+     * {@link AetherResolver#LOCAL_REPO_PATH} folder, using {@link FileBased}.
+     */
     public Controller load() throws ValidationException {
 
         Controller c = _load(FileBased.allBundleDefs(),
                 FileBased.allPipelineDefs());
 
-        LOG.debug(
-                "Done loading from local File store: {} bundles, {} engines, {} pipelines",
-                new Object[] { bundleDefs.size(), engineDefs.size(),
+        LOG.info(
+                "Done loading from local File store ({}): {} bundles, {} engines, {} pipelines",
+                new Object[] { AetherResolver.LOCAL_REPO_PATH,
+                        bundleDefs.size(), engineDefs.size(),
                         pipelineDefs.size() });
         return c;
     }
@@ -65,7 +72,7 @@ public class Controller {
         // BUNDLES AND ENGINES
         bundleDefs = map(); // reinit
         engineDefs = map(); // reinit
-        for (BundleDef b : FileBased.allBundleDefs()) {
+        for (BundleDef b : bundles) {
             b.validate(b.toString());
             String key = b.getId();
             if (bundleDefs.containsKey(key)) {
@@ -74,13 +81,13 @@ public class Controller {
                 // validate all engines
                 for (EngineDef en : b.getEngines()) {
                     en.validate(en.toString());
-                    en.setBundle(b);
+                    en.setBundle(b); // this reference is needed later on
                     if (engineDefs.containsKey(en.getId())) {
                         throw new ValidationException("duplicate engine ids",
                                 en.getId());
                     }
                 }
-                // add bundle and all engines
+                // once all are valid, add bundle and all engines
                 for (EngineDef en : b.getEngines()) {
                     engineDefs.put(en.getId(), en);
                 }
@@ -90,18 +97,18 @@ public class Controller {
 
         // PIPELINES
         pipelineDefs = map(); // reinit
-        for (PipelineDef pd : FileBased.allPipelineDefs()) {
+        for (PipelineDef pd : pipelines) {
             pd.validate(pd.toString());
 
-            // all engines must be found
+            // all engines must have been previousely added above
             for (String pengineId : pd.getEnginesFromScript()) {
 
                 validateId(pengineId, "engine id '" + pengineId
                         + "' in pipeline '" + pd + "'");
                 if (!engineDefs.containsKey(pengineId)) {
                     throw new ValidationException(
-                            "engine def not found in pipeline '" + pd + "'",
-                            pengineId);
+                            format("engine '%s' defined in pipeline '%s' was not found in any registered bundle.",
+                                    pengineId, pd), pengineId);
                 }
             }
             // no duplicate pipeline ids
@@ -162,7 +169,7 @@ public class Controller {
     /** @return the put'ed {@link BundleDef}'s id */
     String putBundle(String bundleStr) throws ValidationException {
         BundleDef b = FileBased.putBundle(bundleStr);
-        // update bundles and engines
+        // update cached bundles and engines
         bundleDefs.put(b.getId(), b);
         for (EngineDef e : b.getEngines()) {
             e.setBundle(b);
@@ -186,18 +193,20 @@ public class Controller {
     void deleteBundleDef(String bundleId) throws ValidationException {
         if (!bundleDefs.containsKey(bundleId)) {
             throw new ValidationException("bundle not found", bundleId);
+        } else {
+            bundleDefs.remove(bundleId);
+            FileBased.deleteBundle(bundleId);
         }
-        FileBased.deleteBundle(bundleId);
-        bundleDefs.remove(bundleId);
     }
 
     void deletePipelineDef(String pipelineId) throws ValidationException {
         if (!pipelineDefs.containsKey(pipelineId)) {
             throw new ValidationException("pipeline  not found", pipelineId);
+        } else {
+            String domain = pipelineDefs.get(pipelineId).getDomain();
+            pipelineDefs.remove(pipelineId);
+            FileBased.deletePipeline(pipelineId, domain);
         }
-        String domain = pipelineDefs.get(pipelineId).getDomain();
-        FileBased.deletePipeline(pipelineId, domain);
-        pipelineDefs.remove(pipelineId);
     }
 
     void deleteResource(String path) throws ValidationException {

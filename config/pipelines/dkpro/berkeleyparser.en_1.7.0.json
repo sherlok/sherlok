@@ -1,19 +1,17 @@
 {
-  "description" : "Parses syntactic tree",
-  "domain" : "dkpro",
-  "language" : "en",
-  "warmup" : false,
   "name" : "berkeleyparser.en",
-  "output" : {
-    "include_annotations" : [
-      "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.*",
-      "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.PennTree"]
-  },
+  "version" : "1.7.0",
+  "description" : "Parses syntactic tree using the Berkeley parser",
+  "domain" : "dkpro",
   "script" : [
-    "ENGINE opennlp.segmenter.en:1.7.0;",
-    "ENGINE opennlp.pos.en:1.7.0;",
-    "ENGINE berkeleyparser.en:1.7.0;"
-  ],
-  "tests" : [ {"input": "The blue house of my childhood was bought: what a pity!" } ],
-  "version" : "1.7.0"
+ "ENGINE opennlp.segmenter.en:1.7.0;"
+, "ENGINE opennlp.pos.en:1.7.0;"
+, "ENGINE berkeleyparser.en:1.7.0;"
+ ],
+  "output" : {
+    "include_annotations" : [ "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.*", "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.PennTree" ]
+  },
+  "tests" : [ {
+    "input" : "The blue house of my childhood was bought: what a pity!"
+  } ]
 }

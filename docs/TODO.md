@@ -18,7 +18,7 @@
 
 * P1 should work offline, too
 
-
+* P2 [release to github maven repo](http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?lq=1)
 
 * P3 p not highlighted anymore when save
 
@@ -86,3 +86,7 @@ Integration testing:
 
 * https://code.google.com/p/rest-assured/
 * http://rest-assured.googlecode.com/svn/tags/2.3.4/apidocs/com/jayway/restassured/path/json/JsonPath.html
+
+Maven:
+
+* List dependencies with upgrades `mvn versions:display-dependency-updates`

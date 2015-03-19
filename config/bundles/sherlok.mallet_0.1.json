@@ -2,15 +2,14 @@
   "name" : "sherlok.mallet",
   "version" : "0.1",
   "dependencies" : [ {
-    "type" : "mvn",
     "value" : "org.sherlok:sherlok_mallet:0.0.1-SNAPSHOT"
   } ],
   "engines" : [ {
     "name" : "NaiveBayesClassifier",
     "class" : "org.sherlok.NaiveBayesClassifier.NaiveBayesClassifier",
     "parameters" : {
-      "annotationClass" : "org.sherlok.types.Category",
-      "featureName" : "categoryType"
+      "annotationClass" : [ "org.sherlok.types.Category" ],
+      "featureName" : [ "categoryType" ]
     }
   } ]
 }

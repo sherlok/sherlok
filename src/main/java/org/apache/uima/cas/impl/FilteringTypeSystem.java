@@ -24,7 +24,7 @@ import org.sherlok.UimaPipeline;
 import org.slf4j.Logger;
 
 /**
- * Used to filter JSON writer, see {@link UimaPipeline}
+ * Filters the UIMA JSON writer, see {@link UimaPipeline}
  * {@link XmiCasSerializer#setFilterTypes(TypeSystemImpl)}. Requires to be in
  * this package because of package visibility
  * 
@@ -34,6 +34,8 @@ public class FilteringTypeSystem extends TypeSystemImpl {
     private static final Logger LOG = getLogger(FilteringTypeSystem.class);
 
     /**
+     * Add this type to the typesystem.
+     * 
      * @param type
      *            the type to include in the JSON output
      */
@@ -46,10 +48,9 @@ public class FilteringTypeSystem extends TypeSystemImpl {
                 if (!cae.getArguments()[0].equals("sofa")) {
                     throw new RuntimeException(cae);
                 }
-            } catch (Exception e) {
-                LOG.warn(
-                        "failed to add feature '{}' to type '{}': "
-                                + e.getMessage(), f, type);
+            } catch (Exception e) { // TODO xLATER why is this happening?
+                LOG.warn("failed to add feature '{}' to type '{}': " //
+                        + e.getMessage(), f, type);
             }
         }
     }

@@ -1,30 +1,43 @@
 {
-  "description" : "Example that annotates countries as an Country",
-  "domain" : "examples",
-  "language" : "en",
   "name" : "02.ruta.annotate.countries",
+  "version" : "1",
+  "description" : "Example that annotates countries",
+  "domain" : "examples",
+  "script" : [
+ "WORDLIST CountriesList = 'countries.txt';"
+, "DECLARE Country;"
+, "Document{-> MARKFAST(Country, CountriesList)};"
+ ],
   "output" : {
     "include_annotations" : [ "org.sherlok.ruta.Country" ]
   },
-  "script" : [ "WORDLIST CountriesList = 'countries.txt';", "DECLARE Country;", "Document{-> MARKFAST(Country, CountriesList)};" ],
   "tests" : [ {
     "input" : "Switzerland is close to Italy, the land of pasta and Michelangelo. Paris is in France. And Madrid in Spain.",
     "expected" : {
-      "Country": [
-        {"begin" : 0, "end" : 11 },
-        {"begin" : 24,  "end" : 29 },
-        {"begin" : 79,  "end" : 85 },
-        {"begin" : 101,  "end" : 106 }
-      ]
+      "Country" : [ {
+        "begin" : 0,
+        "end" : 11
+      }, {
+        "begin" : 24,
+        "end" : 29
+      }, {
+        "begin" : 79,
+        "end" : 85
+      }, {
+        "begin" : 101,
+        "end" : 106
+      } ]
     }
   }, {
     "input" : "China's GDP has taken over the United States.",
     "expected" : {
-      "Country": [
-        {"begin" : 0, "end" : 5 },
-        {"begin" : 31,  "end" : 44 }
-      ]
+      "Country" : [ {
+        "begin" : 0,
+        "end" : 5
+      }, {
+        "begin" : 31,
+        "end" : 44
+      } ]
     }
-  } ],
-  "version" : "1"
+  } ]
 }

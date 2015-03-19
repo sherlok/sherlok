@@ -1,61 +1,47 @@
 {
+  "name" : "dkpro.opennlp.en",
+  "version" : "1.7.0",
+  "description" : "all opennlp engines and models for English",
   "domain" : "dkpro",
   "dependencies" : [ {
-    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-gpl:1.7.0"
   }, {
-    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-asl:1.7.0"
   }, {
-    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-person:20130624.1"
   }, {
-    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-organization:20100907.0"
   }, {
-    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.opennlp-model-ner-en-location:20100907.0"
   } ],
-  "description" : "all opennlp engines and models for English",
-  "name" : "dkpro.opennlp.en",
   "repositories" : {
     "dkpro" : "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"
   },
-  "version" : "1.7.0",
-  "engines" : [
-    {
-      "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder",
-      "description" : null,
-      "name" : "opennlp.ner.location.en",
-      "parameters" : {
-        "language" : "en",
-        "modelVariant" : "location"
-      }
-    },
-    {
-      "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder",
-      "description" : null,
-      "name" : "opennlp.ner.person.en",
-      "parameters" : {
-        "language" : "en",
-        "modelVariant" : "person"
-      }
-    },
-    {
-      "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger",
-      "description" : null,
-      "name" : "opennlp.pos.en",
-      "parameters" : {
-        "language" : "en"
-      }
-    },
-    {
-      "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter",
-      "description" : null,
-      "name" : "opennlp.segmenter.en",
-      "parameters" : {
-        "language" : "en"
-      }
+  "engines" : [ {
+    "name" : "opennlp.ner.location.en",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder",
+    "parameters" : {
+      "language" : [ "en" ],
+      "modelVariant" : [ "location" ]
     }
-  ]
+  }, {
+    "name" : "opennlp.ner.person.en",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpNameFinder",
+    "parameters" : {
+      "language" : [ "en" ],
+      "modelVariant" : [ "person" ]
+    }
+  }, {
+    "name" : "opennlp.pos.en",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger",
+    "parameters" : {
+      "language" : [ "en" ]
+    }
+  }, {
+    "name" : "opennlp.segmenter.en",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter",
+    "parameters" : {
+      "language" : [ "en" ]
+    }
+  } ]
 }

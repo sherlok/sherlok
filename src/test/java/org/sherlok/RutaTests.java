@@ -63,7 +63,7 @@ public class RutaTests {
 
     @Test
     @Ignore
-    // FIXME
+    // FIXME testUimaEngineThenRuta
     public void testUimaEngineThenRuta() throws Exception {
 
         List<String> scriptLines = list(

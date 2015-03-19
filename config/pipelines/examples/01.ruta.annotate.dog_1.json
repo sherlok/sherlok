@@ -11,10 +11,13 @@
     "include_annotations" : [ "org.sherlok.ruta.Dog" ]
   },
   "tests" : [ {
-    "comparison" : "exact",
     "input" : "This is a very good dog!",
     "expected" : {
-      "Dog" : [{ "begin" : 20, "end" : 23 }]
-    }
+      "Dog" : [ {
+        "begin" : 20,
+        "end" : 23
+      } ]
+    },
+    "comparison" : "exact"
   } ]
 }

@@ -17,13 +17,15 @@ package org.sherlok.mappings;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
-import static org.sherlok.utils.CheckThat.validateDomain;
+import static org.sherlok.mappings.PipelineDef.PipelineTest.Comparison.atLeast;
 import static org.sherlok.utils.CheckThat.validateArgument;
+import static org.sherlok.utils.CheckThat.validateDomain;
 import static org.sherlok.utils.CheckThat.validateTypeIdentifier;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.ValidationException.ERR;
 import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
+import static org.sherlok.utils.ValidationException.MSG;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,7 +34,6 @@ import java.util.Set;
 
 import org.sherlok.Controller;
 import org.sherlok.mappings.BundleDef.EngineDef;
-import org.sherlok.utils.CheckThat;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -66,6 +67,7 @@ public class PipelineDef extends Def {
     @JsonProperty("script")
     @JsonSerialize(using = ListSerializer.class)
     private List<String> scriptLines = list();
+
     /** Controls the output of this pipeline */
     private PipelineOutput output = new PipelineOutput();
 
@@ -73,15 +75,13 @@ public class PipelineDef extends Def {
     @JsonInclude(ALWAYS)
     private List<PipelineTest> tests = list();
 
-    /** Whether to run this pipeline when it is loaded. Defaults true */
-    private boolean warmup = true;
-
     /** Defines what kind of annotation this pipeline outputs */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class PipelineOutput {
 
         @JsonProperty("filter_annotations")
         private List<String> annotationFilters = list();
+
         @JsonProperty("include_annotations")
         private List<String> annotationIncludes = list();
 
@@ -110,9 +110,10 @@ public class PipelineDef extends Def {
      * Tests one single input string against a list of expected
      * {@link JsonAnnotation}s
      */
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonInclude(NON_DEFAULT)
-    @JsonPropertyOrder(value = { "input", "expected", "comparison" }, alphabetic = true)
+    // TODO not compiling... @JsonIgnoreProperties(ignoreUnknown = true)
+    // @JsonInclude(NON_DEFAULT)
+    // @JsonPropertyOrder(value = { "input", "expected", "comparison" },
+    // alphabetic = true)
     public static class PipelineTest {
 
         public enum Comparison {
@@ -124,7 +125,7 @@ public class PipelineDef extends Def {
 
         private String input;
         private Map<String, List<JsonAnnotation>> expected = map();
-        private Comparison comparison = Comparison.atLeast; // default
+        private Comparison comparison = atLeast; // default
 
         public String getInput() {
             return input;
@@ -208,14 +209,6 @@ public class PipelineDef extends Def {
         return this;
     }
 
-    public boolean isWarmup() {
-        return warmup;
-    }
-
-    public void setWarmup(boolean warmup) {
-        this.warmup = warmup;
-    }
-
     // Utilities //////////////////////////////////////////////////////////////
 
     @Override
@@ -252,7 +245,7 @@ public class PipelineDef extends Def {
             }
 
         } catch (Throwable e) {
-            throw new ValidationException("" + errorMsg + ": " + e.getMessage());
+            throw new ValidationException(map(MSG, e.getMessage()));
         }
     }
 

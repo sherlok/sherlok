@@ -1,27 +1,22 @@
 {
+  "name" : "dkpro.maltparser.en",
+  "version" : "1.7.0",
+  "description" : "all engines and models for Malt parser English",
   "domain" : "dkpro",
   "dependencies" : [ {
-    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.maltparser-asl:1.7.0"
   }, {
-    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.maltparser-upstream-parser-en-linear:20120312"
   } ],
-  "description" : "all engines and models for Malt parser English",
-  "name" : "dkpro.maltparser.en",
   "repositories" : {
     "dkpro" : "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"
   },
-  "version" : "1.7.0",
-  "engines": [
-    {
-      "class" : "de.tudarmstadt.ukp.dkpro.core.maltparser.MaltParser",
-      "description" : null,
-      "name" : "maltparser.en",
-      "parameters" : {
-        "language" : "en",
-        "modelVariant" : "linear"
-      }
+  "engines" : [ {
+    "name" : "maltparser.en",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.maltparser.MaltParser",
+    "parameters" : {
+      "language" : [ "en" ],
+      "modelVariant" : [ "linear" ]
     }
-  ]
+  } ]
 }

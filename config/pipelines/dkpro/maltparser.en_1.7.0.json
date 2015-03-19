@@ -1,13 +1,17 @@
 {
-  "description" : "Parses syntactic tree",
-  "domain" : "dkpro",
-  "language" : "en",
-  "warmup" : false,
   "name" : "maltparser.en",
+  "version" : "1.7.0",
+  "description" : "Parses syntactic tree using Malt parser, see http://www.maltparser.org",
+  "domain" : "dkpro",
+  "script" : [
+ "ENGINE opennlp.segmenter.en:1.7.0;"
+, "ENGINE opennlp.pos.en:1.7.0;"
+, "ENGINE maltparser.en:1.7.0;"
+ ],
   "output" : {
     "include_annotations" : [ "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency" ]
   },
-  "script" : [ "ENGINE opennlp.segmenter.en:1.7.0;", "ENGINE opennlp.pos.en:1.7.0;", "ENGINE maltparser.en:1.7.0;" ],
-  "tests" : [ {"input": "The blue house of my childhood was bought: what a pity!" } ],
-  "version" : "1.7.0"
+  "tests" : [ {
+    "input" : "The blue house of my childhood was bought: what a pity!"
+  } ]
 }

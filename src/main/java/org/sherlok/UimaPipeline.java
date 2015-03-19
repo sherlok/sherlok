@@ -124,10 +124,8 @@ public class UimaPipeline {
                 .getAnnotationIncludes(), pipelineDef.getOutput()
                 .getAnnotationFilters(), casPool);
 
-        if (pipelineDef.isWarmup()) {
-            // ensures Ruta errors can be catched, at last
-            annotate("Some test text to check for Ruta script errors.");
-        }
+        // // ensures Ruta errors can be catched, at last
+        // annotate("Some test text to check for Ruta script errors.");
     }
 
     static TypeSystemDescription reloadTSD() {

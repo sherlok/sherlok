@@ -24,7 +24,6 @@
 package org.sherlok.utils;
 
 import java.text.Collator;
-import java.util.Comparator;
 
 /**
  * Utility class for common String operations.

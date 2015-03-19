@@ -51,7 +51,7 @@ public class SherlokTests {
         // validate
         switch (comparison) {
         case atLeast:
-        case exact:// FIXME
+        case exact:// FIXME implement exact comparison
             for (Entry<String, List<JsonAnnotation>> exp : expecteds.entrySet()) {
                 String eType = exp.getKey();
                 if (!systems.containsKey(eType)) {

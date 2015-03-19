@@ -17,8 +17,9 @@ package org.sherlok.integration;
 
 import static com.google.common.io.Files.write;
 import static com.jayway.restassured.RestAssured.delete;
-import static com.jayway.restassured.RestAssured.*;
+import static com.jayway.restassured.RestAssured.get;
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.RestAssured.post;
 import static com.jayway.restassured.http.ContentType.JSON;
 import static java.io.File.createTempFile;
 import static java.nio.charset.Charset.defaultCharset;
@@ -26,8 +27,9 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.sherlok.SherlokServer.DEFAULT_IP;
 import static org.sherlok.SherlokServer.RUTA_RESOURCES;
+import static org.sherlok.SherlokServer.STATUS_INVALID;
 import static org.sherlok.SherlokServer.STATUS_MISSING;
-import static org.sherlok.SherlokServer.*;
+import static org.sherlok.SherlokServer.STATUS_OK;
 
 import java.io.File;
 

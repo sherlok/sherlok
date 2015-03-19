@@ -40,7 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * {@link BundleDef}s and {@link PipelineDef}s are retrieved from another master
  * Sherlok server (see {@link #load()}).<br>
  * Same as {@link SealedController}: blocks PUT and DELETE methods from
- * {@link Controller}. FIXME get resources for Ruta scripts
+ * {@link Controller}.
  * 
  * @author renaud@apache.org
  */

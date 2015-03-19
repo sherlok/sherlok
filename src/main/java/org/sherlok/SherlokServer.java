@@ -21,6 +21,7 @@ import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
+import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
 import static org.sherlok.utils.ValidationException.EXPECTED;
@@ -48,7 +49,6 @@ import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
-import org.sherlok.utils.Create;
 import org.sherlok.utils.SherlokTests;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
@@ -80,21 +80,23 @@ public class SherlokServer {
     public static final String BUNDLES = "bundles";
     /** Route and path for Ruta resources */
     public static final String RUTA_RESOURCES = "resources";
-    /** Location for the temporary uploaded files */
-    protected static final MultipartConfigElement RUTA_RESOURCES_UPLOAD_CONFIG = new MultipartConfigElement(
-            createTempDir().getAbsolutePath());
 
     public static final int STATUS_OK = 200;
     public static final int STATUS_INVALID = 400;
     public static final int STATUS_MISSING = 404;
     public static final int STATUS_SERVER_ERROR = 500;
+
     public static final String JSON = "application/json";
 
-    // LOGO http://www.kammerl.de/ascii/AsciiSignature.php font 'thin'
+    /** Location for temp uploaded files */
+    protected static final MultipartConfigElement RUTA_RESOURCES_UPLOAD_CONFIG = new MultipartConfigElement(
+            createTempDir().getAbsolutePath());
+
+    // LOGO, see http://www.kammerl.de/ascii/AsciiSignature.php font 'thin'
     private static final String LOGO = "\n,---.|              |         |    \n`---.|---.,---.,---.|    ,---.|__/ \n    ||   ||---'|    |    |   ||  \\ \n`---'`   '`---'`    `---'`---'`   `\n\n";
     private static final String VERSION = "Sherlok Server        v. "
             + getGitCommitId();
-    static {
+    static { // print at server startup
         System.out.println(LOGO + VERSION);
     }
 
@@ -102,11 +104,9 @@ public class SherlokServer {
     private static final String PUBLIC = "public";
     /** Files allowed in {@link #PUBLIC} folder (to avoid collision with API) */
     private static final List<String> PUBLIC_WHITELIST = //
-    Create.list(".DS_Store", "index.html");
+    list(".DS_Store", "index.html");
 
-    public static final String TEST_TEXT = "Using this calibration procedure, we find that mature granule cells (doublecortin-) contain approximately 40 microm, and newborn granule cells (doublecortin+) contain 0-20 microm calbindin-D28k. U.S. employers added the largest number of workers in nearly three years in October and wages increased, which could bring the Federal Reserve closer to raising interest rates. Nonfarm payrolls surged by 321,000 last month, the most since January of 2012, the Labor Department said on Friday. The unemployment rate held steady at a six-year low of 5.8 percent. Data for September and October were revised to show 44,000 more jobs created than previously reported. Economists polled by Reuters had forecast payrolls increasing by only 230,000 last month. November marked the 10th straight month that job growth has exceeded 200,000, the longest stretch since 1994, and further confirmed the economy is weathering slowdowns in China and the euro zone, as well as a recession in Japan.";
-
-    /** Called at server startup. Registers all {@link Route}s */
+    /** Called at server startup (main). Registers all {@link Route}s */
     public static void init(int port, String ip, String masterUrl,
             boolean sealed) throws ValidationException {
 
@@ -123,6 +123,7 @@ public class SherlokServer {
             controller = new Controller().load();
         }
         final PipelineLoader pipelineLoader = new PipelineLoader(controller);
+
         setPort(port);
         setIpAddress(ip);
         // E.g. public/a/b.txt available as http://{host}:{port}/a/b.txt
@@ -153,8 +154,8 @@ public class SherlokServer {
                     PipelineDef pipeline = FileBased.parsePipeline(req.body());
                     UimaPipeline uimaPipeline = pipelineLoader.load(pipeline);
 
-                    Map<Integer, Object> passed = map(), failed = map();
                     boolean isPassed = true;
+                    Map<Integer, Object> passed = map(), failed = map();
 
                     for (int i = 0; i < pipeline.getTests().size(); i++) {
                         PipelineTest test = pipeline.getTests().get(i);
@@ -216,7 +217,7 @@ public class SherlokServer {
                 } catch (ValidationException ve) {
                     return invalid("test failed: ", ve, resp);
                 } catch (Exception e) {
-                    return error("test failed: ", e, resp);
+                    return error("test error: ", e, resp);
                 }
             }
         });
@@ -227,6 +228,10 @@ public class SherlokServer {
             @Override
             public Object handle(Request req, Response resp) {
                 try {
+                    String clean = req.queryParams("clean");
+                    if (clean != null) {
+                        pipelineLoader.cleanLocalRepo();
+                    }
                     controller.load();
                     pipelineLoader.clearCache();
                     return map("status", "reloaded");
@@ -246,7 +251,7 @@ public class SherlokServer {
                 try {
                     resp.type(JSON);
                     return controller.listPipelines();
-                } catch (Exception e) {// this error should not happen
+                } catch (Exception e) { // should not happen, though
                     return error("LIST pipelines", e, resp);
                 }
             }
@@ -317,7 +322,7 @@ public class SherlokServer {
                 try {
                     resp.type(JSON);
                     return controller.listBundles();
-                } catch (Exception e) {// this error should not happen
+                } catch (Exception e) { // should not happen, though
                     return error("LIST bundle", e, resp);
                 }
             }
@@ -386,7 +391,7 @@ public class SherlokServer {
                 try {
                     resp.type(JSON);
                     return controller.listResources();
-                } catch (Exception e) { // this error should not happen
+                } catch (Exception e) { // should not happen, though
                     return error("LIST resources", e, resp);
                 }
             }
@@ -396,13 +401,13 @@ public class SherlokServer {
             public Object handle(Request req, Response resp) {
                 String path = req.splat()[0];
                 try {
-                    String name = path.contains("/") ? path.substring(
+                    IOUtils.copy(controller.getResource(path), //
+                            resp.raw().getOutputStream());
+                    String fileName = path.contains("/") ? path.substring(
                             path.lastIndexOf('/'), path.length()) : path;
                     resp.type("application/octet-stream");
                     resp.header("Content-Disposition",
-                            "attachment; filename=\"" + name + "\"");
-                    IOUtils.copy(controller.getResource(path), //
-                            resp.raw().getOutputStream());
+                            "attachment; filename=\"" + fileName + "\"");
                     return "";
                 } catch (ValidationException ve) {
                     resp.status(STATUS_MISSING);
@@ -418,6 +423,7 @@ public class SherlokServer {
             public Object handle(Request req, Response resp) {
                 try {
                     String path = req.splat()[0];
+                    // for Jetty...
                     req.raw().setAttribute("org.eclipse.multipartConfig",
                             RUTA_RESOURCES_UPLOAD_CONFIG);
                     resp.type(JSON);
@@ -544,6 +550,7 @@ public class SherlokServer {
         }
     }
 
+    /** validates name and version @return id */
     private static String check(String name, String version)
             throws ValidationException {
         checkOnlyAlphanumDotUnderscore(name, "'name'");

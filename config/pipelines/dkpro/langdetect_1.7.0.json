@@ -1,12 +1,13 @@
 {
-    "name": "langdetect",
-    "version": "1.7.0",
-    "description": "Detects language",
-    "domain": "dkpro",
-    "script": [
-        "ENGINE languageidentifier:1.7.0;"
-    ],
-    "tests": [
-        {"input": "Ce modèle sert à détecter la langue d'un document." }
-    ]
+  "name" : "langdetect",
+  "version" : "1.7.0",
+  "description" : "Detects language",
+  "domain" : "dkpro",
+  "script" : [
+ "ENGINE languageidentifier:1.7.0;"
+ ],
+  "output" : { },
+  "tests" : [ {
+    "input" : "Ce modèle sert à détecter la langue d'un document."
+  } ]
 }

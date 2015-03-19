@@ -36,13 +36,14 @@ import org.sherlok.utils.ValidationException;
  */
 public class RutaHelper {
 
-    final static String IDENTIFIER = "[a-zA-Z]\\w*";
-    final static Pattern TYPES = compile(format(
+    // to parse DECLARE ...
+    private final static String IDENTIFIER = "[a-zA-Z]\\w*";
+    private final static Pattern TYPES = compile(format(
             "DECLARE (?<superType>%s +)?(?<id>%s)(?<inlineids>(, *?%s)+)?(?<features> *?\\(.*\\))?",
             IDENTIFIER, IDENTIFIER, IDENTIFIER));
 
     /*-
-    Syntax of declarations:
+    From the Ruta documentation, syntax of declarations:
      
     Declaration -> "DECLARE" (AnnotationType)? Identifier ("," Identifier )*
                  | "DECLARE" AnnotationType Identifier ( "("FeatureDeclaration ")" )?
@@ -65,22 +66,21 @@ public class RutaHelper {
         for (String line : rutaScript.split("\n")) {
             sb.append(line.replaceAll("//.*$", " ") + "\n");
         }
-        String cleanScript = sb.toString();
+        String script = sb.toString();
 
         // Remove new lines and normalize whitespace
-        cleanScript = cleanScript.replaceAll("\\r?\\n", " ");
-        cleanScript = cleanScript.replaceAll(" +", " ");
+        script = script.replaceAll("\\r?\\n", " ").replaceAll(" +", " ");
 
-        for (String instruction : cleanScript.split(";")) {
+        for (String instruction : script.split(";")) {
             if (instruction.trim().startsWith("DECLARE")) {
 
                 Matcher m = TYPES.matcher(instruction.trim());
                 if (m.find()) {
 
-                    String superType = CAS.TYPE_NAME_ANNOTATION;
-                    try {
+                    String superType = CAS.TYPE_NAME_ANNOTATION; // default val
+                    try { // see if custom superType was defined
                         superType = m.group("superType").trim();
-                    } catch (Exception e) {// ok, since might be absent
+                    } catch (Exception e) { // ok, since might be absent
                     }
 
                     List<TypeFeatureDTO> features = list();
@@ -99,8 +99,8 @@ public class RutaHelper {
                             features.add(new TypeFeatureDTO(split[1].trim(),
                                     "", split[0].trim()));
                         }
-                    } catch (NullPointerException e) {// not catching
-                        // happens if m.group() not found when no features
+                    } catch (NullPointerException e) {// it's ok, will
+                        // happen if m.group() not found when no features
                     }
 
                     String typeName = m.group("id");
@@ -113,8 +113,8 @@ public class RutaHelper {
                             types.add(new TypeDTO(iid.trim(), "", superType,
                                     features));
                         }
-                    } catch (Exception e) {// not catching
-                        // happens if no additional inline declarations
+                    } catch (Exception e) {// it's ok, will
+                        // happen if no additional inline declarations
                     }
                 }
             }

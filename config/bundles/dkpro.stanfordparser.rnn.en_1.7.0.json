@@ -1,24 +1,20 @@
 {
+  "name" : "dkpro.stanfordparser.rnn.en",
+  "version" : "1.7.0",
+  "description" : "Stanford RNN parser English. TODO",
   "domain" : "dkpro",
   "dependencies" : [ {
-    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-model-parser-en-rnn:20140104"
   } ],
-  "description" : "Stanford RNN parser English",
-  "name" : "dkpro.stanfordparser.rnn.en",
   "repositories" : {
     "dkpro" : "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"
   },
-  "version" : "1.7.0",
-  "engines" : [
-    {
-      "class" : "TODO",
-      "description" : null,
-      "name" : "stanfordparser.rnn.en",
-      "parameters" : {
-        "language" : "en",
-        "modelVariant" : "linear"
-      }
+  "engines" : [ {
+    "name" : "stanfordparser.rnn.en",
+    "class" : "TODO",
+    "parameters" : {
+      "language" : [ "en" ],
+      "modelVariant" : [ "linear" ]
     }
-  ]
+  } ]
 }

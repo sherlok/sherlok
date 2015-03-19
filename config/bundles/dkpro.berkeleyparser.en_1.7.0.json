@@ -1,29 +1,23 @@
 {
+  "name" : "dkpro.berkeleyparser.en",
+  "version" : "1.7.0",
+  "description" : "Berkeleyparser sm6 English",
   "domain" : "dkpro",
-  "dependencies" : [
-  {
-    "type" : "mvn",
+  "dependencies" : [ {
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.berkeleyparser-gpl:1.7.0"
   }, {
-    "type" : "mvn",
     "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.berkeleyparser-upstream-parser-en-sm6:20100819"
-  }
-  ],
-  "description" : "Berkeleyparser sm6 English",
-  "name" : "dkpro.berkeleyparser.en",
+  } ],
   "repositories" : {
     "dkpro" : "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"
   },
-  "version" : "1.7.0",
-  "engines" : [
-    {
-      "class" : "de.tudarmstadt.ukp.dkpro.core.berkeleyparser.BerkeleyParser",
-      "name" : "berkeleyparser.en",
-      "parameters" : {
-        "language" : "en",
-        "modelVariant" : "sm6",
-        "writePennTree" : "true"
-      }
+  "engines" : [ {
+    "name" : "berkeleyparser.en",
+    "class" : "de.tudarmstadt.ukp.dkpro.core.berkeleyparser.BerkeleyParser",
+    "parameters" : {
+      "language" : [ "en" ],
+      "modelVariant" : [ "sm6" ],
+      "writePennTree" : [ "true" ]
     }
-  ]
+  } ]
 }

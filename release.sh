@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2014 Renaud Richardet (renaud@apache.org)
+# Copyright (C) 2014-2015 Renaud Richardet (renaud@apache.org)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,9 +30,10 @@ if [ -e "$RELEASE" ]; then
 fi
 mkdir "$RELEASE"
 
-mv local_repo /tmp/. # start with a fresh local_repo
+# start with a fresh local_repo
+mv local_repo /tmp/.
 
-# package sherlok module with appassembler
+# package sherlok with appassembler
 $MAVEN package appassembler:assemble
 rc=$?
 if [[ $rc != 0 ]] ; then
@@ -53,5 +54,6 @@ git rev-parse HEAD > "$RELEASE/git_revision.txt"
 
 chmod 744 "$RELEASE"/bin/sherlok
 
-echo "\n\n************************************************\nDone creating release in '$RELEASE'\n************************************************\n\n"
-
+echo "\n\n************************************************"
+echo "Done creating release in '$RELEASE'"
+echo "************************************************\n\n"

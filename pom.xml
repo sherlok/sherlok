@@ -47,12 +47,12 @@
   </distributionManagement>
 
   <properties>
-    <aetherVersion>1.0.0.v20140518</aetherVersion>
-    <mavenVersion>3.1.0</mavenVersion>
+    <aetherVersion>1.0.2.v20150114</aetherVersion>
+    <mavenVersion>3.3.1</mavenVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
-    <slf4j.version>1.6.5</slf4j.version>
+    <slf4j.version>1.7.10</slf4j.version>
   </properties>
 
   <dependencyManagement>
@@ -60,18 +60,17 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>2.1</version>
+        <version>3.0.21</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.6.2</version>
+        <version>${slf4j.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
-    <!-- latest (unreleased), for Json writer -->
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>uimaj-json</artifactId>
@@ -153,27 +152,27 @@
     <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
-      <version>1.35</version>
+      <version>1.47</version>
     </dependency>
 
     <!-- LOGGING -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.0.6</version>
+      <version>1.1.2</version>
     </dependency>
 
     <!-- TESTS -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>[4.0,5.0)</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.jayway.restassured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>2.3.4</version>
+      <version>2.4.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -211,6 +210,21 @@
           <source>1.7</source>
           <target>1.7</target>
           <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <!-- mvn clean: delete tmp engines and pipelines -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.6.1</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>config/resources/.pipelines</directory>
+            </fileset>
+            <fileset>
+              <directory>config/resources/.engines</directory>
+            </fileset>
+          </filesets>
         </configuration>
       </plugin>
       <!-- attach sources to jars -->
@@ -281,7 +295,7 @@
           </execution>
         </executions>
       </plugin>
-      <!-- APPASEMBLER to create one portable application -->
+      <!-- APPASSEMBLER to create one portable application -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>appassembler-maven-plugin</artifactId>

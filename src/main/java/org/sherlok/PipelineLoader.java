@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.uima.UIMAException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -77,7 +78,7 @@ import freemarker.template.TemplateException;
 public class PipelineLoader {
     private static final Logger LOG = getLogger(PipelineLoader.class);
 
-    private Controller controller;
+    private final Controller controller;
     private Map<String, UimaPipeline> uimaPipelinesCache = map();
 
     public PipelineLoader(Controller controller) {
@@ -89,7 +90,8 @@ public class PipelineLoader {
      * corresponding {@link UimaPipeline} (if it is in cache) or else
      * instantiates it. <br/>
      * Instantiation involves resolving the pipeline engines and the engines
-     * bundles, then loading the bundles Maven artifacts into the classpath. <br/>
+     * bundles, then loading the bundles Maven artifacts into the current
+     * classpath. <br/>
      * This method is synchronized, so that no two threads can access it during
      * initialization. TODO release the lock earlier
      * 
@@ -105,7 +107,9 @@ public class PipelineLoader {
 
         // 0. resolve version (fallback) if version=null
         if (version == null || version.equals("null")) {
+            // init with a lexicographically lowsest value
             String highestVersion = "0000000000000000000000000000000";
+            // find highest version
             for (String pId : controller.listPipelineDefNames()) {
                 if (getName(pId).equals(pipelineName)) {
                     String pVersion = getVersion(pId);
@@ -119,9 +123,9 @@ public class PipelineLoader {
                     highestVersion, version);
             version = highestVersion;
         }
+        String pipelineId = createId(pipelineName, version);
 
         // 1. get pipeline from cache if available
-        String pipelineId = createId(pipelineName, version);
         if (uimaPipelinesCache.containsKey(pipelineId)) {
             LOG.trace("pipeline '{}' found in cache", pipelineId);
             return uimaPipelinesCache.get(pipelineId);
@@ -130,7 +134,7 @@ public class PipelineLoader {
             // 2. else, load it from pipeline def
             PipelineDef pipelineDef = controller.getPipelineDef(pipelineId);
             validateNotNull(pipelineDef, "could not find Pipeline with Id '"
-                    + pipelineId + "'");
+                    + pipelineId + "'"); // should not happen here, though...
 
             UimaPipeline uimaPipeline = load(pipelineDef);
             uimaPipelinesCache.put(pipelineId, uimaPipeline);
@@ -138,30 +142,31 @@ public class PipelineLoader {
         }
     }
 
+    /** Just loads that pipeline. No caching. */
     UimaPipeline load(PipelineDef pipelineDef) throws ValidationException {
 
         pipelineDef.validate("could not validate pipeline wit Id '"
                 + pipelineDef.getId() + "',"); // just to make sure...
 
-        // 3. resolve engines (and their bundles)
-        List<EngineDef> engineDefs = list();
-        Set<BundleDef> bundleDefs = set();
+        // 3. create a list of engines (and their bundles) to resolve
+        List<EngineDef> engineDefsUsedInP = list();
+        Set<BundleDef> bundleDefsToResolve = set();
         for (String pengineId : pipelineDef.getEnginesFromScript()) {
             EngineDef en = controller.getEngineDef(pengineId);
-            validateNotNull(en, "could not find engine '" + pengineId + "' as defined in pipeline '"
-                    + pipelineDef.getId() + "'");
-            engineDefs.add(en);
+            validateNotNull(en, "could not find engine '" + pengineId
+                    + "' as defined in pipeline '" + pipelineDef.getId() + "'");
             BundleDef b = en.getBundle();
-            LOG.trace("adding engineDef '{}' with bundleDef '{}'", en, b);
             validateNotNull(b, "could not find bundle '" + b
                     + "' that is required by engine '" + en + "'");
-            bundleDefs.add(b);
+            LOG.trace("adding engineDef '{}' with bundleDef '{}'", en, b);
+            engineDefsUsedInP.add(en);
+            bundleDefsToResolve.add(b);
         }
 
-        // 4. solve library dependencies
+        // 4. solve (download) bundle dependencies
         try {
-            solveDependencies(bundleDefs, pipelineDef.getName(),
-                    pipelineDef.getVersion(), engineDefs.size());
+            solveDependencies(pipelineDef.getName(), pipelineDef.getVersion(),
+                    bundleDefsToResolve, engineDefsUsedInP.size());
         } catch (ArtifactResolutionException e) {
             throw new ValidationException(map(MSG, "Failed to load pipeline: "
                     + e.getMessage(), ERR, pipelineDef.getId()));
@@ -172,10 +177,10 @@ public class PipelineLoader {
             throw new RuntimeException(e); // should not happen
         }
 
-        // 5. create UimaPipeline and add components
+        // 5. create UimaPipeline
         UimaPipeline uimaPipeline;
         try {
-            uimaPipeline = new UimaPipeline(pipelineDef, engineDefs);
+            uimaPipeline = new UimaPipeline(pipelineDef, engineDefsUsedInP);
         } catch (IOException | UIMAException e) {
             throw new ValidationException(
                     "could not initialize UIMA pipeline: " + e.getMessage(), e);
@@ -184,21 +189,25 @@ public class PipelineLoader {
         return uimaPipeline;
     }
 
+    public void cleanLocalRepo() throws IOException {
+        FileUtils.deleteDirectory(new File(AetherResolver.LOCAL_REPO_PATH));
+    }
+
     /**
      * Resolves a maven dependency tree, download the dependencies and add them
      * (jars) to the classpath
      */
-    static void solveDependencies(Set<BundleDef> bundleDefs,
-            String pipelineName, String version, int nrEngines)
-            throws IOException, TemplateException, ArtifactResolutionException,
+    static void solveDependencies(String pipelineName, String version,
+            Set<BundleDef> bundleDefs, int nrEngines) throws IOException,
+            TemplateException, ArtifactResolutionException,
             DependencyCollectionException, IOException, ValidationException {
 
-        // create fake POM from bundles and copy it
+        // create fake POM that contains all bundle deps
         String fakePom = MavenPom.writePom(bundleDefs, pipelineName, version);
         Artifact rootArtifact = new DefaultArtifact(fakePom);
         LOG.trace("* rootArtifact: '{}'", rootArtifact);
 
-        // add remote repository urls
+        // repositorysystem, with our remote repository urls
         RepositorySystem system = AetherResolver.newRepositorySystem();
         RepositorySystemSession session = AetherResolver
                 .newRepositorySystemSession(system, LOCAL_REPO_PATH);
@@ -237,7 +246,7 @@ public class PipelineLoader {
             File jar = resolvedArtifact.getFile();
 
             // add downloaded artifact to local ~/.m2/repository, if possible
-            // FIXME test
+            // FIXME test that downloaded artifact to local ~/.m2/repository
             if (AetherResolver.localRepo.exists()
                     && AetherResolver.localRepo.canWrite()) {
                 File sherlokRepo = new File(AetherResolver.LOCAL_REPO_PATH);
@@ -265,9 +274,15 @@ public class PipelineLoader {
         }
     }
 
+    /**
+     * Samples classes from that jar, to see if they are already on the
+     * classpath. If some classes are already, then assume this jar was already
+     * on the classpath.<br>
+     * The goal is to avoid overloading the classpath...
+     */
     private static boolean isAlreadyOnClasspath(File jar) throws IOException {
 
-        if (!getExtension(jar.getName()).equals("jar")) {
+        if (!getExtension(jar.getName()).equals("jar")) { // filter poms
             return false;
 
         } else {
@@ -281,7 +296,7 @@ public class PipelineLoader {
                     new_++;
                     // LOG.trace("new::" + className);
                 }
-                if (exists + new_ > 20) {
+                if (exists + new_ > 20) {// we have sampled enough classes
                     break;
                 }
             }
@@ -293,8 +308,8 @@ public class PipelineLoader {
         }
     }
 
-    public static List<String> getClasses(File jar) throws IOException {
-
+    /** Get all classes from this jar file */
+    private static List<String> getClasses(File jar) throws IOException {
         List<String> classNames = new ArrayList<String>();
         ZipInputStream zip = new ZipInputStream(new FileInputStream(jar));
         for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip
@@ -316,7 +331,7 @@ public class PipelineLoader {
         return classNames;
     }
 
-    /** reflection to bypass encapsulation */
+    /** Reflection to bypass encapsulation. Yeah... */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static class ClassPathHack {
         private static final Class[] parameters = new Class[] { URL.class };

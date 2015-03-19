@@ -44,11 +44,9 @@ import org.apache.commons.io.FileUtils;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.Def;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.utils.CheckThat;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -65,33 +63,43 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
  * 
  * @author renaud@apache.org
  */
-/**
- * @author richarde
- *
- */
 public class FileBased {
 
     private static final String CONFIG_DIR_PATH = "config/";
 
-    public static final String TYPES_PATH = CONFIG_DIR_PATH + "types/";
-    public static final String BUNDLES_PATH = CONFIG_DIR_PATH + "bundles/";
-    public static final String PIPELINES_PATH = CONFIG_DIR_PATH + "pipelines/";
+    public static final String BUNDLES_PATH = CONFIG_DIR_PATH
+            + SherlokServer.BUNDLES + "/";
+    public static final String PIPELINES_PATH = CONFIG_DIR_PATH
+            + SherlokServer.PIPELINES + "/";
     public static final String RUTA_RESOURCES_PATH = CONFIG_DIR_PATH
-            + "resources/";
+            + SherlokServer.RUTA_RESOURCES + "/";
     public static final String RUTA_PIPELINE_CACHE_PATH = RUTA_RESOURCES_PATH
             + ".pipelines/";
     public static final String RUTA_ENGINE_CACHE_PATH = RUTA_RESOURCES_PATH
             + ".engines/";
 
-    /** 50Mb, in bytes */
-    static final long MAX_UPLOAD_SIZE = 50 * 1000000l;
+    /** 100Mb, in bytes */
+    static final long MAX_UPLOAD_SIZE = 100 * 1000000l;
 
+    /** JSON serializer for mapped objects. */
     private static final ObjectMapper MAPPER = new ObjectMapper(
             new JsonFactory());
     static {
         MAPPER.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
+        // important for EngineDef.properties
         MAPPER.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+    }
+
+    /** path convention: BUNDLE_PATH{name}_{version}.json */
+    private static String getBundlePath(String name, String version) {
+        return BUNDLES_PATH + name + "_" + version + ".json";
+    }
+
+    /** path convention: PIPELINES_PATH{domain}/{name}_{version}.json */
+    private static String getPipelinePath(String domain, String name,
+            String version) {
+        return PIPELINES_PATH + domain + "/" + name + "_" + version + ".json";
     }
 
     /**
@@ -110,12 +118,6 @@ public class FileBased {
         } catch (Exception e) {
             throw new ValidationException(e);// TODO validate better
         }
-    }
-
-    /** Used e.g. to test a pipeline without writing it out */
-    public static PipelineDef parsePipeline(String pipelineStr)
-            throws JsonParseException, JsonMappingException, IOException {
-        return MAPPER.readValue(pipelineStr, PipelineDef.class);
     }
 
     /**
@@ -165,6 +167,12 @@ public class FileBased {
         }
     }
 
+    /** Used e.g. to test a pipeline without writing it out */
+    public static PipelineDef parsePipeline(String pipelineStr)
+            throws JsonParseException, JsonMappingException, IOException {
+        return MAPPER.readValue(pipelineStr, PipelineDef.class);
+    }
+
     /**
      * Writes a {@link Def} to a file<br/>
      * Note: this should be private, but is used in tests...
@@ -175,7 +183,7 @@ public class FileBased {
      *            the object to write
      * @throws ValidationException
      */
-    public static void write(File f, Object def) throws ValidationException {
+    public static void write(File f, Def def) throws ValidationException {
         try {
             MAPPER.writeValue(f, def);
         } catch (Exception e) {
@@ -183,7 +191,7 @@ public class FileBased {
         }
     }
 
-    /** Writes this object as String, using Jackson {@link ObjectMapper} */
+    /** Writes this object as String, using Jackson's {@link ObjectMapper} */
     public static String writeAsString(Object obj)
             throws JsonProcessingException {
         return MAPPER.writeValueAsString(obj);
@@ -191,22 +199,23 @@ public class FileBased {
 
     private static void writeBundle(BundleDef b) throws ValidationException {
         b.validate(b.toString());
-        File bFile = new File(BUNDLES_PATH + b.getName() + "_" + b.getVersion()
-                + ".json");
+        File bFile = new File(getBundlePath(b.getName(), b.getVersion()));
         bFile.getParentFile().mkdirs();
         write(bFile, b);
     }
 
     private static void writePipeline(PipelineDef p) throws ValidationException {
         p.validate(p.toString());
-        File defFile = new File(PIPELINES_PATH + p.getDomain() + "/"
-                + p.getName() + "_" + p.getVersion() + ".json");
+        File defFile = new File(getPipelinePath(p.getDomain(), p.getName(),
+                p.getVersion()));
         defFile.getParentFile().mkdirs();
         write(defFile, p);
     }
 
     /**
      * Read a JSON-serialized object from file and parse it back to an object.
+     * Performs extensive error-catching to provide useful information in case
+     * of error.
      * 
      * @param f
      *            the file to read
@@ -226,11 +235,13 @@ public class FileBased {
                     + " does not exist", io.getMessage()
                     .replaceFirst(PIPELINES_PATH, "").replaceFirst(//
                             "\\(No such file or directory\\)", "").trim());
+
         } catch (UnrecognizedPropertyException upe) {
             String msg = "Unrecognized field \"" + upe.getPropertyName()
                     + "\" in file '" + f.getName() + "',  "
                     + upe.getMessageSuffix();
             throw new ValidationException(msg, upe);
+
         } catch (JsonMappingException jme) {
 
             StringBuilder sb = new StringBuilder();
@@ -241,11 +252,13 @@ public class FileBased {
 
             throw new ValidationException(sb.toString().replaceAll(
                     "org\\.sherlok\\.mappings\\.\\w+Def\\[", "["), jme);
+
         } catch (JsonParseException jpe) {
             throw new ValidationException("Could not read JSON"
                     + clazz.getSimpleName() + " '"
                     + f.getName().replaceAll("Def$", "") + "'",
                     jpe.getMessage());
+
         } catch (Exception e) {
             throw new ValidationException(e);
         }
@@ -283,7 +296,7 @@ public class FileBased {
         return ret;
     }
 
-    /** @return paths to all resources */
+    /** @return a list of the paths of all resources */
     public static Collection<String> allResources() throws ValidationException {
         try {
             List<String> resources = list();
@@ -294,11 +307,10 @@ public class FileBased {
             Iterator<File> fit = FileUtils.iterateFiles(dir, null, true);
             while (fit.hasNext()) {
                 File f = fit.next();
-                if (!f.getName().startsWith(".")) {
+                if (!f.getName().startsWith(".")) { // filtering hidden files
                     String relativePath = Paths.get(dir.getAbsolutePath())
                             .relativize(Paths.get(f.getAbsolutePath()))
                             .toString();
-                    // + "/" + f.getName();
                     if (!relativePath.startsWith(".")) {
                         resources.add(relativePath);
                     }
@@ -313,8 +325,8 @@ public class FileBased {
     public static boolean deleteBundle(String bundleId)
             throws ValidationException {
         validateId(bundleId, "BundleId not valid: ");
-        File defFile = new File(BUNDLES_PATH + getName(bundleId) + "_"
-                + getVersion(bundleId) + ".json");
+        File defFile = new File(getBundlePath(getName(bundleId),
+                getVersion(bundleId)));
         if (!defFile.exists())
             throw new ValidationException(
                     "Cannot delete bundle, since it does not exist", bundleId);
@@ -324,8 +336,8 @@ public class FileBased {
     public static boolean deletePipeline(String pipelineId, String domain)
             throws ValidationException {
         validateId(pipelineId, "PipelineId not valid: ");
-        File defFile = new File(PIPELINES_PATH + domain + "/"
-                + getName(pipelineId) + "_" + getVersion(pipelineId) + ".json");
+        File defFile = new File(getPipelinePath(domain, getName(pipelineId),
+                getVersion(pipelineId)));
         if (!defFile.exists())
             throw new ValidationException(
                     "Cannot delete pipeline, since it does not exist",
@@ -352,8 +364,8 @@ public class FileBased {
         }
     }
 
-    /** Util to read and rewrite all {@link Def}s */
     /*-
+    // Util to read and rewrite all {@link Def}s 
     public static void main(String[] args) throws ValidationException {
         Controller controller = new Controller().load();
         for (BundleDef b : controller.listBundles())

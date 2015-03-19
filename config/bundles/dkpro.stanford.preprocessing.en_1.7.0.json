@@ -1,20 +1,12 @@
 {
-  "domain" : "stanford",
-  "dependencies" : [
-  {
-    "type" : "mvn",
-    "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-model-parser-en-rnn:20140104"
-  }
-  ],
-  "description" : "TODO Stanford NLP preprocessing English",
   "name" : "dkpro.stanford.preprocessing.en",
+  "version" : "1.7.0",
+  "description" : "TODO Stanford NLP preprocessing English",
+  "domain" : "stanford",
+  "dependencies" : [ {
+    "value" : "de.tudarmstadt.ukp.dkpro.core:de.tudarmstadt.ukp.dkpro.core.stanfordnlp-model-parser-en-rnn:20140104"
+  } ],
   "repositories" : {
     "dkpro" : "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/"
-  },
-  "version" : "1.7.0",
-  "engines" : [
-
-
-
-  ]
+  }
 }
