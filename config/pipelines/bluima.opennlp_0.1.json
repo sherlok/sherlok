@@ -1,7 +1,0 @@
-{
-  "name" : "bluima.opennlp",
-  "version" : "0.1",
-  "description" : "OpenNLP Annotator",
-  "domain" : "bluima",
-  "script": ["ENGINE SentenceAnnotator:0.1;", "ENGINE TokenAnnotator:0.1;", "ENGINE PosTagAnnotator:0.1;", "ENGINE ChunkAnnotator:0.1;"]
-}
