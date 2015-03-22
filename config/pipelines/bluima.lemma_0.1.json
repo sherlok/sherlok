@@ -1,0 +1,95 @@
+{
+  "name": "bluima.lemma",
+  "version": "0.1",
+  "description": "lemmatizer",
+  "domain": "bluima",
+  "script": [
+    "ENGINE TokenAnnotator:0.1;",
+    "ENGINE BlueBioLemmatizer:0.1;"
+  ],
+  "tests": [
+    {
+      "comparison": "atLeast",
+      "input": "long form pressure hydrocephalus (NPH) be classify. Thalamic conditioned acoustic areas houses",
+      "expected": {
+        "Token": [
+          {
+            "begin": 0,
+            "end": 4,
+            "lemmaStr": "long"
+          },
+          {
+            "begin": 5,
+            "end": 9,
+            "lemmaStr": "form"
+          },
+          {
+            "begin": 10,
+            "end": 18,
+            "lemmaStr": "pressure"
+          },
+          {
+            "begin": 19,
+            "end": 32,
+            "lemmaStr": "hydrocephalus"
+          },
+          {
+            "begin": 33,
+            "end": 34,
+            "lemmaStr": "("
+          },
+          {
+            "begin": 34,
+            "end": 37,
+            "lemmaStr": "NPH"
+          },
+          {
+            "begin": 37,
+            "end": 38,
+            "lemmaStr": ")"
+          },
+          {
+            "begin": 39,
+            "end": 41,
+            "lemmaStr": "be"
+          },
+          {
+            "begin": 42,
+            "end": 50,
+            "lemmaStr": "classify"
+          },
+          {
+            "begin": 50,
+            "end": 51,
+            "lemmaStr": "."
+          },
+          {
+            "begin": 52,
+            "end": 60,
+            "lemmaStr": "thalamic"
+          },
+          {
+            "begin": 61,
+            "end": 72,
+            "lemmaStr": "condition"
+          },
+          {
+            "begin": 73,
+            "end": 81,
+            "lemmaStr": "acoustic"
+          },
+          {
+            "begin": 82,
+            "end": 87,
+            "lemmaStr": "area"
+          },
+          {
+            "begin": 88,
+            "end": 94,
+            "lemmaStr": "house"
+          }
+        ]
+      }
+    }
+  ]
+}
