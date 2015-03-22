@@ -1,7 +1,111 @@
 {
-  "name" : "bluima.token",
-  "version" : "0.1",
-  "description" : "tokenizer",
-  "domain" : "bluima",
-  "script": ["ENGINE TokenAnnotator:0.1;"]
+  "name": "bluima.token",
+  "version": "0.1",
+  "description": "tokenizer",
+  "domain": "bluima",
+  "script": [
+    "ENGINE TokenAnnotator:0.1;"
+  ],
+  "tests": [
+    {
+      "comparison": "atLeast",
+      "input": "Switzerland is close to Italy, the land of pasta and Michelangelo. Paris is in France. And Madrid in Spain.",
+      "expected": {
+        "Token": [
+          {
+            "begin": 0,
+            "end": 11
+          },
+          {
+            "begin": 12,
+            "end": 14
+          },
+          {
+            "begin": 15,
+            "end": 20
+          },
+          {
+            "begin": 21,
+            "end": 23
+          },
+          {
+            "begin": 24,
+            "end": 29
+          },
+          {
+            "begin": 29,
+            "end": 30
+          },
+          {
+            "begin": 31,
+            "end": 34
+          },
+          {
+            "begin": 35,
+            "end": 39
+          },
+          {
+            "begin": 40,
+            "end": 42
+          },
+          {
+            "begin": 43,
+            "end": 48
+          },
+          {
+            "begin": 49,
+            "end": 52
+          },
+          {
+            "begin": 53,
+            "end": 65
+          },
+          {
+            "begin": 65,
+            "end": 66
+          },
+          {
+            "begin": 67,
+            "end": 72
+          },
+          {
+            "begin": 73,
+            "end": 75
+          },
+          {
+            "begin": 76,
+            "end": 78
+          },
+          {
+            "begin": 79,
+            "end": 85
+          },
+          {
+            "begin": 85,
+            "end": 86
+          },
+          {
+            "begin": 87,
+            "end": 90
+          },
+          {
+            "begin": 91,
+            "end": 97
+          },
+          {
+            "begin": 98,
+            "end": 100
+          },
+          {
+            "begin": 101,
+            "end": 106
+          },
+          {
+            "begin": 106,
+            "end": 107
+          }
+        ]
+      }
+    }
+  ]
 }
