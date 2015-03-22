@@ -208,9 +208,9 @@ public class SherlokServer {
 
                     for (PipelineTest test : pipeline.getPipelineDef()
                             .getTests()) {
-                        String systemOut = pipeline.annotate(test.getInput());
+                        String actual = pipeline.annotate(test.getInput());
                         SherlokTests.assertEquals(test.getExpected(),
-                                systemOut, test.getComparison());
+                                actual, test.getComparison());
                     }
                     return map("status", "passed");
 

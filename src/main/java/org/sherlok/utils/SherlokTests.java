@@ -35,39 +35,100 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class SherlokTests {
 
     public static Map<String, List<JsonAnnotation>> assertEquals(
-            Map<String, List<JsonAnnotation>> expecteds, String systemString,
+            Map<String, List<JsonAnnotation>> expecteds, String actualsString,
             Comparison comparison) throws ValidationException, JSONException,
             JsonProcessingException {
 
         // parse
-        Map<String, List<JsonAnnotation>> systems = null;
+        Map<String, List<JsonAnnotation>> actuals = null;
         try {
-            systems = SherlokResult.parse(systemString).getAnnotations();
+            actuals = SherlokResult.parse(actualsString).getAnnotations();
         } catch (IOException e) {
-            throw new ValidationException("could not parse systemAnnots "
-                    + systemString, e);
+            throw new ValidationException("could not parse actual annotations "
+                    + actualsString, e);
         }
 
         // validate
         switch (comparison) {
         case atLeast:
+            // For each annotation in expecteds we make sure it exists in
+            // actuals
+            for (Entry<String, List<JsonAnnotation>> entry : expecteds
+                    .entrySet()) {
+
+                String expectedKey = entry.getKey();
+                List<JsonAnnotation> expectedValues = entry.getValue();
+
+                // Get the corresponding annotations and make sure they exists
+                List<JsonAnnotation> actualValues = actuals.get(expectedKey);
+                if (actualValues == null) {
+                    throw new ValidationException(map(ERR_NOTFOUND,
+                            expectedKey, EXPECTED, expecteds, SYSTEM, actuals));
+                }
+
+                for (JsonAnnotation expected : expectedValues) {
+                    // Find an annotation that has the same begin and end in the
+                    // actual annotations. Note that two annotations with the
+                    // same key and same region are not supported by this test.
+                    JsonAnnotation actual = null;
+                    for (JsonAnnotation annotation : actualValues) {
+                        if (expected.getBegin() == annotation.getBegin()
+                                && expected.getEnd() == annotation.getEnd()) {
+                            actual = annotation;
+                            break;
+                        }
+                    }
+
+                    // Make sure that such (begin, end) pair was found
+                    if (actual == null) {
+                        throw new ValidationException(map(ERR_NOTFOUND,
+                                expected, EXPECTED, expecteds, SYSTEM, actuals));
+                    }
+
+                    // Make sure that each expected properties exist
+                    Map<String, Object> expectedProperties = expected
+                            .getProperties();
+                    Map<String, Object> actualProperties = actual
+                            .getProperties();
+                    for (Entry<String, Object> expectedProperty : expectedProperties
+                            .entrySet()) {
+                        Object actualProperty = actualProperties
+                                .get(expectedProperty.getKey());
+
+                        // This isn't a proper recursive solution: it means
+                        // that sub-properties must be included in both
+                        // expected and actual properties. Hence the "at least"
+                        // test is not perfect.
+                        if (!actualProperty.equals(expectedProperty.getValue())) {
+                            throw new ValidationException("actual property <"
+                                    + actualProperty
+                                    + "> is not equal to expected property <"
+                                    + expectedProperty + ">");
+                        }
+                    }
+                }
+            }
+            
+            break;
+
         case exact:// FIXME implement exact comparison
             for (Entry<String, List<JsonAnnotation>> exp : expecteds.entrySet()) {
                 String eType = exp.getKey();
-                if (!systems.containsKey(eType)) {
+                if (!actuals.containsKey(eType)) {
                     throw new ValidationException(map(ERR_NOTFOUND, eType,
-                            EXPECTED, expecteds, SYSTEM, systems));
+                            EXPECTED, expecteds, SYSTEM, actuals));
                 } else {
                     for (JsonAnnotation a : exp.getValue()) {
                         boolean found = false;
-                        for (JsonAnnotation sa : systems.get(eType)) {
+                        for (JsonAnnotation sa : actuals.get(eType)) {
+                            // FIXME currently it is not recursive
                             if (sa.equals(a)) {
                                 found = true;break;
                             }
                         }
                         if (!found) {
                             throw new ValidationException(map(ERR_NOTFOUND, a,
-                                    EXPECTED, expecteds, SYSTEM, systems));
+                                    EXPECTED, expecteds, SYSTEM, actuals));
                         }
                     }
                 }
@@ -93,7 +154,7 @@ public class SherlokTests {
         break;
          */
         }
-        return systems;
+        return actuals;
     }
 
 }
