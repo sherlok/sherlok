@@ -17,7 +17,6 @@ package org.sherlok.mappings;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
-import static org.sherlok.mappings.PipelineDef.PipelineTest.Comparison.atLeast;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateDomain;
 import static org.sherlok.utils.CheckThat.validateTypeIdentifier;
@@ -110,10 +109,9 @@ public class PipelineDef extends Def {
      * Tests one single input string against a list of expected
      * {@link JsonAnnotation}s
      */
-    // TODO not compiling... @JsonIgnoreProperties(ignoreUnknown = true)
-    // @JsonInclude(NON_DEFAULT)
-    // @JsonPropertyOrder(value = { "input", "expected", "comparison" },
-    // alphabetic = true)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonInclude(NON_DEFAULT)
+    @JsonPropertyOrder(value = { "input", "expected", "comparison" }, alphabetic = true)
     public static class PipelineTest {
 
         public enum Comparison {
@@ -125,7 +123,7 @@ public class PipelineDef extends Def {
 
         private String input;
         private Map<String, List<JsonAnnotation>> expected = map();
-        private Comparison comparison = atLeast; // default
+        private Comparison comparison = Comparison.atLeast; // default
 
         public String getInput() {
             return input;
