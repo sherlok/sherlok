@@ -1,54 +1,92 @@
 {
-  "name" : "bluima.preprocessing",
-  "domain" : "bluima",
-  "version" : "0.1",
-  "dependencies" : [
-      {
-        "value" : "ch.epfl.bbp.nlp:bluima_opennlp:0.1"
-      }, {
-        "value" : "ch.epfl.bbp.nlp:bluima_chunker_genia:0.1"
-      }, {
-        "value" : "ch.epfl.bbp.nlp:bluima_postagger_genia:0.1"
-      }, {
-        "value" : "ch.epfl.bbp.nlp:bluima_sentence_detector_genia:0.1"
-      }, {
-        "value" : "ch.epfl.bbp.nlp:bluima_sentence_detector_pennbio:0.1"
-      }, {
-        "value" : "ch.epfl.bbp.nlp:bluima_tagdict_genia:0.1"
-      }, {
-        "value" : "ch.epfl.bbp.nlp:bluima_tokenizer_genia:0.1"
-      }
+  "name": "bluima.preprocessing",
+  "domain": "bluima",
+  "version": "0.1",
+  "dependencies": [
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_opennlp:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_chunker_genia:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_postagger_genia:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_sentence_detector_genia:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_sentence_detector_pennbio:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_tagdict_genia:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_tokenizer_genia:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_commons:0.1"
+    }
   ],
-  "engines" : [
-      {
-        "name" : "ChunkAnnotator",
-        "class" : "ch.epfl.bbp.uima.ae.ChunkAnnotator",
-        "parameters" : {
-          "posTagSetPreference" : [ "de.julielab.jules.types.GeniaPOSTag" ],
-          "model" : [ "ch.epfl.bbp.nlp.res.chunk.GeniaResource" ]
-        }
-      }, {
-        "name" : "PosTagAnnotator",
-        "class" : "ch.epfl.bbp.uima.ae.PosTagAnnotator",
-        "parameters" : {
-          "tagDict" : [ "ch.epfl.bbp.nlp.res.tag.dict.GeniaResource" ],
-          "model" : [ "ch.epfl.bbp.nlp.res.tag.GeniaResource" ],
-          "tagset" : [ "de.julielab.jules.types.GeniaPOSTag" ],
-          "caseSensitive" : [ "false" ],
-          "useTagdict" : [ "true" ]
-        }
-      }, {
-        "name" : "SentenceAnnotator",
-        "class" : "ch.epfl.bbp.uima.ae.SentenceAnnotator",
-        "parameters" : {
-          "model" : [ "ch.epfl.bbp.nlp.res.sentence.GeniaResource" ]
-        }
-      }, {
-        "name" : "TokenAnnotator",
-        "class" : "ch.epfl.bbp.uima.ae.TokenAnnotator",
-        "parameters" : {
-          "model" : [ "ch.epfl.bbp.nlp.res.token.GeniaResource" ]
-        }
+  "engines": [
+    {
+      "name": "ChunkAnnotator",
+      "description": "OpenNLP Chunker provides chunks to tokens in IOB format (e.g. B-NP, I-VP)",
+      "class": "ch.epfl.bbp.uima.ae.ChunkAnnotator",
+      "parameters": {
+        "posTagSetPreference": [
+          "de.julielab.jules.types.GeniaPOSTag"
+        ],
+        "model": [
+          "ch.epfl.bbp.nlp.res.chunk.GeniaResource"
+        ]
       }
+    },
+    {
+      "name": "PosTagAnnotator",
+      "description": "OpenNLP Part Of Speech Tagger. This annotator assumes that sentences and tokens have been annotated first.",
+      "class": "ch.epfl.bbp.uima.ae.PosTagAnnotator",
+      "parameters": {
+        "tagDict": [
+          "ch.epfl.bbp.nlp.res.tag.dict.GeniaResource"
+        ],
+        "model": [
+          "ch.epfl.bbp.nlp.res.tag.GeniaResource"
+        ],
+        "tagset": [
+          "de.julielab.jules.types.GeniaPOSTag"
+        ],
+        "caseSensitive": [
+          "false"
+        ],
+        "useTagdict": [
+          "true"
+        ]
+      }
+    },
+    {
+      "name": "SentenceAnnotator",
+      "description": "Sentence splitter, based on OpenNLP's MaxEnt SentenceDetector, and trained on biomedical corpora (PennBio or Genia corpora).",
+      "class": "ch.epfl.bbp.uima.ae.SentenceAnnotator",
+      "parameters": {
+        "model": [
+          "ch.epfl.bbp.nlp.res.sentence.GeniaResource"
+        ]
+      }
+    },
+    {
+      "name": "TokenAnnotator",
+      "description": "OpenNLP Tokenizer. This engine assumes that sentences have been annotated first.",
+      "class": "ch.epfl.bbp.uima.ae.TokenAnnotator",
+      "parameters": {
+        "model": [
+          "ch.epfl.bbp.nlp.res.token.GeniaResource"
+        ]
+      }
+    },
+    {
+      "name": "BlueBioLemmatizer",
+      "class": "ch.epfl.bbp.uima.ae.BlueBioLemmatizer"
+    }
   ]
 }

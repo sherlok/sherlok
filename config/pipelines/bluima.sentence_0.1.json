@@ -1,7 +1,31 @@
 {
-  "name" : "bluima.sentence",
-  "version" : "0.1",
-  "description" : "sentence splitter",
-  "domain" : "bluima",
-  "script": ["ENGINE SentenceAnnotator:0.1;"]
+  "name": "bluima.sentence",
+  "version": "0.1",
+  "description": "sentence splitter",
+  "domain": "bluima",
+  "script": [
+    "ENGINE SentenceAnnotator:0.1;"
+  ],
+  "tests": [
+    {
+      "comparison": "atLeast",
+      "input": "Switzerland is close to Italy, the land of pasta and Michelangelo. Paris is in France. And Madrid in Spain.",
+      "expected": {
+        "Sentence": [
+          {
+            "begin": 0,
+            "end": 66
+          },
+          {
+            "begin": 67,
+            "end": 86
+          },
+          {
+            "begin": 87,
+            "end": 107
+          }
+        ]
+      }
+    }
+  ]
 }

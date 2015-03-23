@@ -1,7 +1,173 @@
 {
-  "name" : "bluima.pos",
-  "version" : "0.1",
-  "description" : "tokenizer",
-  "domain" : "bluima",
-  "script": ["ENGINE SentenceAnnotator:0.1;", "ENGINE TokenAnnotator:0.1;", "ENGINE PosTagAnnotator:0.1;"]
+  "name": "bluima.pos",
+  "version": "0.1",
+  "description": "PoS Tagger",
+  "domain": "bluima",
+  "script": [
+    "ENGINE SentenceAnnotator:0.1;",
+    "ENGINE TokenAnnotator:0.1;",
+    "ENGINE PosTagAnnotator:0.1;"
+  ],
+  "tests": [
+    {
+      "comparison": "atLeast",
+      "input": "Switzerland is close to Italy, the land of pasta and Michelangelo. Paris is in France. And Madrid in Spain.",
+      "expected": {
+        "Sentence": [
+          {
+            "begin": 0,
+            "end": 66
+          },
+          {
+            "begin": 67,
+            "end": 86
+          },
+          {
+            "begin": 87,
+            "end": 107
+          }
+        ],
+        "Token": [
+          {
+            "begin": 0,
+            "end": 11,
+            "posTag": 792,
+            "pos": "NN"
+          },
+          {
+            "begin": 12,
+            "end": 14,
+            "posTag": 804,
+            "pos": "VBZ"
+          },
+          {
+            "begin": 15,
+            "end": 20,
+            "posTag": 816,
+            "pos": "JJ"
+          },
+          {
+            "begin": 21,
+            "end": 23,
+            "posTag": 828,
+            "pos": "TO"
+          },
+          {
+            "begin": 24,
+            "end": 29,
+            "posTag": 840,
+            "pos": "RB"
+          },
+          {
+            "begin": 29,
+            "end": 30,
+            "posTag": 852,
+            "pos": ","
+          },
+          {
+            "begin": 31,
+            "end": 34,
+            "posTag": 864,
+            "pos": "DT"
+          },
+          {
+            "begin": 35,
+            "end": 39,
+            "posTag": 876,
+            "pos": "NN"
+          },
+          {
+            "begin": 40,
+            "end": 42,
+            "posTag": 888,
+            "pos": "IN"
+          },
+          {
+            "begin": 43,
+            "end": 48,
+            "posTag": 900,
+            "pos": "NN"
+          },
+          {
+            "begin": 49,
+            "end": 52,
+            "posTag": 912,
+            "pos": "CC"
+          },
+          {
+            "begin": 53,
+            "end": 65,
+            "posTag": 924,
+            "pos": "NN"
+          },
+          {
+            "begin": 65,
+            "end": 66,
+            "posTag": 936,
+            "pos": "."
+          },
+          {
+            "begin": 67,
+            "end": 72,
+            "posTag": 948,
+            "pos": "NN"
+          },
+          {
+            "begin": 73,
+            "end": 75,
+            "posTag": 960,
+            "pos": "VBZ"
+          },
+          {
+            "begin": 76,
+            "end": 78,
+            "posTag": 972,
+            "pos": "IN"
+          },
+          {
+            "begin": 79,
+            "end": 85,
+            "posTag": 984,
+            "pos": "NN"
+          },
+          {
+            "begin": 85,
+            "end": 86,
+            "posTag": 996,
+            "pos": "."
+          },
+          {
+            "begin": 87,
+            "end": 90,
+            "posTag": 1008,
+            "pos": "CC"
+          },
+          {
+            "begin": 91,
+            "end": 97,
+            "posTag": 1020,
+            "pos": "NN"
+          },
+          {
+            "begin": 98,
+            "end": 100,
+            "posTag": 1032,
+            "pos": "IN"
+          },
+          {
+            "begin": 101,
+            "end": 106,
+            "posTag": 1044,
+            "pos": "NN"
+          },
+          {
+            "begin": 106,
+            "end": 107,
+            "posTag": 1056,
+            "pos": "."
+          }
+        ]
+      }
+    }
+  ]
 }
