@@ -45,6 +45,8 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef;
@@ -470,8 +472,8 @@ public class SherlokServer {
     protected static Object annotateRequest(Request req, Response resp,
             PipelineLoader pipelineLoader) {
         String pipelineName = req.params(":name");
-        String version = req.queryParams("version");
-        String text = req.queryParams("text");
+        String version = getRequestParam(req, "version");
+        String text = getRequestParam(req, "text");
         try {
             checkOnlyAlphanumDotUnderscore(pipelineName,
                     "'pipeline' req parameter");
@@ -519,6 +521,31 @@ public class SherlokServer {
         } catch (Exception e) {
             return error("annotate text '" + text + "'", e, resp);
         }
+    }
+
+    /**
+     * Extract `param` from `req`, either from the request itself or from its
+     * body (which is expected to be a JSON object), in that order.
+     * 
+     * @return null if the parameter is not found
+     */
+    private static String getRequestParam(Request req, String param) {
+        String value = req.queryParams(param);
+
+        // If the param is not in the header, try its body
+        if (value == null) {
+            try {
+                value = new JSONObject(req.body()).getString(param);
+            } catch (JSONException e) {
+                // Value not found/body format is not JSON.
+                LOG.warn("Request {} doesn't contain any value for param {}",
+                        req.raw(), param);
+                // We do nothing about it since this can happen when using GET
+                // request; the error should be handled elsewhere in any case.
+            }
+        }
+
+        return value;
     }
 
     /** Ensures that no file or directory in pluginFolder can collide with API */
