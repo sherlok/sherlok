@@ -301,7 +301,7 @@
         <artifactId>appassembler-maven-plugin</artifactId>
         <version>1.8.1</version>
         <configuration>
-          <extraJvmArguments> -Dfile.encoding=UTF8</extraJvmArguments>
+          <extraJvmArguments>-Djava.util.logging.config.file=log.properties -Dfile.encoding=UTF8</extraJvmArguments>
           <programs>
             <program>
               <mainClass>org.sherlok.SherlokServer</mainClass>
