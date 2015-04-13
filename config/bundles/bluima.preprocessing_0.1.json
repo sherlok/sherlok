@@ -7,24 +7,6 @@
       "value": "ch.epfl.bbp.nlp:bluima_opennlp:0.1"
     },
     {
-      "value": "ch.epfl.bbp.nlp:bluima_chunker_genia:0.1"
-    },
-    {
-      "value": "ch.epfl.bbp.nlp:bluima_postagger_genia:0.1"
-    },
-    {
-      "value": "ch.epfl.bbp.nlp:bluima_sentence_detector_genia:0.1"
-    },
-    {
-      "value": "ch.epfl.bbp.nlp:bluima_sentence_detector_pennbio:0.1"
-    },
-    {
-      "value": "ch.epfl.bbp.nlp:bluima_tagdict_genia:0.1"
-    },
-    {
-      "value": "ch.epfl.bbp.nlp:bluima_tokenizer_genia:0.1"
-    },
-    {
       "value": "ch.epfl.bbp.nlp:bluima_commons:0.1"
     }
   ],
@@ -37,8 +19,8 @@
         "posTagSetPreference": [
           "de.julielab.jules.types.GeniaPOSTag"
         ],
-        "model": [
-          "ch.epfl.bbp.nlp.res.chunk.GeniaResource"
+        "modelFile": [
+          "../bluima/resources/opennlp/chunker/Chunker_Genia.bin.gz"
         ]
       }
     },
@@ -48,10 +30,10 @@
       "class": "ch.epfl.bbp.uima.ae.PosTagAnnotator",
       "parameters": {
         "tagDict": [
-          "ch.epfl.bbp.nlp.res.tag.dict.GeniaResource"
+          "../bluima/resources/opennlp/postag/tagdict-genia"
         ],
-        "model": [
-          "ch.epfl.bbp.nlp.res.tag.GeniaResource"
+        "modelFile": [
+          "../bluima/resources/opennlp/postag/Tagger_Genia.bin.gz"
         ],
         "tagset": [
           "de.julielab.jules.types.GeniaPOSTag"
@@ -69,8 +51,8 @@
       "description": "Sentence splitter, based on OpenNLP's MaxEnt SentenceDetector, and trained on biomedical corpora (PennBio or Genia corpora).",
       "class": "ch.epfl.bbp.uima.ae.SentenceAnnotator",
       "parameters": {
-        "model": [
-          "ch.epfl.bbp.nlp.res.sentence.GeniaResource"
+        "modelFile": [
+          "../bluima/resources/opennlp/sentence/SentDetectGenia.bin.gz"
         ]
       }
     },
@@ -79,8 +61,8 @@
       "description": "OpenNLP Tokenizer. This engine assumes that sentences have been annotated first.",
       "class": "ch.epfl.bbp.uima.ae.TokenAnnotator",
       "parameters": {
-        "model": [
-          "ch.epfl.bbp.nlp.res.token.GeniaResource"
+        "modelFile": [
+          "../bluima/resources/opennlp/token/TokenizerGenia.bin.gz"
         ]
       }
     },
