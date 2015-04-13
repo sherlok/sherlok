@@ -1,0 +1,24 @@
+{
+  "name": "bluima_regions",
+  "domain": "bluima",
+  "version": "0.1",
+  "dependencies": [
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_regions:0.1"
+    }
+  ],
+  "engines": [
+    {
+      "name": "BrainRegionAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.BrainRegionAnnotator",
+      "parameters": {
+        "modelFile": [
+          "config/resources/bluima/regions/20131116_BrainRegion.model"
+        ],
+        "mode": [
+          "infer"
+        ]
+      }
+    }
+  ]
+}

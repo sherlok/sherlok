@@ -1,0 +1,31 @@
+{
+  "name": "bluima.regions",
+  "version": "0.1",
+  "description": "annotate brain regions",
+  "domain": "bluima",
+  "script": [
+    "ENGINE SentenceAnnotator:0.1;",
+    "ENGINE TokenAnnotator:0.1;",
+    "ENGINE PosTagAnnotator:0.1;",
+    "// TODO BlueBioLemmatizer",
+    "// TODO MeasureRegexAnnotators.getAllAED",
+    "// TODO PruneMeasuresAnnotator",
+    "// TODO createLinnaeusEngineDescription",
+    "// TODO EvaluationPreprocessorAnnotator",
+    "ENGINE BrainRegionAnnotator:0.1;"
+  ],
+  "tests": [
+    {
+      "comparison": "atLeast",
+      "input": "Sex differences in the gross size of the rat neocortex.",
+      "expected": {
+        "BrainRegion": [
+          {
+            "begin": 45,
+            "end": 54
+          }
+        ]
+      }
+    }
+  ]
+}
