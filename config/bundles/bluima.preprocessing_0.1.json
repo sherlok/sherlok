@@ -5,9 +5,6 @@
   "dependencies": [
     {
       "value": "ch.epfl.bbp.nlp:bluima_opennlp:0.1"
-    },
-    {
-      "value": "ch.epfl.bbp.nlp:bluima_commons:0.1"
     }
   ],
   "engines": [
@@ -65,10 +62,6 @@
           "config/resources/bluima/opennlp/token/TokenizerGenia.bin.gz"
         ]
       }
-    },
-    {
-      "name": "BlueBioLemmatizer",
-      "class": "ch.epfl.bbp.uima.ae.BlueBioLemmatizer"
     }
   ]
 }

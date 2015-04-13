@@ -1,0 +1,25 @@
+{
+  "name": "bluima.commons",
+  "domain": "bluima",
+  "version": "0.1",
+  "dependencies": [
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_commons:0.1"
+    }
+  ],
+  "engines": [
+    {
+      "name": "BlueBioLemmatizer",
+      "class": "ch.epfl.bbp.uima.ae.BlueBioLemmatizer"
+    },
+    {
+      "name": "LinnaeusAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.LinnaeusAnnotator",
+      "parameters": {
+        "CONFIG_FILE": [
+          "config/resources/bluima/linnaeus/properties.conf"
+        ]
+      }
+    }
+  ]
+}
