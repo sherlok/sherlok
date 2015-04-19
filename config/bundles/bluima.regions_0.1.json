@@ -54,6 +54,18 @@
       }
     },
     {
+      "name": "ExtractSameBrainRegionCoocurrences",
+      "class": "ch.epfl.bbp.uima.ae.relations.ExtractSameCoocurrences",
+      "parameters": {
+        "annot1": [
+          "ch.epfl.bbp.uima.types.BrainRegion"
+        ],
+        "annot2": [
+          "ch.epfl.bbp.uima.types.BrainRegion"
+        ]
+      }
+    },
+    {
       "name": "JsreBrainRegionFilterAnnotator",
       "class": "ch.epfl.bbp.uima.jsre.JsreFilterAnnotator",
       "parameters": {
