@@ -31,6 +31,24 @@
           "ch.epfl.bbp.uima.types.Measure"
         ]
       }
+    },
+    {
+      "name": "KeepLargestBrainRegionAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.KeepLargestAnnotationAnnotator",
+      "parameters": {
+        "annotationClass": [
+          "ch.epfl.bbp.uima.types.BrainRegion"
+        ]
+      }
+    },
+    {
+      "name": "KeepLargestCooccurrenceAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.KeepLargestAnnotationAnnotator",
+      "parameters": {
+        "annotationClass": [
+          "ch.epfl.bbp.uima.types.Cooccurrence"
+        ]
+      }
     }
   ]
 }

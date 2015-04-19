@@ -7,12 +7,15 @@
     "ENGINE SentenceAnnotator:0.1;",
     "ENGINE TokenAnnotator:0.1;",
     "ENGINE PosTagAnnotator:0.1;",
-    "// TODO BlueBioLemmatizer",
+    "ENGINE BlueBioLemmatizer:0.1;",
     "// TODO MeasureRegexAnnotators.getAllAED",
     "ENGINE PruneMeasuresAnnotator:0.1;",
-    "// TODO createLinnaeusEngineDescription",
-    "// TODO EvaluationPreprocessorAnnotator",
-    "ENGINE BrainRegionAnnotator:0.1;"
+    "// TODO ENGINE LinnaeusAnnotator:0.1",
+    "ENGINE BrainRegionAnnotator:0.1;",
+    "ENGINE KeepLargestBrainRegionAnnotator:0.1",
+    "// TODO ENGINE ExtractSameBrainRegionCoocurrences:0.1",
+    "// TODO ENGINE JsreBrainRegionFilterAnnotator:0.1",
+    "ENGINE KeepLargestCooccurrenceAnnotator:0.1"
   ],
   "tests": [
     {
