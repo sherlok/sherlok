@@ -5,6 +5,9 @@
   "dependencies": [
     {
       "value": "ch.epfl.bbp.nlp:bluima_regions:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_utils:0.1"
     }
   ],
   "engines": [
@@ -17,6 +20,15 @@
         ],
         "mode": [
           "infer"
+        ]
+      }
+    },
+    {
+      "name": "PruneMeasuresAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.KeepLargestAnnotationAnnotator",
+      "parameters": {
+        "annotationClass": [
+          "ch.epfl.bbp.uima.types.Measure"
         ]
       }
     }

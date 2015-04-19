@@ -9,7 +9,7 @@
     "ENGINE PosTagAnnotator:0.1;",
     "// TODO BlueBioLemmatizer",
     "// TODO MeasureRegexAnnotators.getAllAED",
-    "// TODO PruneMeasuresAnnotator",
+    "ENGINE PruneMeasuresAnnotator:0.1;",
     "// TODO createLinnaeusEngineDescription",
     "// TODO EvaluationPreprocessorAnnotator",
     "ENGINE BrainRegionAnnotator:0.1;"
