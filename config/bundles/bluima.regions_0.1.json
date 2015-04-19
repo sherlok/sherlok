@@ -8,6 +8,9 @@
     },
     {
       "value": "ch.epfl.bbp.nlp:bluima_utils:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_jsre:0.1"
     }
   ],
   "engines": [
@@ -47,6 +50,15 @@
       "parameters": {
         "annotationClass": [
           "ch.epfl.bbp.uima.types.Cooccurrence"
+        ]
+      }
+    },
+    {
+      "name": "JsreBrainRegionFilterAnnotator",
+      "class": "ch.epfl.bbp.uima.jsre.JsreFilterAnnotator",
+      "parameters": {
+        "annotationClass": [
+          "ch.epfl.bbp.uima.types.BrainRegion"
         ]
       }
     }

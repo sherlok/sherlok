@@ -14,7 +14,7 @@
     "ENGINE BrainRegionAnnotator:0.1;",
     "ENGINE KeepLargestBrainRegionAnnotator:0.1",
     "// TODO ENGINE ExtractSameBrainRegionCoocurrences:0.1",
-    "// TODO ENGINE JsreBrainRegionFilterAnnotator:0.1",
+    "ENGINE JsreBrainRegionFilterAnnotator:0.1",
     "ENGINE KeepLargestCooccurrenceAnnotator:0.1"
   ],
   "tests": [
