@@ -1,4 +1,4 @@
 [submodule "config/resources/bluima"]
 	path = config/resources/bluima
-    url = https://github.com/mantognini/bluima_resources.git
+    url = https://github.com/BlueBrain/bluima_resources.git
 	branch = master
