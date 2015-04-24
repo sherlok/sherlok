@@ -10,6 +10,9 @@
       "value": "ch.epfl.bbp.nlp:bluima_utils:0.1"
     },
     {
+      "value": "ch.epfl.bbp.nlp:bluima_units:0.1"
+    },
+    {
       "value": "ch.epfl.bbp.nlp:bluima_jsre:0.1"
     }
   ],
@@ -23,6 +26,16 @@
         ],
         "mode": [
           "infer"
+        ]
+      }
+    },
+    {
+      "name": "MeasureRegexAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.RegExAnnotator",
+      "parameters": {
+        "ConceptFiles": [
+          "config/resources/bluima/regex_concepts/concentrations.xml",
+          "config/resources/bluima/regex_concepts/measures.xml"
         ]
       }
     },

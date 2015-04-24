@@ -8,7 +8,7 @@
     "ENGINE TokenAnnotator:0.1;",
     "ENGINE PosTagAnnotator:0.1;",
     "ENGINE BlueBioLemmatizer:0.1;",
-    "// TODO MeasureRegexAnnotators.getAllAED;",
+    "ENGINE MeasureRegexAnnotator:0.1;",
     "ENGINE PruneMeasuresAnnotator:0.1;",
     "ENGINE LinnaeusAnnotator:0.1;",
     "ENGINE BrainRegionAnnotator:0.1;",
