@@ -7,6 +7,9 @@
       "value": "ch.epfl.bbp.nlp:bluima_opennlp:0.1"
     }
   ],
+  "config": {
+    "opennlp": "config/resources/bluima/opennlp"
+  },
   "engines": [
     {
       "name": "ChunkAnnotator",
@@ -17,7 +20,7 @@
           "de.julielab.jules.types.GeniaPOSTag"
         ],
         "modelFile": [
-          "config/resources/bluima/opennlp/chunker/Chunker_Genia.bin.gz"
+          "$opennlp/chunker/Chunker_Genia.bin.gz"
         ]
       }
     },
@@ -27,10 +30,10 @@
       "class": "ch.epfl.bbp.uima.ae.PosTagAnnotator",
       "parameters": {
         "tagDict": [
-          "config/resources/bluima/opennlp/postag/tagdict-genia"
+          "$opennlp/postag/tagdict-genia"
         ],
         "modelFile": [
-          "config/resources/bluima/opennlp/postag/Tagger_Genia.bin.gz"
+          "$opennlp/postag/Tagger_Genia.bin.gz"
         ],
         "tagset": [
           "de.julielab.jules.types.GeniaPOSTag"
@@ -49,7 +52,7 @@
       "class": "ch.epfl.bbp.uima.ae.SentenceAnnotator",
       "parameters": {
         "modelFile": [
-          "config/resources/bluima/opennlp/sentence/SentDetectGenia.bin.gz"
+          "$opennlp/sentence/SentDetectGenia.bin.gz"
         ]
       }
     },
@@ -59,7 +62,7 @@
       "class": "ch.epfl.bbp.uima.ae.TokenAnnotator",
       "parameters": {
         "modelFile": [
-          "config/resources/bluima/opennlp/token/TokenizerGenia.bin.gz"
+          "$opennlp/token/TokenizerGenia.bin.gz"
         ]
       }
     }
