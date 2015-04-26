@@ -43,7 +43,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 // ensure property output order
 @JsonPropertyOrder(value = { "name", "version", "description", "domain",
-        "dependencies", "repositories", "engines" }, alphabetic = true)
+        "dependencies", "repositories", "engines", "config" }, alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class BundleDef extends Def {
 
@@ -54,6 +54,9 @@ public class BundleDef extends Def {
     private Map<String, String> repositories = map();
 
     private List<EngineDef> engines = list();
+    
+    /** variable configuration with support for protocols such as file, git, ... */
+    private Map<String, String> config = map();
 
     /** A Maven dependency to some external UIMA code. */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -319,6 +322,20 @@ public class BundleDef extends Def {
 
     public BundleDef addEngine(EngineDef engine) {
         this.engines.add(engine);
+        return this;
+    }
+
+    public Map<String, String> getConfig() {
+        return config;
+    }
+
+    public BundleDef setConfig(Map<String, String> config) {
+        this.config = config;
+        return this;
+    }
+
+    public BundleDef addConfig(String var, String value) {
+        this.config.put(var, value);
         return this;
     }
 

@@ -39,6 +39,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.UIMAException;
@@ -508,9 +510,10 @@ public class UimaPipeline {
         Map<String, List<String>> defParams = engineDef.getParameters();
         for (Entry<String, List<String>> en : defParams.entrySet()) {
 
-            // TODO process configuration variables here
+            List<String> values = processConfigVariables(en.getValue(),
+                    engineDef);
 
-            convertedParameters.put(en.getKey(), en.getValue());
+            convertedParameters.put(en.getKey(), values);
         }
 
         // then, extract the parameters from the class definition
@@ -528,7 +531,12 @@ public class UimaPipeline {
                 // the engine definition
 
                 if (defParams.containsKey(parameterName)) {
-                    List<String> list = defParams.get(parameterName);
+                    // TODO since convertedParameters contains all elements of
+                    // defParams, it should be possible to process it once only.
+                    // But this would need an additional map of String to
+                    // List<String>.
+                    List<String> list = processConfigVariables(
+                            defParams.get(parameterName), engineDef);
                     Object o = ConfigurationFieldParser
                             .getDefaultValue(field, list
                                     .toArray(new String[list.size()]));
@@ -538,6 +546,46 @@ public class UimaPipeline {
         }
         
         return convertedParameters;
+    }
+
+    // Process configuration variables in each value
+    private List<String> processConfigVariables(List<String> values,
+            EngineDef engineDef) {
+        List<String> processed = list();
+        for (String value : values) {
+            processed.add(processConfigVariables(value, engineDef));
+        }
+
+        return processed;
+    }
+
+    // Accepts variable starting by '$' and containing only alpha-numerical
+    // characters (+ underscore). The variable can be accessed through the
+    // named-capturing group "name".
+    private static final Pattern VARIABLE_PATTERN = Pattern
+            .compile("\\$(?<name>\\w+)");
+
+    // Process configuration variables
+    private String processConfigVariables(String value, EngineDef engineDef) {
+        Matcher matcher = VARIABLE_PATTERN.matcher(value);
+        Map<String, String> config = engineDef.getBundle().getConfig();
+
+        while (matcher.find()) {
+            String name = matcher.group("name");
+            String processed = processConfigVariable(name, config);
+
+            // replace all occurrences of "$name" in the original string
+            value = value.replace(matcher.group(), processed);
+        }
+
+        return value;
+    }
+
+    private String processConfigVariable(String name, Map<String, String> config) {
+        // TODO handle URLs here (e.g. file, git, ...)
+
+        // fallback: basic substitution
+        return config.get(name);
     }
 
     @SuppressWarnings("unchecked")
