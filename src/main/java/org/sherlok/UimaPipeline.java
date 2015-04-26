@@ -29,6 +29,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -86,6 +87,8 @@ import org.xml.sax.SAXException;
  * @author renaud@apache.org
  */
 public class UimaPipeline {
+    private static final String ENGINE_ID_SEPARATOR = "___";
+
     private static Logger LOG = getLogger(UimaPipeline.class);
 
     private final PipelineDef pipelineDef;
@@ -370,7 +373,6 @@ public class UimaPipeline {
         return pipelineDef.toString();
     }
 
-    @SuppressWarnings("unchecked")
     private void initScript(List<String> scriptLines, List<EngineDef> engineDefs)
             throws ResourceInitializationException, IOException,
             ValidationException {
@@ -382,98 +384,18 @@ public class UimaPipeline {
             String scriptLine = scriptLines.get(i);
 
             if (scriptLine.startsWith("ENGINE")) {
-                // TODO refactor and abstract
-                String pengineId = scriptLine.trim()
-                        .substring("ENGINE".length()).trim()
-                        .replaceAll(";", "");
-                validateId(pengineId, "ENGINE id in '" + pengineId + "'");
+                // find the corresponding engine description
+                String pengineId = extractPengineId(scriptLine);
+                EngineDef engineDef = findEngineDefById(pengineId, engineDefs);
 
-                boolean found = false;
-                for (EngineDef engineDef : engineDefs) {
-                    if (engineDef.getId().equals(pengineId)) {
+                // create ae and write xml descriptor
+                String engineDescription = generateXmlDescriptor(pengineId,
+                        engineDef);
+                engineDescriptions.add(engineDescription);
 
-                        found = true;
-                        String engineDescription = engineDef
-                                .getIdForDescriptor("___");
-
-                        // instantiate class
-                        Class<? extends AnalysisComponent> classz;
-                        try {
-                            classz = (Class<? extends AnalysisComponent>) Class
-                                    .forName(engineDef.getClassz());
-                        } catch (ClassNotFoundException e) {
-                            throw new ValidationException(
-                                    "could not find class "
-                                            + engineDef.getClassz(), e);
-                        }
-
-                        // convert fields strings to primitives
-                        Map<String, Object> convertedParameters = map();
-                        for (Entry<String, List<String>> en : engineDef
-                                .getParameters().entrySet()) {
-                            convertedParameters.put(en.getKey(), en.getValue());
-                        }
-                        for (Field f : classz.getDeclaredFields()) {
-                            java.lang.annotation.Annotation[] annots2 = f
-                                    .getDeclaredAnnotations();
-                            for (java.lang.annotation.Annotation a : annots2) {
-                                if (a instanceof ConfigurationParameter) {
-
-                                    String parameterName = ((ConfigurationParameter) a)
-                                            .name();
-                                    if (engineDef.getParameters().containsKey(
-                                            parameterName)) {
-                                        List<String> list = engineDef
-                                                .getParameter(parameterName);
-                                        Object o = ConfigurationFieldParser
-                                                .getDefaultValue(
-                                                        f,
-                                                        list.toArray(new String[list
-                                                                .size()]));
-                                        convertedParameters.put(parameterName,
-                                                o);
-                                    }
-                                }
-                            }
-                        }
-                        List<Object> flatParams = list();
-                        for (Entry<String, Object> en : convertedParameters
-                                .entrySet()) {
-                            flatParams.add(en.getKey());
-                            flatParams.add(en.getValue());
-                        }
-                        Object[] flatParamsArray = flatParams
-                                .toArray(new Object[flatParams.size()]);
-
-                        // create ae and write xml descriptor
-                        AnalysisEngineDescription aed = AnalysisEngineFactory
-                                .createEngineDescription(classz,
-                                        flatParamsArray);
-                        try {
-                            File tmpEngine = new File(
-                                    FileBased.RUTA_ENGINE_CACHE_PATH
-                                            + engineDef
-                                                    .getIdForDescriptor("___")
-                                            + ".xml");
-                            tmpEngine.getParentFile().mkdirs();
-                            FileOutputStream fos = new FileOutputStream(
-                                    tmpEngine);
-                            aed.toXML(fos);
-                        } catch (SAXException e) {
-                            throw new RuntimeException(
-                                    "could not write descriptor of "
-                                            + pengineId, e); // should not
-                                                             // happen
-                        }
-                        engineDescriptions.add(engineDescription);
-                        scriptLines.set(i, "Document{-> EXEC("
-                                + engineDescription + ")}; // " + scriptLine);
-                    }
-                }
-                if (!found) {
-                    throw new ValidationException("pipeline engine not found",
-                            pengineId);
-                }
+                // update script line
+                scriptLines.set(i, "Document{-> EXEC(" + engineDescription
+                        + ")}; // " + scriptLine);
             }
         }
 
@@ -532,5 +454,128 @@ public class UimaPipeline {
                 PARAM_DESCRIPTOR_PATHS, FileBased.RUTA_ENGINE_CACHE_PATH,//
                 RutaEngine.PARAM_ADDITIONAL_ENGINES, engineDescriptions,//
                 PARAM_MAIN_SCRIPT, scriptName));
+    }
+
+    /**
+     * Generate XML descriptor and return engine's descriptor
+     */
+    private String generateXmlDescriptor(String pengineId, EngineDef engineDef)
+            throws ValidationException, ResourceInitializationException,
+            FileNotFoundException, IOException {
+
+        // convert fields strings to primitives
+        Map<String, Object> engineParameters = extractParameters(engineDef);
+        Object[] flatParamsArray = flattenParameters(engineParameters);
+
+        // construct AE
+        Class<? extends AnalysisComponent> classz = extractAnalysisComponentClass(engineDef);
+        String engineDescription = engineDef
+                .getIdForDescriptor(ENGINE_ID_SEPARATOR);
+        AnalysisEngineDescription aed = AnalysisEngineFactory
+                .createEngineDescription(classz, flatParamsArray);
+
+        // generate XML descriptor
+        try {
+            File tmpEngine = new File(FileBased.RUTA_ENGINE_CACHE_PATH
+                    + engineDescription + ".xml");
+            tmpEngine.getParentFile().mkdirs();
+            FileOutputStream fos = new FileOutputStream(tmpEngine);
+            aed.toXML(fos);
+        } catch (SAXException e) {
+            throw new RuntimeException("could not write descriptor of "
+                    + pengineId, e); // should not happen
+        }
+
+        return engineDescription;
+    }
+
+    private Object[] flattenParameters(Map<String, Object> parameters) {
+        List<Object> flatParams = list();
+        for (Entry<String, Object> en : parameters.entrySet()) {
+            flatParams.add(en.getKey());
+            flatParams.add(en.getValue());
+        }
+        Object[] flatParamsArray = flatParams.toArray(new Object[flatParams
+                .size()]);
+        return flatParamsArray;
+    }
+
+    private Map<String, Object> extractParameters(EngineDef engineDef)
+            throws ValidationException {
+        Map<String, Object> convertedParameters = map();
+
+        // first, extract all parameters from the engine definition
+        Map<String, List<String>> defParams = engineDef.getParameters();
+        for (Entry<String, List<String>> en : defParams.entrySet()) {
+
+            // TODO process configuration variables here
+
+            convertedParameters.put(en.getKey(), en.getValue());
+        }
+
+        // then, extract the parameters from the class definition
+        Class<? extends AnalysisComponent> klass = extractAnalysisComponentClass(engineDef);
+        for (Field field : klass.getDeclaredFields()) {
+            ConfigurationParameter annotation = field
+                    .getAnnotation(ConfigurationParameter.class);
+            if (annotation != null) {
+                String parameterName = annotation.name();
+
+                // if the parameter is also present in the engine definition
+                // we override the value with the proper default value
+
+                // TODO not sure why it's a "default" value since it comes from
+                // the engine definition
+
+                if (defParams.containsKey(parameterName)) {
+                    List<String> list = defParams.get(parameterName);
+                    Object o = ConfigurationFieldParser
+                            .getDefaultValue(field, list
+                                    .toArray(new String[list.size()]));
+                    convertedParameters.put(parameterName, o); // override value
+                }
+            }
+        }
+        
+        return convertedParameters;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<? extends AnalysisComponent> extractAnalysisComponentClass(
+            EngineDef engineDef) throws ValidationException {
+        try {
+            return (Class<? extends AnalysisComponent>) Class
+                    .forName(engineDef.getClassz());
+        } catch (ClassNotFoundException e) {
+            throw new ValidationException("could not find class "
+                    + engineDef.getClassz(), e);
+        }
+    }
+
+    /**
+     * Find an engine definition in a given list based on its id.
+     * 
+     * @throws ValidationException
+     *             when no such engine exists in the list
+     */
+    private EngineDef findEngineDefById(String pengineId,
+            List<EngineDef> engineDefs) throws ValidationException {
+        for (EngineDef engineDef : engineDefs) {
+            if (engineDef.getId().equals(pengineId)) {
+                return engineDef;
+            }
+        }
+
+        throw new ValidationException("pipeline engine not found", pengineId);
+    }
+
+    // TODO why "p"engine?
+    private String extractPengineId(String scriptLine)
+            throws ValidationException {
+        String pengineId = scriptLine.trim()
+                .substring("ENGINE".length()).trim()
+                .replaceAll(";", "");
+        validateId(pengineId, "ENGINE id in '" + pengineId + "'");
+        return pengineId;
     }
 }
