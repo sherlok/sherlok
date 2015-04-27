@@ -301,7 +301,13 @@
         <artifactId>appassembler-maven-plugin</artifactId>
         <version>1.8.1</version>
         <configuration>
-          <extraJvmArguments> -Dfile.encoding=UTF8</extraJvmArguments>
+          <!-- Add Java property for log to prevent ValidationException from
+               org.sherlok.UimaPipeline.initEngines(UimaPipeline.java:243)
+               (line numbering from 156718b0d11d5402e73de45406666a854fa09c5a)
+               because MalletLogger might write on syserr if this property
+               is not set and resources/logging.properties is not found.
+               Note that log.properties doesn't have to exist to make this work. -->
+          <extraJvmArguments>-Djava.util.logging.config.file=log.properties -Dfile.encoding=UTF8</extraJvmArguments>
           <programs>
             <program>
               <mainClass>org.sherlok.SherlokServer</mainClass>

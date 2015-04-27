@@ -70,6 +70,7 @@ public class BundleCreatorUtil {
             System.out
                     .println("usage: create_bundle bundle1 bundle2 bundle3"
                             + " ...\nwhere bundles have the format groupId:artifactId:version");
+            return;
         }
 
         BundleDef b = (BundleDef) new BundleDef().setName("placeholdername")

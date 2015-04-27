@@ -1,0 +1,26 @@
+{
+  "name": "bluima.linnaeus",
+  "version": "0.1",
+  "description": "linnaeus",
+  "domain": "bluima",
+  "script": [
+    "ENGINE LinnaeusAnnotator:0.1;"
+  ],
+  "tests": [
+    {
+      "comparison": "atLeast",
+      "input": "bla bla rat bla bla",
+      "expected": {
+        "LinnaeusSpecies": [
+          {
+            "begin": 8,
+            "end": 11,
+            "mostProbableSpeciesId": "species:ncbi:10116",
+            "allIdsString": "species:ncbi:10116",
+            "ambigous": false
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "name": "bluima_regions",
+  "domain": "bluima",
+  "version": "0.1",
+  "dependencies": [
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_regions:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_utils:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_units:0.1"
+    },
+    {
+      "value": "ch.epfl.bbp.nlp:bluima_jsre:0.1"
+    }
+  ],
+  "engines": [
+    {
+      "name": "BrainRegionAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.BrainRegionAnnotator",
+      "parameters": {
+        "modelFile": [
+          "config/resources/bluima/regions/20131116_BrainRegion.model"
+        ],
+        "mode": [
+          "infer"
+        ]
+      }
+    },
+    {
+      "name": "MeasureRegexAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.RegExAnnotator",
+      "parameters": {
+        "ConceptFiles": [
+          "config/resources/bluima/regex_concepts/concentrations.xml",
+          "config/resources/bluima/regex_concepts/measures.xml"
+        ]
+      }
+    },
+    {
+      "name": "PruneMeasuresAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.KeepLargestAnnotationAnnotator",
+      "parameters": {
+        "annotationClass": [
+          "ch.epfl.bbp.uima.types.Measure"
+        ]
+      }
+    },
+    {
+      "name": "KeepLargestBrainRegionAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.KeepLargestAnnotationAnnotator",
+      "parameters": {
+        "annotationClass": [
+          "ch.epfl.bbp.uima.types.BrainRegion"
+        ]
+      }
+    },
+    {
+      "name": "KeepLargestCooccurrenceAnnotator",
+      "class": "ch.epfl.bbp.uima.ae.KeepLargestAnnotationAnnotator",
+      "parameters": {
+        "annotationClass": [
+          "ch.epfl.bbp.uima.types.Cooccurrence"
+        ]
+      }
+    },
+    {
+      "name": "ExtractSameBrainRegionCoocurrences",
+      "class": "ch.epfl.bbp.uima.ae.relations.ExtractSameCoocurrences",
+      "parameters": {
+        "annot1": [
+          "ch.epfl.bbp.uima.types.BrainRegion"
+        ],
+        "annot2": [
+          "ch.epfl.bbp.uima.types.BrainRegion"
+        ]
+      }
+    },
+    {
+      "name": "JsreBrainRegionFilterAnnotator",
+      "class": "ch.epfl.bbp.uima.jsre.JsreFilterAnnotator",
+      "parameters": {
+        "annotationClass": [
+          "ch.epfl.bbp.uima.types.BrainRegion"
+        ]
+      }
+    }
+  ]
+}

@@ -270,6 +270,10 @@ public class UimaPipeline {
             } else {
                 engines[i] = AnalysisEngineFactory.createEngine(descs[i]);
             }
+            // FIXME both if and else bodies are equivalent. Should something
+            // special be done or should the if statement be removed?
+            // NB: testing sentence, linnaeus and regions: all involved
+            // descriptions are primitives.
         }
         return engines;
     }
