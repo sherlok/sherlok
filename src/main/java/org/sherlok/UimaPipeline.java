@@ -89,8 +89,6 @@ import org.xml.sax.SAXException;
  * @author renaud@apache.org
  */
 public class UimaPipeline {
-    private static final String ENGINE_ID_SEPARATOR = "___";
-
     private static Logger LOG = getLogger(UimaPipeline.class);
 
     private final PipelineDef pipelineDef;
@@ -387,11 +385,11 @@ public class UimaPipeline {
 
             if (scriptLine.startsWith("ENGINE")) {
                 // find the corresponding engine description
-                String pengineId = extractPengineId(scriptLine);
-                EngineDef engineDef = findEngineDefById(pengineId, engineDefs);
+                String engineId = extractEngineId(scriptLine);
+                EngineDef engineDef = findEngineDefById(engineId, engineDefs);
 
                 // create ae and write xml descriptor
-                String engineDescription = generateXmlDescriptor(pengineId,
+                String engineDescription = generateXmlDescriptor(engineId,
                         engineDef);
                 engineDescriptions.add(engineDescription);
 
@@ -459,9 +457,17 @@ public class UimaPipeline {
     }
 
     /**
+     * Engine descriptor separator
+     *
+     * used to separate the engine id when creating tmp xml descriptor
+     */
+    private static final String ENGINE_ID_SEPARATOR = "___";
+
+    /**
      * Generate XML descriptor and return engine's descriptor
      */
-    private String generateXmlDescriptor(String pengineId, EngineDef engineDef)
+    private static String generateXmlDescriptor(String engineId,
+            EngineDef engineDef)
             throws ValidationException, ResourceInitializationException,
             FileNotFoundException, IOException {
 
@@ -485,13 +491,13 @@ public class UimaPipeline {
             aed.toXML(fos);
         } catch (SAXException e) {
             throw new RuntimeException("could not write descriptor of "
-                    + pengineId, e); // should not happen
+                    + engineId, e); // should not happen
         }
 
         return engineDescription;
     }
 
-    private Object[] flattenParameters(Map<String, Object> parameters) {
+    private static Object[] flattenParameters(Map<String, Object> parameters) {
         List<Object> flatParams = list();
         for (Entry<String, Object> en : parameters.entrySet()) {
             flatParams.add(en.getKey());
@@ -502,7 +508,7 @@ public class UimaPipeline {
         return flatParamsArray;
     }
 
-    private Map<String, Object> extractParameters(EngineDef engineDef)
+    private static Map<String, Object> extractParameters(EngineDef engineDef)
             throws ValidationException {
         Map<String, Object> convertedParameters = map();
 
@@ -549,7 +555,7 @@ public class UimaPipeline {
     }
 
     // Process configuration variables in each value
-    private List<String> processConfigVariables(List<String> values,
+    private static List<String> processConfigVariables(List<String> values,
             EngineDef engineDef) {
         List<String> processed = list();
         for (String value : values) {
@@ -566,7 +572,8 @@ public class UimaPipeline {
             .compile("\\$(?<name>\\w+)");
 
     // Process configuration variables
-    private String processConfigVariables(String value, EngineDef engineDef) {
+    private static String processConfigVariables(String value,
+            EngineDef engineDef) {
         Matcher matcher = VARIABLE_PATTERN.matcher(value);
         Map<String, String> config = engineDef.getBundle().getConfig();
 
@@ -581,7 +588,8 @@ public class UimaPipeline {
         return value;
     }
 
-    private String processConfigVariable(String name, Map<String, String> config) {
+    private static String processConfigVariable(String name,
+            Map<String, String> config) {
         // TODO handle URLs here (e.g. file, git, ...)
 
         // fallback: basic substitution
@@ -589,7 +597,7 @@ public class UimaPipeline {
     }
 
     @SuppressWarnings("unchecked")
-    private Class<? extends AnalysisComponent> extractAnalysisComponentClass(
+    private static Class<? extends AnalysisComponent> extractAnalysisComponentClass(
             EngineDef engineDef) throws ValidationException {
         try {
             return (Class<? extends AnalysisComponent>) Class
@@ -606,7 +614,7 @@ public class UimaPipeline {
      * @throws ValidationException
      *             when no such engine exists in the list
      */
-    private EngineDef findEngineDefById(String pengineId,
+    private static EngineDef findEngineDefById(String pengineId,
             List<EngineDef> engineDefs) throws ValidationException {
         for (EngineDef engineDef : engineDefs) {
             if (engineDef.getId().equals(pengineId)) {
@@ -617,8 +625,7 @@ public class UimaPipeline {
         throw new ValidationException("pipeline engine not found", pengineId);
     }
 
-    // TODO why "p"engine?
-    private String extractPengineId(String scriptLine)
+    private static String extractEngineId(String scriptLine)
             throws ValidationException {
         String pengineId = scriptLine.trim()
                 .substring("ENGINE".length()).trim()
