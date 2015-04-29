@@ -19,6 +19,9 @@ import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
+import static org.sherlok.utils.ValidationException.ERR;
+import static org.sherlok.utils.ValidationException.MSG;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -116,6 +119,9 @@ public class RutaHelper {
                     } catch (Exception e) {// it's ok, will
                         // happen if no additional inline declarations
                     }
+                } else {
+                    throw new ValidationException(map(MSG,
+                            "could not parse DECLARE", ERR, instruction));
                 }
             }
         }

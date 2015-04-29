@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
@@ -33,11 +34,18 @@ public class RutaHelperTest {
     public void testEmpty() throws Exception {
         Set<TypeDTO> types = parseDeclaredTypes("PACKAGE oh;");
         assertEquals(0, types.size());
-        types = parseDeclaredTypes("DECLARE;");
+    }
+
+    @Test
+    public void testEmpty2() throws Exception {
+        Set<TypeDTO> types = parseDeclaredTypes("Declare;");
         assertEquals(0, types.size());
-        types = parseDeclaredTypes("Declare;");
-        assertEquals(0, types.size());
-        types = parseDeclaredTypes("DECLARE Dog");
+
+    }
+
+    @Test
+    public void testEmpty3() throws Exception {
+        Set<TypeDTO> types = parseDeclaredTypes("DECLARE Dog");
         assertEquals("missing ;, but that is ok", 1, types.size());
     }
 
@@ -129,5 +137,12 @@ public class RutaHelperTest {
     @Test(expected = ValidationException.class)
     public void testFeatures4() throws Exception {
         parseDeclaredTypes("DECLARE Aa (INT asf cc, Blah dd);");
+    }
+
+    @Test(expected = ValidationException.class)
+    @Ignore
+    // TODO
+    public void testSupertype() throws Exception {
+        parseDeclaredTypes("DECLARE org.apache.uima.jcas.tcas.Annotation Methods(STRING ontologyId);");
     }
 }

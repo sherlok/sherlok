@@ -256,8 +256,11 @@ public class UimaPipeline {
     static CasPool initCasPool(TypeSystemDescription tsd)
             throws ResourceInitializationException {
 
-        // for (TypeDescription td : tsd.getTypes())
-        // LOG.debug("type: {}", td.getName());
+        if (LOG.isTraceEnabled()) {
+            for (TypeDescription td : tsd.getTypes()) {
+                LOG.trace("type: {}", td.getName());
+            }
+        }
 
         AnalysisEngine noOpEngine = AnalysisEngineFactory.createEngine(
                 NoOpAnnotator.class, tsd);
@@ -422,18 +425,22 @@ public class UimaPipeline {
 
         // add types
         for (TypeDTO t : RutaHelper.parseDeclaredTypes(script)) {
-            // fix type and supertype names (add namespace)
+            // fix type and supertype names (add namespace or convert to root)
             String typeName = nameSpace + "." + t.typeName;
             String supertypeName = t.supertypeName;
-            if (supertypeName.indexOf('.') == -1) {
+            if ("Annotation".equals(supertypeName)) {
+                supertypeName = "uima.tcas.Annotation"; // root-superType
+            } else if (supertypeName.indexOf('.') == -1) {
+                // superType previousely defined in script
                 supertypeName = nameSpace + "." + supertypeName;
             }
-            LOG.trace("adding type {}::{}", typeName, supertypeName);
+            LOG.trace("adding type '{}' (supertype '{}')", typeName,
+                    supertypeName);
 
             TypeDescription typeD = tsd.addType(typeName, t.description,
                     supertypeName);
             for (TypeFeatureDTO f : t.getTypeFeatures()) {
-                LOG.trace("  adding feat {}::{}", f.featureName,
+                LOG.trace("  adding feat '{}' (range '{}')", f.featureName,
                         f.getRangeTypeNameCleaned());
                 typeD.addFeature(f.featureName, f.description,
                         f.getRangeTypeNameCleaned());
