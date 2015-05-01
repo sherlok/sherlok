@@ -497,14 +497,18 @@ public class UimaPipeline {
         return engineDescription;
     }
 
-    private static Object[] flattenParameters(Map<String, Object> parameters) {
+    /**
+     * Flatten key-value pairs into an array of Objects
+     * 
+     * TODO move me to a more appropriate class for such generic functions
+     */
+    private static <K, V> Object[] flattenParameters(Map<K, V> parameters) {
         List<Object> flatParams = list();
-        for (Entry<String, Object> en : parameters.entrySet()) {
+        for (Entry<K, V> en : parameters.entrySet()) {
             flatParams.add(en.getKey());
             flatParams.add(en.getValue());
         }
-        Object[] flatParamsArray = flatParams.toArray(new Object[flatParams
-                .size()]);
+        Object[] flatParamsArray = flatParams.toArray();
         return flatParamsArray;
     }
 
