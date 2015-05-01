@@ -1,6 +1,7 @@
 package org.sherlok;
 
 import static org.sherlok.utils.Create.map;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,12 +20,15 @@ import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.utils.ConfigurationFieldParser;
 import org.sherlok.utils.MapOps;
 import org.sherlok.utils.ValidationException;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 /**
  * Operations on Engine such as generating XML description for RUTA.
  */
 public class EngineOps {
+
+    private static Logger LOG = getLogger(EngineOps.class);
 
     /**
      * Engine descriptor separator
@@ -70,50 +74,80 @@ public class EngineOps {
     }
 
 
+    /**
+     * Extract parameters from the engine definition and use annotation in the
+     * corresponding annotator class to convert the parameter value to the right
+     * type.
+     */
     private static Map<String, Object> extractParameters(EngineDef engineDef)
             throws ValidationException {
-        Map<String, Object> convertedParameters = map();
+        // build a [param name -> annotated field] mapping
+        Map<String, Field> annotatedFields = extractParametersFields(engineDef);
 
-        // first, extract all parameters from the engine definition
+        // load all parameters from the engine definition
+        Map<String, Object> convertedParameters = map();
         Map<String, List<String>> defParams = engineDef.getParameters();
         for (Entry<String, List<String>> en : defParams.entrySet()) {
+            String parameterName = en.getKey();
 
             List<String> values = ConfigVariableManager.processConfigVariables(
                     en.getValue(), engineDef);
 
-            convertedParameters.put(en.getKey(), values);
-        }
-
-        // then, extract the parameters from the class definition
-        Class<? extends AnalysisComponent> klass = extractAnalysisComponentClass(engineDef);
-        for (Field field : klass.getDeclaredFields()) {
-            ConfigurationParameter annotation = field
-                    .getAnnotation(ConfigurationParameter.class);
-            if (annotation != null) {
-                String parameterName = annotation.name();
-
-                // if the parameter is also present in the engine definition
-                // we override the value with the proper default value
-
-                // TODO not sure why it's a "default" value since it comes from
-                // the engine definition
-
-                if (defParams.containsKey(parameterName)) {
-                    // TODO since convertedParameters contains all elements of
-                    // defParams, it should be possible to process it once only.
-                    // But this would need an additional map of String to
-                    // List<String>.
-                    List<String> list = ConfigVariableManager
-                            .processConfigVariables(
-                                    defParams.get(parameterName), engineDef);
-                    Object o = ConfigurationFieldParser.getDefaultValue(field,
-                            list.toArray(new String[list.size()]));
-                    convertedParameters.put(parameterName, o); // override value
-                }
+            Field field = annotatedFields.get(parameterName);
+            if (field == null) {
+                throw new ValidationException(
+                        "Expected annotated field in annotator "
+                                + engineDef.getClassz() + " for parameter name",
+                        parameterName);
             }
+
+            Object configuredValue = ConfigurationFieldParser.getDefaultValue(
+                    field, values.toArray(new String[values.size()]));
+            convertedParameters.put(parameterName, configuredValue);
         }
 
         return convertedParameters;
+    }
+
+
+    /** Create a map from configuration parameter name to the matching field */
+    @SuppressWarnings("unchecked")
+    private static Map<String, Field> extractParametersFields(
+            EngineDef engineDef)
+            throws ValidationException {
+        Class<? extends AnalysisComponent> klass = extractAnalysisComponentClass(engineDef);
+        Map<String, Field> params = map();
+
+        // we need to recurse and find annotated field in super classes too
+        while (klass != null) {
+            for (Field field : klass.getDeclaredFields()) {
+                ConfigurationParameter annotation = field
+                        .getAnnotation(ConfigurationParameter.class);
+                if (annotation != null) {
+                    String parameterName = annotation.name();
+                    params.put(parameterName, field);
+                }
+            }
+
+            // find super class (if still implementing AnalysisComponent)
+            Class<?> superklass = klass.getSuperclass();
+            if (AnalysisComponent.class.isAssignableFrom(superklass)) {
+                LOG.trace("klass " + klass.getName() + " has superklass: "
+                        + superklass.getName());
+                klass = (Class<? extends AnalysisComponent>) superklass;
+            } else {
+                LOG.trace("klass " + klass.getName()
+                        + " has no matching superclass.");
+                klass = null;
+            }
+
+        }
+
+        // TODO is it possible that a subclass redefines a annotated field?
+        // If yes, we don't handle it properly ATM: the loop should start from
+        // the top type instead.
+
+        return params;
     }
 
     @SuppressWarnings("unchecked")
