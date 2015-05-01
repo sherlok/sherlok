@@ -22,29 +22,21 @@ import static org.apache.uima.ruta.engine.RutaEngine.PARAM_RESOURCE_PATHS;
 import static org.apache.uima.ruta.engine.RutaEngine.PARAM_SCRIPT_PATHS;
 import static org.apache.uima.ruta.engine.RutaEngine.SCRIPT_FILE_EXTENSION;
 import static org.apache.uima.util.FileUtils.saveString2File;
+import static org.sherlok.EngineOps.generateXmlDescriptor;
 import static org.sherlok.utils.CheckThat.validateId;
 import static org.sherlok.utils.Create.list;
-import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.UIMAException;
-import org.apache.uima.analysis_component.AnalysisComponent;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -55,7 +47,6 @@ import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.impl.FilteringTypeSystem;
 import org.apache.uima.cas.impl.TypeSystemImpl;
 import org.apache.uima.fit.component.NoOpAnnotator;
-import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
@@ -70,7 +61,6 @@ import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.utils.ConfigurationFieldParser;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
@@ -86,7 +76,12 @@ import org.xml.sax.SAXException;
  * <li>close</li>
  * </ol>
  * 
+ * 
+ * TODO: the 'initScript' part was refactored. 'initEngines' part should be
+ * refactored too.
+ * 
  * @author renaud@apache.org
+ * 
  */
 public class UimaPipeline {
     private static Logger LOG = getLogger(UimaPipeline.class);
@@ -386,11 +381,10 @@ public class UimaPipeline {
             if (scriptLine.startsWith("ENGINE")) {
                 // find the corresponding engine description
                 String engineId = extractEngineId(scriptLine);
-                EngineDef engineDef = findEngineDefById(engineId, engineDefs);
 
                 // create ae and write xml descriptor
-                String engineDescription = generateXmlDescriptor(engineId,
-                        engineDef);
+                String engineDescription = generateXmlDescriptor(
+                        engineId, engineDefs);
                 engineDescriptions.add(engineDescription);
 
                 // update script line
@@ -456,179 +450,7 @@ public class UimaPipeline {
                 PARAM_MAIN_SCRIPT, scriptName));
     }
 
-    /**
-     * Engine descriptor separator
-     *
-     * used to separate the engine id when creating tmp xml descriptor
-     */
-    private static final String ENGINE_ID_SEPARATOR = "___";
-
-    /**
-     * Generate XML descriptor and return engine's descriptor
-     */
-    private static String generateXmlDescriptor(String engineId,
-            EngineDef engineDef)
-            throws ValidationException, ResourceInitializationException,
-            FileNotFoundException, IOException {
-
-        // convert fields strings to primitives
-        Map<String, Object> engineParameters = extractParameters(engineDef);
-        Object[] flatParamsArray = flattenParameters(engineParameters);
-
-        // construct AE
-        Class<? extends AnalysisComponent> classz = extractAnalysisComponentClass(engineDef);
-        String engineDescription = engineDef
-                .getIdForDescriptor(ENGINE_ID_SEPARATOR);
-        AnalysisEngineDescription aed = AnalysisEngineFactory
-                .createEngineDescription(classz, flatParamsArray);
-
-        // generate XML descriptor
-        try {
-            File tmpEngine = new File(FileBased.RUTA_ENGINE_CACHE_PATH
-                    + engineDescription + ".xml");
-            tmpEngine.getParentFile().mkdirs();
-            FileOutputStream fos = new FileOutputStream(tmpEngine);
-            aed.toXML(fos);
-        } catch (SAXException e) {
-            throw new RuntimeException("could not write descriptor of "
-                    + engineId, e); // should not happen
-        }
-
-        return engineDescription;
-    }
-
-    /**
-     * Flatten key-value pairs into an array of Objects
-     * 
-     * TODO move me to a more appropriate class for such generic functions
-     */
-    private static <K, V> Object[] flattenParameters(Map<K, V> parameters) {
-        List<Object> flatParams = list();
-        for (Entry<K, V> en : parameters.entrySet()) {
-            flatParams.add(en.getKey());
-            flatParams.add(en.getValue());
-        }
-        Object[] flatParamsArray = flatParams.toArray();
-        return flatParamsArray;
-    }
-
-    private static Map<String, Object> extractParameters(EngineDef engineDef)
-            throws ValidationException {
-        Map<String, Object> convertedParameters = map();
-
-        // first, extract all parameters from the engine definition
-        Map<String, List<String>> defParams = engineDef.getParameters();
-        for (Entry<String, List<String>> en : defParams.entrySet()) {
-
-            List<String> values = processConfigVariables(en.getValue(),
-                    engineDef);
-
-            convertedParameters.put(en.getKey(), values);
-        }
-
-        // then, extract the parameters from the class definition
-        Class<? extends AnalysisComponent> klass = extractAnalysisComponentClass(engineDef);
-        for (Field field : klass.getDeclaredFields()) {
-            ConfigurationParameter annotation = field
-                    .getAnnotation(ConfigurationParameter.class);
-            if (annotation != null) {
-                String parameterName = annotation.name();
-
-                // if the parameter is also present in the engine definition
-                // we override the value with the proper default value
-
-                // TODO not sure why it's a "default" value since it comes from
-                // the engine definition
-
-                if (defParams.containsKey(parameterName)) {
-                    // TODO since convertedParameters contains all elements of
-                    // defParams, it should be possible to process it once only.
-                    // But this would need an additional map of String to
-                    // List<String>.
-                    List<String> list = processConfigVariables(
-                            defParams.get(parameterName), engineDef);
-                    Object o = ConfigurationFieldParser
-                            .getDefaultValue(field, list
-                                    .toArray(new String[list.size()]));
-                    convertedParameters.put(parameterName, o); // override value
-                }
-            }
-        }
-        
-        return convertedParameters;
-    }
-
-    // Process configuration variables in each value
-    private static List<String> processConfigVariables(List<String> values,
-            EngineDef engineDef) {
-        List<String> processed = list();
-        for (String value : values) {
-            processed.add(processConfigVariables(value, engineDef));
-        }
-
-        return processed;
-    }
-
-    // Accepts variable starting by '$' and containing only alpha-numerical
-    // characters (+ underscore). The variable can be accessed through the
-    // named-capturing group "name".
-    private static final Pattern VARIABLE_PATTERN = Pattern
-            .compile("\\$(?<name>\\w+)");
-
-    // Process configuration variables
-    private static String processConfigVariables(String value,
-            EngineDef engineDef) {
-        Matcher matcher = VARIABLE_PATTERN.matcher(value);
-        Map<String, String> config = engineDef.getBundle().getConfig();
-
-        while (matcher.find()) {
-            String name = matcher.group("name");
-            String processed = processConfigVariable(name, config);
-
-            // replace all occurrences of "$name" in the original string
-            value = value.replace(matcher.group(), processed);
-        }
-
-        return value;
-    }
-
-    private static String processConfigVariable(String name,
-            Map<String, String> config) {
-        // TODO handle URLs here (e.g. file, git, ...)
-
-        // fallback: basic substitution
-        return config.get(name);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Class<? extends AnalysisComponent> extractAnalysisComponentClass(
-            EngineDef engineDef) throws ValidationException {
-        try {
-            return (Class<? extends AnalysisComponent>) Class
-                    .forName(engineDef.getClassz());
-        } catch (ClassNotFoundException e) {
-            throw new ValidationException("could not find class "
-                    + engineDef.getClassz(), e);
-        }
-    }
-
-    /**
-     * Find an engine definition in a given list based on its id.
-     * 
-     * @throws ValidationException
-     *             when no such engine exists in the list
-     */
-    private static EngineDef findEngineDefById(String pengineId,
-            List<EngineDef> engineDefs) throws ValidationException {
-        for (EngineDef engineDef : engineDefs) {
-            if (engineDef.getId().equals(pengineId)) {
-                return engineDef;
-            }
-        }
-
-        throw new ValidationException("pipeline engine not found", pengineId);
-    }
-
+    /** Extract the engine ID from a "ENGINE $id;" script line */
     private static String extractEngineId(String scriptLine)
             throws ValidationException {
         String pengineId = scriptLine.trim()
