@@ -1,6 +1,7 @@
-package org.sherlok;
+package org.sherlok.config;
 
 import static org.sherlok.utils.Create.list;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.sherlok.mappings.BundleDef.EngineDef;
+import org.slf4j.Logger;
 
 /**
  * Manage configuration variables for the engine definition.
@@ -16,6 +18,8 @@ import org.sherlok.mappings.BundleDef.EngineDef;
  * they are stored.
  */
 public class ConfigVariableManager {
+
+    private static Logger LOG = getLogger(ConfigVariableManager.class);
 
     /**
      * Process the configuration variables in each value and return the
@@ -36,9 +40,12 @@ public class ConfigVariableManager {
      * where <a_path> is some path to a local copy of bluima repository that  
      * Sherlok will download at runtime.
      * </pre>
+     * 
+     * @throws NoSuchVariableException
+     *             when an unknown variable is used
      */
-    static List<String> processConfigVariables(List<String> values,
-            EngineDef engineDef) {
+    public static List<String> processConfigVariables(List<String> values,
+            EngineDef engineDef) throws NoSuchVariableException {
         List<String> processed = list();
         for (String value : values) {
             processed.add(processConfigVariables(value, engineDef));
@@ -55,9 +62,10 @@ public class ConfigVariableManager {
 
     // Process configuration variables
     private static String processConfigVariables(String value,
-            EngineDef engineDef) {
+            EngineDef engineDef) throws NoSuchVariableException {
         Matcher matcher = VARIABLE_PATTERN.matcher(value);
-        Map<String, String> config = engineDef.getBundle().getConfig();
+        Map<String, ConfigVariable> config = engineDef.getBundle()
+                .getConfigVariables();
 
         while (matcher.find()) {
             String name = matcher.group("name");
@@ -71,11 +79,13 @@ public class ConfigVariableManager {
     }
 
     private static String processConfigVariable(String name,
-            Map<String, String> config) {
-        // TODO handle URLs here (e.g. file, git, ...)
-
-        // fallback: basic substitution
-        return config.get(name);
+            Map<String, ConfigVariable> config) throws NoSuchVariableException {
+        ConfigVariable var = config.get(name);
+        if (var == null) {
+            LOG.debug("unknown variable " + name);
+            throw new NoSuchVariableException(name);
+        }
+        return var.getProcessedValue();
     }
 
 }

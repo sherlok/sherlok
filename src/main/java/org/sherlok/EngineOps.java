@@ -1,5 +1,6 @@
 package org.sherlok;
 
+import static org.sherlok.config.ConfigVariableManager.processConfigVariables;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -16,6 +17,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.sherlok.config.NoSuchVariableException;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.utils.ConfigurationFieldParser;
 import org.sherlok.utils.MapOps;
@@ -81,32 +83,37 @@ public class EngineOps {
      */
     private static Map<String, Object> extractParameters(EngineDef engineDef)
             throws ValidationException {
-        // build a [param name -> annotated field] mapping
-        Map<String, Field> annotatedFields = extractParametersFields(engineDef);
+        try {
+            // build a [param name -> annotated field] mapping
+            Map<String, Field> annotatedFields = extractParametersFields(engineDef);
 
-        // load all parameters from the engine definition
-        Map<String, Object> convertedParameters = map();
-        Map<String, List<String>> defParams = engineDef.getParameters();
-        for (Entry<String, List<String>> en : defParams.entrySet()) {
-            String parameterName = en.getKey();
+            // load all parameters from the engine definition
+            Map<String, Object> convertedParameters = map();
+            Map<String, List<String>> defParams = engineDef.getParameters();
+            for (Entry<String, List<String>> en : defParams.entrySet()) {
+                String parameterName = en.getKey();
 
-            List<String> values = ConfigVariableManager.processConfigVariables(
-                    en.getValue(), engineDef);
+                List<String> values = processConfigVariables(en.getValue(),
+                        engineDef);
 
-            Field field = annotatedFields.get(parameterName);
-            if (field == null) {
-                throw new ValidationException(
-                        "Expected annotated field in annotator "
-                                + engineDef.getClassz() + " for parameter name",
-                        parameterName);
+                Field field = annotatedFields.get(parameterName);
+                if (field == null) {
+                    throw new ValidationException(
+                            "Expected annotated field in annotator "
+                                    + engineDef.getClassz()
+                                    + " for parameter name", parameterName);
+                }
+
+                Object configuredValue = ConfigurationFieldParser
+                        .getDefaultValue(field,
+                                values.toArray(new String[values.size()]));
+                convertedParameters.put(parameterName, configuredValue);
             }
 
-            Object configuredValue = ConfigurationFieldParser.getDefaultValue(
-                    field, values.toArray(new String[values.size()]));
-            convertedParameters.put(parameterName, configuredValue);
+            return convertedParameters;
+        } catch (NoSuchVariableException e) {
+            throw new ValidationException(e);
         }
-
-        return convertedParameters;
     }
 
 

@@ -8,7 +8,9 @@
     }
   ],
   "config": {
-    "opennlp": "config/resources/bluima/opennlp"
+    "opennlp": {
+      "value": "config/resources/bluima/opennlp"
+    }
   },
   "engines": [
     {

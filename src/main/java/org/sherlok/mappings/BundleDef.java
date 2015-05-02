@@ -25,10 +25,12 @@ import static org.sherlok.utils.Create.map;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.sherlok.Controller;
+import org.sherlok.config.ConfigVariable;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -55,8 +57,16 @@ public class BundleDef extends Def {
 
     private List<EngineDef> engines = list();
     
-    /** variable configuration with support for protocols such as file, git, ... */
-    private Map<String, String> config = map();
+    /**
+     * (internal) configuration variables which support for protocols such as
+     * file, git, ...
+     */
+    @JsonProperty("config")
+    private Map<String, Map<String, String>> rawConfig = map();
+
+    /** configuration variables (based on rawConfigs) */
+    @JsonIgnore
+    private Map<String, ConfigVariable> configVariables = null;
 
     /** A Maven dependency to some external UIMA code. */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -325,17 +335,17 @@ public class BundleDef extends Def {
         return this;
     }
 
-    public Map<String, String> getConfig() {
-        return config;
+    public Map<String, Map<String, String>> getRawConfig() {
+        return rawConfig;
     }
 
-    public BundleDef setConfig(Map<String, String> config) {
-        this.config = config;
+    public BundleDef setRawConfig(Map<String, Map<String, String>> configs) {
+        this.rawConfig = configs;
         return this;
     }
 
-    public BundleDef addConfig(String var, String value) {
-        this.config.put(var, value);
+    public BundleDef addRawConfig(String var, Map<String, String> config) {
+        this.rawConfig.put(var, config);
         return this;
     }
 
@@ -349,9 +359,47 @@ public class BundleDef extends Def {
             for (EngineDef e : getEngines()) {
                 e.validate(bundleObject);
             }
+            // build and validate configuration variables
+            configVariables = buildConfigVariables(rawConfig);
         } catch (Throwable e) {
             throw new ValidationException("invalid bundle '" + bundleObject
                     + "'", e.getMessage());
         }
+    }
+
+    public Map<String, ConfigVariable> getConfigVariables() {
+        if (configVariables == null) {
+            // This should not happen. It need to be not validated before...
+            try {
+                configVariables = buildConfigVariables(rawConfig);
+            } catch (ValidationException e) {
+                LOG.warn("Configuration variables are not valid "
+                        + "and were not validated before!", e);
+            }
+        }
+
+        return configVariables;
+    }
+
+    /**
+     * Build and validate the configuration variable
+     */
+    private static Map<String, ConfigVariable> buildConfigVariables(
+            Map<String, Map<String, String>> rawConfig)
+            throws ValidationException {
+        Map<String, ConfigVariable> config = map();
+
+        for (Entry<String, Map<String, String>> var : rawConfig.entrySet()) {
+            // TODO use factory system to create appropriate type of
+            // ConfigVariable
+            String val = var.getValue().get("value");
+            if (val == null) {
+                throw new ValidationException(
+                        "no value for configuration variable", var.getKey());
+            }
+            config.put(var.getKey(), new ConfigVariable(val));
+        }
+
+        return config;
     }
 }
