@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.sherlok.Controller;
 import org.sherlok.config.ConfigVariable;
+import org.sherlok.config.ConfigVariableFactory;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -361,6 +362,9 @@ public class BundleDef extends Def {
             }
             // build and validate configuration variables
             configVariables = buildConfigVariables(rawConfig);
+
+            // TODO validate usage of variables in engines and make sure no
+            // unknown variable are used
         } catch (Throwable e) {
             throw new ValidationException("invalid bundle '" + bundleObject
                     + "'", e.getMessage());
@@ -389,15 +393,11 @@ public class BundleDef extends Def {
             throws ValidationException {
         Map<String, ConfigVariable> config = map();
 
-        for (Entry<String, Map<String, String>> var : rawConfig.entrySet()) {
-            // TODO use factory system to create appropriate type of
-            // ConfigVariable
-            String val = var.getValue().get("value");
-            if (val == null) {
-                throw new ValidationException(
-                        "no value for configuration variable", var.getKey());
-            }
-            config.put(var.getKey(), new ConfigVariable(val));
+        for (Entry<String, Map<String, String>> entry : rawConfig.entrySet()) {
+            String name = entry.getKey();
+            ConfigVariable val = ConfigVariableFactory.factory(name,
+                    entry.getValue());
+            config.put(name, val);
         }
 
         return config;

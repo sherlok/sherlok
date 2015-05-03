@@ -7,6 +7,13 @@
       "value": "ch.epfl.bbp.nlp:bluima_commons:0.1"
     }
   ],
+  "config": {
+    "bluima": {
+      "type": "git", 
+      "url": "https://github.com/BlueBrain/bluima_resources.git",
+      "ref": "master"
+    }
+  },
   "engines": [
     {
       "name": "BlueBioLemmatizer",
@@ -17,7 +24,7 @@
       "class": "ch.epfl.bbp.uima.ae.LinnaeusAnnotator",
       "parameters": {
         "CONFIG_FILE": [
-          "config/resources/bluima/linnaeus/properties.conf"
+          "$bluima/linnaeus/properties.conf"
         ]
       }
     }

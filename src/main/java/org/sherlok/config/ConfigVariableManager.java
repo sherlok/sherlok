@@ -43,9 +43,12 @@ public class ConfigVariableManager {
      * 
      * @throws NoSuchVariableException
      *             when an unknown variable is used
+     * @throws ProcessConfigVariableException
+     *             if a variable could not be processed
      */
     public static List<String> processConfigVariables(List<String> values,
-            EngineDef engineDef) throws NoSuchVariableException {
+            EngineDef engineDef) throws NoSuchVariableException,
+            ProcessConfigVariableException {
         List<String> processed = list();
         for (String value : values) {
             processed.add(processConfigVariables(value, engineDef));
@@ -62,7 +65,8 @@ public class ConfigVariableManager {
 
     // Process configuration variables
     private static String processConfigVariables(String value,
-            EngineDef engineDef) throws NoSuchVariableException {
+            EngineDef engineDef) throws NoSuchVariableException,
+            ProcessConfigVariableException {
         Matcher matcher = VARIABLE_PATTERN.matcher(value);
         Map<String, ConfigVariable> config = engineDef.getBundle()
                 .getConfigVariables();
@@ -79,7 +83,8 @@ public class ConfigVariableManager {
     }
 
     private static String processConfigVariable(String name,
-            Map<String, ConfigVariable> config) throws NoSuchVariableException {
+            Map<String, ConfigVariable> config) throws NoSuchVariableException,
+            ProcessConfigVariableException {
         ConfigVariable var = config.get(name);
         if (var == null) {
             LOG.debug("unknown variable " + name);

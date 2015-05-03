@@ -16,13 +16,20 @@
       "value": "ch.epfl.bbp.nlp:bluima_jsre:0.1"
     }
   ],
+  "config": {
+    "bluima": {
+      "type": "git", 
+      "url": "https://github.com/BlueBrain/bluima_resources.git",
+      "ref": "master"
+    }
+  },
   "engines": [
     {
       "name": "BrainRegionAnnotator",
       "class": "ch.epfl.bbp.uima.ae.BrainRegionAnnotator",
       "parameters": {
         "modelFile": [
-          "config/resources/bluima/regions/20131116_BrainRegion.model"
+          "$bluima/regions/20131116_BrainRegion.model"
         ],
         "mode": [
           "infer"
@@ -34,8 +41,8 @@
       "class": "ch.epfl.bbp.uima.ae.RegExAnnotator",
       "parameters": {
         "ConceptFiles": [
-          "config/resources/bluima/regex_concepts/concentrations.xml",
-          "config/resources/bluima/regex_concepts/measures.xml"
+          "$bluima/regex_concepts/concentrations.xml",
+          "$bluima/regex_concepts/measures.xml"
         ]
       }
     },

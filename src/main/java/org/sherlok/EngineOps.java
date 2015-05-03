@@ -18,6 +18,7 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.sherlok.config.NoSuchVariableException;
+import org.sherlok.config.ProcessConfigVariableException;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.utils.ConfigurationFieldParser;
 import org.sherlok.utils.MapOps;
@@ -111,7 +112,7 @@ public class EngineOps {
             }
 
             return convertedParameters;
-        } catch (NoSuchVariableException e) {
+        } catch (NoSuchVariableException | ProcessConfigVariableException e) {
             throw new ValidationException(e);
         }
     }
