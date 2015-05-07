@@ -25,13 +25,10 @@ import static org.sherlok.utils.Create.map;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.sherlok.Controller;
-import org.sherlok.config.ConfigVariable;
-import org.sherlok.config.ConfigVariableFactory;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -58,17 +55,6 @@ public class BundleDef extends Def {
 
     private List<EngineDef> engines = list();
     
-    /**
-     * (internal) configuration variables which support for protocols such as
-     * file, git, ...
-     */
-    @JsonProperty("config")
-    private Map<String, Map<String, String>> rawConfig = map();
-
-    /** configuration variables (based on rawConfigs) */
-    @JsonIgnore
-    private Map<String, ConfigVariable> configVariables = null;
-
     /** A Maven dependency to some external UIMA code. */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class BundleDependency {
@@ -336,20 +322,6 @@ public class BundleDef extends Def {
         return this;
     }
 
-    public Map<String, Map<String, String>> getRawConfig() {
-        return rawConfig;
-    }
-
-    public BundleDef setRawConfig(Map<String, Map<String, String>> configs) {
-        this.rawConfig = configs;
-        return this;
-    }
-
-    public BundleDef addRawConfig(String var, Map<String, String> config) {
-        this.rawConfig.put(var, config);
-        return this;
-    }
-
     @Override
     public void validate(String bundleObject) throws ValidationException {
         super.validate(bundleObject);
@@ -360,8 +332,6 @@ public class BundleDef extends Def {
             for (EngineDef e : getEngines()) {
                 e.validate(bundleObject);
             }
-            // build and validate configuration variables
-            configVariables = buildConfigVariables(rawConfig);
 
             // TODO validate usage of variables in engines and make sure no
             // unknown variable are used
@@ -369,37 +339,5 @@ public class BundleDef extends Def {
             throw new ValidationException("invalid bundle '" + bundleObject
                     + "'", e.getMessage());
         }
-    }
-
-    public Map<String, ConfigVariable> getConfigVariables() {
-        if (configVariables == null) {
-            // This should not happen. It need to be not validated before...
-            try {
-                configVariables = buildConfigVariables(rawConfig);
-            } catch (ValidationException e) {
-                LOG.warn("Configuration variables are not valid "
-                        + "and were not validated before!", e);
-            }
-        }
-
-        return configVariables;
-    }
-
-    /**
-     * Build and validate the configuration variable
-     */
-    private static Map<String, ConfigVariable> buildConfigVariables(
-            Map<String, Map<String, String>> rawConfig)
-            throws ValidationException {
-        Map<String, ConfigVariable> config = map();
-
-        for (Entry<String, Map<String, String>> entry : rawConfig.entrySet()) {
-            String name = entry.getKey();
-            ConfigVariable val = ConfigVariableFactory.factory(name,
-                    entry.getValue());
-            config.put(name, val);
-        }
-
-        return config;
     }
 }
