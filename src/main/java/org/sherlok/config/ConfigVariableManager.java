@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.sherlok.mappings.BundleDef.EngineDef;
+import org.sherlok.mappings.Def;
 import org.slf4j.Logger;
 
 /**
@@ -23,7 +23,8 @@ public class ConfigVariableManager {
 
     /**
      * Process the configuration variables in each value and return the
-     * interpreted value.
+     * interpreted value. Works for both pipeline and engine definition
+     * (actually for all class inheriting from Def).
      * 
      * <pre>
      * For example, with the following variables defined in the bundle of the
@@ -47,11 +48,11 @@ public class ConfigVariableManager {
      *             if a variable could not be processed
      */
     public static List<String> processConfigVariables(List<String> values,
-            EngineDef engineDef) throws NoSuchVariableException,
+            Def def) throws NoSuchVariableException,
             ProcessConfigVariableException {
         List<String> processed = list();
         for (String value : values) {
-            processed.add(processConfigVariables(value, engineDef));
+            processed.add(processConfigVariables(value, def));
         }
 
         return processed;
@@ -64,12 +65,11 @@ public class ConfigVariableManager {
             .compile("\\$(?<name>\\w+)");
 
     // Process configuration variables
-    private static String processConfigVariables(String value,
-            EngineDef engineDef) throws NoSuchVariableException,
+    private static String processConfigVariables(String value, Def def)
+            throws NoSuchVariableException,
             ProcessConfigVariableException {
         Matcher matcher = VARIABLE_PATTERN.matcher(value);
-        Map<String, ConfigVariable> config = engineDef.getBundle()
-                .getConfigVariables();
+        Map<String, ConfigVariable> config = def.getConfigVariables();
 
         while (matcher.find()) {
             String name = matcher.group("name");

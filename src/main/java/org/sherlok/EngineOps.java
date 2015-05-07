@@ -50,8 +50,7 @@ public class EngineOps {
         EngineDef engineDef = findEngineDefById(engineId, engineDefs);
 
         // convert fields strings to primitives
-        Map<String, Object> engineParameters = EngineOps
-                .extractParameters(engineDef);
+        Map<String, Object> engineParameters = extractParameters(engineDef);
         Object[] flatParamsArray = MapOps.flattenParameters(engineParameters);
 
         // construct AE
@@ -95,7 +94,7 @@ public class EngineOps {
                 String parameterName = en.getKey();
 
                 List<String> values = processConfigVariables(en.getValue(),
-                        engineDef);
+                        engineDef.getBundle());
 
                 Field field = annotatedFields.get(parameterName);
                 if (field == null) {

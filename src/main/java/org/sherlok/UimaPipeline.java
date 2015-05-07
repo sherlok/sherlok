@@ -59,6 +59,9 @@ import org.apache.uima.ruta.engine.RutaEngine;
 import org.apache.uima.util.CasPool;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
+import org.sherlok.config.ConfigVariableManager;
+import org.sherlok.config.NoSuchVariableException;
+import org.sherlok.config.ProcessConfigVariableException;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.utils.ValidationException;
@@ -372,6 +375,14 @@ public class UimaPipeline {
             throws ResourceInitializationException, IOException,
             ValidationException {
 
+        // Handle variables in script
+        try {
+            scriptLines = ConfigVariableManager.processConfigVariables(
+                    scriptLines, pipelineDef);
+        } catch (NoSuchVariableException | ProcessConfigVariableException e) {
+            throw new ValidationException(e);
+        }
+
         // load engines
         List<String> engineDescriptions = list();
         for (int i = 0; i < scriptLines.size(); i++) {
@@ -453,9 +464,8 @@ public class UimaPipeline {
     /** Extract the engine ID from a "ENGINE $id;" script line */
     private static String extractEngineId(String scriptLine)
             throws ValidationException {
-        String pengineId = scriptLine.trim()
-                .substring("ENGINE".length()).trim()
-                .replaceAll(";", "");
+        String pengineId = scriptLine.trim().substring("ENGINE".length())
+                .trim().replaceAll(";", "");
         validateId(pengineId, "ENGINE id in '" + pengineId + "'");
         return pengineId;
     }
