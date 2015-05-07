@@ -3,6 +3,13 @@
   "version" : "0.1",
   "description" : "named entity recognizer for neuronal cells, based on UIMA Ruta rules",
   "domain" : "bluima/neuroner",
+  "config": {
+    "bluima": {
+      "type": "git", 
+      "url": "https://github.com/BlueBrain/bluima_resources.git",
+      "ref": "master"
+    }
+  },
   "script" : [
  "PACKAGE neuroner;"
 , ""
@@ -16,23 +23,23 @@
 , ""
 , ""
 , "// DEVELOPMENTAL STAGES"
-, "WORDTABLE developmentalWt  = 'bluima/neuroner/hbp_developmental_ontology.csv';"
+, "WORDTABLE developmentalWt  = '$bluima/neuroner/hbp_developmental_ontology.csv';"
 , "DECLARE NeuronProperty Developmental(STRING name, STRING ontologyId); "
 , "Document{-> MARKTABLE(Developmental, 1, developmentalWt, true, 2, \"\", 2, \"ontologyId\" = 2)};"
 , ""
 , "// NEUROTRANSMITTER"
-, "WORDTABLE neurotransmitterWt = 'bluima/neuroner/hbp_neurotransmitter_ontology.csv';"
+, "WORDTABLE neurotransmitterWt = '$bluima/neuroner/hbp_neurotransmitter_ontology.csv';"
 , "DECLARE NeuronProperty NeurotransmitterProp(STRING name, STRING ontologyId);"
 , "Document{-> MARKTABLE(NeurotransmitterProp, 1, neurotransmitterWt, true, 2, \"\", 2, \"ontologyId\" = 2)};"
 , ""
 , "// LAYER"
 , "//\"[Ll]ayers? ([1-6][AaBb]?([/-][1-6][AaBb]?)?|[iIvV]+([/-][iIvV]+)?)\" -> Layer;"
-, "WORDTABLE layerWt = 'bluima/neuroner/hbp_layer_ontology.csv';"
+, "WORDTABLE layerWt = '$bluima/neuroner/hbp_layer_ontology.csv';"
 , "DECLARE NeuronProperty Layer(STRING name, STRING ontologyId);"
 , "Document{-> MARKTABLE(Layer, 1, layerWt, true, 2, \"\", 2, \"ontologyId\" = 2)};"
 , ""
 , "// SPECIES"
-, "WORDTABLE speciesWt = 'bluima/neuroner/ncbi_species_top1000.csv';"
+, "WORDTABLE speciesWt = '$bluima/neuroner/ncbi_species_top1000.csv';"
 , "DECLARE NeuronProperty Species(STRING name, STRING ontologyId);"
 , "Document{-> MARKTABLE(Species, 1, speciesWt, true, 2, \"\", 2, \"ontologyId\" = 2)};"
 , ""
@@ -53,7 +60,7 @@
 , ""
 , "// DICTIONARY MATCHING"
 , "// we use a single compiled trie to match word lists (found in resources folder)"
-, "WORDLIST generated = 'bluima/neuroner/generated.mtwl';"
+, "WORDLIST generated = '$bluima/neuroner/generated.mtwl';"
 , "Document{->TRIE("
 , "\"neuron_triggers.txt\" = NeuronTrigger,"
 , "\"functions.txt\" = Function,"
