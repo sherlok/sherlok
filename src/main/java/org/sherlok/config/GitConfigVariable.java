@@ -3,7 +3,8 @@ package org.sherlok.config;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Scanner;
+
+import org.sherlok.utils.ops.InputStreamOps;
 
 /**
  * Git config variable
@@ -72,22 +73,13 @@ public class GitConfigVariable implements ConfigVariable {
             if (status != 0) {
                 InputStream stderr = clone.getErrorStream();
                 String msg = "Cloning failed with status " + status
-                        + ". stderr was: " + readContent(stderr);
+                        + ". stderr was: " + InputStreamOps.readContent(stderr);
                 throw new ProcessConfigVariableException(msg);
             }
         } catch (IOException | InterruptedException e) {
             // TODO is it OK to do nothing about InterruptedException?
             throw new ProcessConfigVariableException(
                     "An IO error occured while executing " + command, e);
-        }
-    }
-
-    // TODO move me to a more appropriate location
-    private static String readContent(InputStream input) {
-        try (Scanner s = new Scanner(input)) {
-            // Read until beginning (never reached -> read whole input)
-            s.useDelimiter("\\A");
-            return s.hasNext() ? s.next() : "";
         }
     }
 

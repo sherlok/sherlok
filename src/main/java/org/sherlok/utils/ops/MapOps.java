@@ -1,4 +1,4 @@
-package org.sherlok.utils;
+package org.sherlok.utils.ops;
 
 import static org.sherlok.utils.Create.list;
 

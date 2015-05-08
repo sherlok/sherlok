@@ -21,8 +21,8 @@ import org.sherlok.config.NoSuchVariableException;
 import org.sherlok.config.ProcessConfigVariableException;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.utils.ConfigurationFieldParser;
-import org.sherlok.utils.MapOps;
 import org.sherlok.utils.ValidationException;
+import org.sherlok.utils.ops.MapOps;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
