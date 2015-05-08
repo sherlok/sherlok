@@ -104,6 +104,26 @@ public class AnnotationApiIntegrationTest {
     }
 
     @Test
+    public void test011_POSTBodyAnnotate() throws Exception {
+        String json = given().body("{\"text\":\"" + TEST_TEXT + "\"}").when()
+                .post(API_URL + "/opennlp.ners.en")//
+                .then().log().everything()//
+                .statusCode(STATUS_OK)//
+                .contentType(JSON)//
+                .body(containsString(TEST_TEXT))//
+                .extract().asString();
+        assertEquals(3, parse(json).get("NamedEntity").size());
+
+        // same POST to check multiple calls
+        json = given().body("{\"text\":\"" + TEST_TEXT + "\"}").when()
+                .post(API_URL + "/opennlp.ners.en").then().log().everything()
+                .statusCode(STATUS_OK).contentType(JSON)
+                .body(containsString(TEST_TEXT))//
+                .extract().asString();
+        assertEquals(3, parse(json).get("NamedEntity").size());
+    }
+
+    @Test
     public void test012WrongPipeline() {
         given().param("text", TEST_TEXT) //
                 .when()//
