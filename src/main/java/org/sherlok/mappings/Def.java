@@ -64,11 +64,13 @@ public abstract class Def {
      * file, git, ...
      */
     @JsonProperty("config")
-    protected Map<String, Map<String, String>> rawConfig = map();
+    private Map<String, Map<String, String>> rawConfig = map();
 
     /** configuration variables (based on rawConfigs) */
     @JsonIgnore
-    protected Map<String, ConfigVariable> configVariables = null;
+    private Map<String, ConfigVariable> configVariables = map();
+    @JsonIgnore
+    private Integer rawConfigCacheHash = rawConfig.hashCode();
 
     // get/set
 
@@ -115,7 +117,7 @@ public abstract class Def {
         validateDomain(domain, msgName + " 'domain' ");
 
         // build and validate configuration variables
-        configVariables = buildConfigVariables(rawConfig);
+        updateConfigVariableIfNeeded();
     }
 
     @JsonIgnore
@@ -152,16 +154,23 @@ public abstract class Def {
     }
 
     public Map<String, ConfigVariable> getConfigVariables() {
-        if (configVariables == null) {
-            // This should not happen. It need to be not validated before...
-            try {
-                configVariables = buildConfigVariables(rawConfig);
-            } catch (ValidationException e) {
-                LOG.warn("Configuration variables are not valid "
-                        + "and were not validated before!", e);
-            }
+        try {
+            return updateConfigVariableIfNeeded();
+        } catch (ValidationException e) {
+            LOG.warn("Configuration variables are not valid "
+                    + "and were not validated before!", e);
+            return null;
         }
-    
+    }
+
+    private Map<String, ConfigVariable> updateConfigVariableIfNeeded()
+            throws ValidationException {
+        Integer last = rawConfig.hashCode();
+        if (!last.equals(rawConfigCacheHash)) { // rawConfig was changed
+            configVariables = buildConfigVariables(rawConfig);
+            rawConfigCacheHash = last;
+        }
+
         return configVariables;
     }
 
