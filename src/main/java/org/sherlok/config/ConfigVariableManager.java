@@ -59,15 +59,19 @@ public class ConfigVariableManager {
     }
 
     // Accepts variable starting by '$' and containing only alpha-numerical
-    // characters (+ underscore). The variable can be accessed through the
-    // named-capturing group "name".
+    // characters (+ underscore). The variable name can be accessed through
+    // the named-capturing group "name", group name "var" include the '$'
+    // and is an alias for group number 1.
+    // NB: '$$$x' will be transformed into '$$x'
     private static final Pattern VARIABLE_PATTERN = Pattern
-            .compile("\\$(?<name>\\w+)");
+            .compile("(?:^|[^\\$])(?:\\{2})*(?<var>\\$(?<name>\\w+))");
 
     // Process configuration variables
     private static String processConfigVariables(String value, Def def)
             throws NoSuchVariableException,
             ProcessConfigVariableException {
+
+        // Find all variables
         Matcher matcher = VARIABLE_PATTERN.matcher(value);
         Map<String, ConfigVariable> config = def.getConfigVariables();
 
@@ -75,9 +79,18 @@ public class ConfigVariableManager {
             String name = matcher.group("name");
             String processed = processConfigVariable(name, config);
 
-            // replace all occurrences of "$name" in the original string
-            value = value.replace(matcher.group(), processed);
+            // replace *this* occurrence of "$name" in the original string
+            // and not all since we could have $$name somewhere.
+            String prefix = value.substring(0, matcher.start(1));
+            String postfix = value.substring(matcher.end());
+            value = prefix + processed + postfix;
+
+            // reset the matcher since we edited the value
+            matcher = VARIABLE_PATTERN.matcher(value);
         }
+
+        // Replace all double dollar signs
+        value = value.replace("$$", "$");
 
         return value;
     }
