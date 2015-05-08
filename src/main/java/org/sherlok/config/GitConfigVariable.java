@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.sherlok.utils.ops.InputStreamOps;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 /**
@@ -93,7 +93,7 @@ public class GitConfigVariable implements ConfigVariable {
             if (status != 0) {
                 InputStream stderr = clone.getErrorStream();
                 String msg = "Cloning failed with status " + status
-                        + ". stderr was: " + InputStreamOps.readContent(stderr);
+                        + ". stderr was: " + IOUtils.toString(stderr);
                 throw new ProcessConfigVariableException(msg);
             }
         } catch (IOException | InterruptedException e) {

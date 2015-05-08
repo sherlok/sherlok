@@ -6,7 +6,7 @@ import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +42,7 @@ public class ConfigVariableManagerTest {
     @Test
     public final void testProcessConfigVariables()
             throws NoSuchVariableException, ProcessConfigVariableException,
-            FileNotFoundException {
+            IOException {
         List<String> input = list("$var/$x/$y", "$$", "$$x/$x", "$$$$z$z$$$z");
         List<String> output = ConfigVariableManager.processConfigVariables(
                 input, TEST_DEF);

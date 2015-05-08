@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class GitConfigVariableTest {
 
     @Test
     public final void testGetProcessedValueMaster()
-            throws ProcessConfigVariableException, FileNotFoundException {
+            throws ProcessConfigVariableException, IOException {
         String val1 = testGetProcessedValueImpl(MASTER, FILE_CONTENT_MASTER);
         String val2 = testGetProcessedValueImpl(null, FILE_CONTENT_MASTER);
         
@@ -44,19 +44,19 @@ public class GitConfigVariableTest {
 
     @Test
     public final void testGetProcessedValueSHA()
-            throws ProcessConfigVariableException, FileNotFoundException {
+            throws ProcessConfigVariableException, IOException {
         testGetProcessedValueImpl(SHA, FILE_CONTENT_SHA);
     }
 
     @Test
     public final void testGetProcessedValueTAG()
-            throws ProcessConfigVariableException, FileNotFoundException {
+            throws ProcessConfigVariableException, IOException {
         testGetProcessedValueImpl(TAG, FILE_CONTENT_TAG);
     }
 
     @Test
     public final void testGetProcessedValueDevelop()
-            throws ProcessConfigVariableException, FileNotFoundException {
+            throws ProcessConfigVariableException, IOException {
         testGetProcessedValueImpl(DEVELOP, FILE_CONTENT_DEVELOP);
     }
 
@@ -75,7 +75,7 @@ public class GitConfigVariableTest {
     }
 
     private String testGetProcessedValueImpl(String ref, String expectedContent)
-            throws ProcessConfigVariableException, FileNotFoundException {
+            throws ProcessConfigVariableException, IOException {
         GitConfigVariable var = new GitConfigVariable(TEST_URL, ref);
         String val = var.getProcessedValue(); // should not throw
         assertNotNull(val);
@@ -91,7 +91,7 @@ public class GitConfigVariableTest {
     }
 
     private static String getTestFileContent(String processedValue)
-            throws FileNotFoundException {
+            throws IOException {
         File file = getTestFile(processedValue);
         return FileOps.readContent(file);
     }
