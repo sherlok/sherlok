@@ -15,7 +15,7 @@ import org.sherlok.utils.ops.InputStreamOps;
  */
 public class GitConfigVariable implements ConfigVariable {
 
-    private static final File PATH_BASE;
+    public static final File PATH_BASE;
 
     static {
         // TODO add environment variable to let the user select another
