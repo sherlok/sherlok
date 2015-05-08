@@ -116,10 +116,8 @@ public class GitConfigVariable implements ConfigVariable {
     }
 
     private String getPathId() {
-        // The hash should have a low collision factor and should be enough for
-        // our needs.
-        Integer id = (url + "@" + ref).hashCode(); // "unique" ID
-        return id.toString();
+        // The hash should have a low collision factor
+        return Integer.toHexString((url + "@" + ref).hashCode());
     }
 
 }
