@@ -1,10 +1,14 @@
 package org.sherlok.config;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.sherlok.utils.ops.InputStreamOps;
+import org.slf4j.Logger;
 
 /**
  * Git config variable
@@ -15,7 +19,8 @@ import org.sherlok.utils.ops.InputStreamOps;
  */
 public class GitConfigVariable implements ConfigVariable {
 
-    public static final File PATH_BASE;
+    private static Logger LOG = getLogger(GitConfigVariable.class);
+    private static final File PATH_BASE;
 
     static {
         // TODO add environment variable to let the user select another
@@ -28,6 +33,21 @@ public class GitConfigVariable implements ConfigVariable {
         assert PATH_BASE.isDirectory();
         assert PATH_BASE.canRead();
         assert PATH_BASE.canWrite();
+    }
+
+    /**
+     * This removes EVERYTHING that was downloaded
+     */
+    public static void cleanCache() {
+        if (PATH_BASE.exists()) {
+            try {
+                // NB: File.delete() is NOT recursive!
+                FileUtils.deleteDirectory(PATH_BASE);
+            } catch (IOException e) {
+                String error = "GitConfigVariable couldn't properly clean its cache";
+                LOG.debug(error, e);
+            }
+        }
     }
 
     private final String url;

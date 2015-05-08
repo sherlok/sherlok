@@ -1,15 +1,14 @@
 package org.sherlok.config;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
+import java.io.File;
+import java.io.FileNotFoundException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sherlok.utils.ops.InputStreamOps;
+import org.sherlok.utils.ops.FileOps;
 
 public class GitConfigVariableTest {
 
@@ -31,11 +30,7 @@ public class GitConfigVariableTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         // Remove any cached repository
-        File base = GitConfigVariable.PATH_BASE;
-        if (base.exists()) {
-            FileUtils.deleteDirectory(base);
-            // NB: base.delete() is NOT recursive!
-        }
+        GitConfigVariable.cleanCache();
     }
 
     @Test
@@ -44,7 +39,7 @@ public class GitConfigVariableTest {
         String val1 = testGetProcessedValueImpl(MASTER, FILE_CONTENT_MASTER);
         String val2 = testGetProcessedValueImpl(null, FILE_CONTENT_MASTER);
         
-        Assert.assertEquals(val1, val2);
+        assertEquals(val1, val2);
     }
 
     @Test
@@ -83,10 +78,10 @@ public class GitConfigVariableTest {
             throws ProcessConfigVariableException, FileNotFoundException {
         GitConfigVariable var = new GitConfigVariable(TEST_URL, ref);
         String val = var.getProcessedValue(); // should not throw
-        Assert.assertNotNull(val);
+        assertNotNull(val);
 
         String content = getTestFileContent(val); // should not throw
-        Assert.assertEquals("checking content", expectedContent, content);
+        assertEquals("checking content", expectedContent, content);
 
         return val;
     }
@@ -98,8 +93,7 @@ public class GitConfigVariableTest {
     private static String getTestFileContent(String processedValue)
             throws FileNotFoundException {
         File file = getTestFile(processedValue);
-        InputStream stream = new FileInputStream(file);
-        return InputStreamOps.readContent(stream);
+        return FileOps.readContent(file);
     }
 
 }
