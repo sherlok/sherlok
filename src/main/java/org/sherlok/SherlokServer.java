@@ -211,8 +211,8 @@ public class SherlokServer {
                     for (PipelineTest test : pipeline.getPipelineDef()
                             .getTests()) {
                         String actual = pipeline.annotate(test.getInput());
-                        SherlokTests.assertEquals(test.getExpected(),
-                                actual, test.getComparison());
+                        SherlokTests.assertEquals(test.getExpected(), actual,
+                                test.getComparison());
                     }
                     return map("status", "passed");
 
@@ -538,10 +538,8 @@ public class SherlokServer {
                 value = new JSONObject(req.body()).getString(param);
             } catch (JSONException e) {
                 // Value not found/body format is not JSON.
-                LOG.warn("Request {} doesn't contain any value for param {}",
-                        req.raw(), param);
                 // We do nothing about it since this can happen when using GET
-                // request; the error should be handled elsewhere in any case.
+                // request; the error must be handled elsewhere in any case.
             }
         }
 

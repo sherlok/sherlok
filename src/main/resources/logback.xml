@@ -30,5 +30,6 @@
   <logger name="spark" level="INFO" />
   <logger name="de.tudarmstadt.ukp.dkpro.core.api.resources.ResourceObjectProviderBase" level="WARN" />
   <logger name="org.eclipse.aether.internal.impl" level="WARN" />
+  <logger name="org.eclipse.aether.internal.impl.WarnChecksumPolicy" level="ERROR" />
 
 </configuration>

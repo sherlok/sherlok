@@ -191,7 +191,7 @@
   <repositories>
     <repository>
       <id>sherlok_deps</id>
-      <url>https://raw.githubusercontent.com/renaud/sherlok_mavenrepo/master/</url>
+      <url>https://raw.githubusercontent.com/sherlok/sherlok_mavenrepo/master/</url>
     </repository>
     <repository>
       <id>dkpro</id>
