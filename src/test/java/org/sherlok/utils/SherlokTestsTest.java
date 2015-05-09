@@ -75,19 +75,27 @@ public class SherlokTestsTest {
 
             if (hasExpectations) {
 
-                UimaPipeline pipeline = pipelineLoader.resolvePipeline(
-                        pipelineDef.getName(), pipelineDef.getVersion());
+                try {
 
-                for (PipelineTest test : pipeline.getPipelineDef().getTests()) {
+                    UimaPipeline pipeline = pipelineLoader.resolvePipeline(
+                            pipelineDef.getName(), pipelineDef.getVersion());
 
-                    if (test.getExpected() != null
-                            && !test.getExpected().toString().isEmpty()) {
-                        String systemOut = pipeline.annotate(test.getInput());
-                        SherlokTests.assertEquals(test.getExpected(),
-                                systemOut, test.getComparison());
-                    } else {
-                        LOG.debug("  no output for {}", test.getInput());
+                    for (PipelineTest test : pipeline.getPipelineDef()
+                            .getTests()) {
+
+                        if (test.getExpected() != null
+                                && !test.getExpected().toString().isEmpty()) {
+                            String systemOut = pipeline.annotate(test
+                                    .getInput());
+                            SherlokTests.assertEquals(test.getExpected(),
+                                    systemOut, test.getComparison());
+                        } else {
+                            LOG.debug("  no output for {}", test.getInput());
+                        }
                     }
+                } catch (Exception e) {
+                    LOG.error("---FAILED " + pipelineDef, e);
+                    throw e;
                 }
 
                 LOG.debug("+++passed                                      ");
