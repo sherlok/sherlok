@@ -164,17 +164,21 @@ public class PipelineLoader {
         }
 
         // 4. solve (download) bundle dependencies
-        try {
-            solveDependencies(pipelineDef.getName(), pipelineDef.getVersion(),
-                    bundleDefsToResolve, engineDefsUsedInP.size());
-        } catch (ArtifactResolutionException e) {
-            throw new ValidationException(map(MSG, "Failed to load pipeline: "
-                    + e.getMessage(), ERR, pipelineDef.getId()));
-        } catch (DependencyCollectionException e) {
-            throw new ValidationException("could not collect dependency: "
-                    + e.getMessage(), e);
-        } catch (Exception e) {
-            throw new RuntimeException(e); // should not happen
+        if (bundleDefsToResolve.size() > 0) {
+            try {
+                solveDependencies(pipelineDef.getName(),
+                        pipelineDef.getVersion(), bundleDefsToResolve,
+                        engineDefsUsedInP.size());
+            } catch (ArtifactResolutionException e) {
+                throw new ValidationException(map(MSG,
+                        "Failed to load pipeline: " + e.getMessage(), ERR,
+                        pipelineDef.getId()));
+            } catch (DependencyCollectionException e) {
+                throw new ValidationException("could not collect dependency: "
+                        + e.getMessage(), e);
+            } catch (Exception e) {
+                throw new RuntimeException(e); // should not happen
+            }
         }
 
         // 5. create UimaPipeline
