@@ -42,3 +42,4 @@ target/**
 Icon?
 ehthumbs.db
 Thumbs.d
+config/runtime

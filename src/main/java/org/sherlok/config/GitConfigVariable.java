@@ -86,6 +86,9 @@ public class GitConfigVariable implements ConfigVariable {
     private static void runCommand(File workingDirectory, String command)
             throws ProcessConfigVariableException {
         try {
+            LOG.trace("Running system command '" + command + "' in "
+                    + workingDirectory);
+
             Process clone = Runtime.getRuntime().exec(command, null,
                     workingDirectory.getAbsoluteFile());
 

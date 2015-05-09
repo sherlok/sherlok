@@ -17,11 +17,21 @@ public class ConfigVariableFactory {
             return constructBasicVariable(name, config);
         } else if (type.equals("git")) {
             return constructGitVariable(name, config);
+        } else if (type.equals("http")) {
+            return constructHttpVariable(name, config);
         }
 
-        // TODO http(s) protocols
-
         throw new ValidationException("unknown type variable", name);
+    }
+
+    private static ConfigVariable constructHttpVariable(String name,
+            Map<String, String> config) throws ValidationException {
+        String url = config.get("url");
+
+        if (url == null)
+            throw new ValidationException("http variable without url", name);
+
+        return new HttpConfigVariable(url);
     }
 
     private static ConfigVariable constructGitVariable(String name,
