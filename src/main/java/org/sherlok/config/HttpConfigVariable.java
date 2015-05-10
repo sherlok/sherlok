@@ -49,10 +49,12 @@ public class HttpConfigVariable implements ConfigVariable {
     }
 
     private final String url;
+    private final Boolean rutaCompatible;
 
-    public HttpConfigVariable(String url) {
+    public HttpConfigVariable(String url, Boolean rutaCompatible) {
         assert url != null;
         this.url = url;
+        this.rutaCompatible = rutaCompatible;
     }
 
     @Override
@@ -74,7 +76,11 @@ public class HttpConfigVariable implements ConfigVariable {
             }
         }
 
-        return FileBased.getRelativePathToResources(file.getAbsoluteFile());
+        if (rutaCompatible) {
+            return FileBased.getRelativePathToResources(file.getAbsoluteFile());
+        } else {
+            return file.getAbsolutePath();
+        }
     }
 
     private File getPath() {

@@ -53,6 +53,7 @@ public class GitConfigVariable implements ConfigVariable {
 
     private final String url;
     private final String ref; // SHA or branch/tag
+    private final Boolean rutaCompatible;
 
     /**
      * Construct a config variable for git repository
@@ -62,11 +63,14 @@ public class GitConfigVariable implements ConfigVariable {
      * @param ref
      *            can be a SHA, a branch, a tag or null (for default master
      *            branch)
+     * @param rutaCompatible
+     *            whether or not the processed value should be absolute or not
      */
-    public GitConfigVariable(String url, String ref) {
+    public GitConfigVariable(String url, String ref, Boolean rutaCompatible) {
         assert url != null;
         this.url = url;
         this.ref = ref != null ? ref : "master";
+        this.rutaCompatible = rutaCompatible;
     }
 
     @Override
@@ -80,7 +84,11 @@ public class GitConfigVariable implements ConfigVariable {
             runCommand(dir, getCheckoutCommand());
         }
 
-        return FileBased.getRelativePathToResources(dir.getAbsoluteFile());
+        if (rutaCompatible) {
+            return FileBased.getRelativePathToResources(dir.getAbsoluteFile());
+        } else {
+            return dir.getAbsolutePath();
+        }
     }
 
     // TODO move me to a more appropriate location

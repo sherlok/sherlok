@@ -37,64 +37,80 @@ public class GitConfigVariableTest {
     @Test
     public final void testGetProcessedValueMaster()
             throws ProcessConfigVariableException, IOException {
-        String val1 = testGetProcessedValueImpl(MASTER, FILE_CONTENT_MASTER);
-        String val2 = testGetProcessedValueImpl(null, FILE_CONTENT_MASTER);
+        String val1 = testGetProcessedValueImpl(MASTER, FILE_CONTENT_MASTER, true);
+        String val2 = testGetProcessedValueImpl(null, FILE_CONTENT_MASTER, true);
         
+        assertEquals(val1, val2);
+
+        val1 = testGetProcessedValueImpl(MASTER, FILE_CONTENT_MASTER, false);
+        val2 = testGetProcessedValueImpl(null, FILE_CONTENT_MASTER, false);
+
         assertEquals(val1, val2);
     }
 
     @Test
     public final void testGetProcessedValueSHA()
             throws ProcessConfigVariableException, IOException {
-        testGetProcessedValueImpl(SHA, FILE_CONTENT_SHA);
+        testGetProcessedValueImpl(SHA, FILE_CONTENT_SHA, true);
     }
 
     @Test
     public final void testGetProcessedValueTAG()
             throws ProcessConfigVariableException, IOException {
-        testGetProcessedValueImpl(TAG, FILE_CONTENT_TAG);
+        testGetProcessedValueImpl(TAG, FILE_CONTENT_TAG, true);
     }
 
     @Test
     public final void testGetProcessedValueDevelop()
             throws ProcessConfigVariableException, IOException {
-        testGetProcessedValueImpl(DEVELOP, FILE_CONTENT_DEVELOP);
+        testGetProcessedValueImpl(DEVELOP, FILE_CONTENT_DEVELOP, true);
     }
 
     @Test(expected = ProcessConfigVariableException.class)
     public final void testGetProcessedValueInvalidURL()
             throws ProcessConfigVariableException {
-        GitConfigVariable var = new GitConfigVariable(TEST_INVALID_URL, null);
+        GitConfigVariable var = new GitConfigVariable(TEST_INVALID_URL, null,
+                true);
         var.getProcessedValue(); // should fire
     }
 
     @Test(expected = ProcessConfigVariableException.class)
     public final void testGetProcessedValueInvalidBranch()
             throws ProcessConfigVariableException {
-        GitConfigVariable var = new GitConfigVariable(TEST_URL, INVALID_BRANCH);
+        GitConfigVariable var = new GitConfigVariable(TEST_URL, INVALID_BRANCH,
+                true);
         var.getProcessedValue(); // should fire
     }
 
-    private String testGetProcessedValueImpl(String ref, String expectedContent)
+    private String testGetProcessedValueImpl(String ref,
+            String expectedContent, Boolean rutaCompatibility)
             throws ProcessConfigVariableException, IOException {
-        GitConfigVariable var = new GitConfigVariable(TEST_URL, ref);
+        GitConfigVariable var = new GitConfigVariable(TEST_URL, ref, rutaCompatibility);
         String val = var.getProcessedValue(); // should not throw
         assertNotNull(val);
 
-        String content = getTestFileContent(val); // should not throw
+        // should not fire:
+        String content = getTestFileContent(val, rutaCompatibility);
         assertEquals("checking content", expectedContent, content);
 
         return val;
     }
 
-    private static File getTestFile(String processedValue) {
-        File dir = new File(FileBased.RUTA_RESOURCES_PATH, processedValue);
+    private static File getTestFile(String processedValue,
+            Boolean rutaCompatibility) {
+        File dir = null;
+        if (rutaCompatibility) {
+            dir = new File(FileBased.RUTA_RESOURCES_PATH, processedValue);
+        } else {
+            dir = new File(processedValue);
+        }
         return new File(dir, FILE_RELATIVE_PATH);
     }
 
-    private static String getTestFileContent(String processedValue)
+    private static String getTestFileContent(String processedValue,
+            Boolean rutaCompatibility)
             throws IOException {
-        File file = getTestFile(processedValue);
+        File file = getTestFile(processedValue, rutaCompatibility);
         return FileOps.readContent(file);
     }
 

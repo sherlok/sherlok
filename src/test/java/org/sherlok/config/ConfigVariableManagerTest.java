@@ -25,7 +25,8 @@ public class ConfigVariableManagerTest {
     private static Def createValueDef() {
         Def def = new DummyDef();
 
-        Map<String, String> var = map("type", "git", "url", TEST_URL);
+        Map<String, String> var = map("type", "git", "url", TEST_URL, "mode",
+                "ruta");
         def.addRawConfig("var", var);
 
         Map<String, String> x = map("value", "resources");

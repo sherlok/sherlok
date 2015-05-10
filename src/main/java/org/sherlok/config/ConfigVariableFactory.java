@@ -31,7 +31,9 @@ public class ConfigVariableFactory {
         if (url == null)
             throw new ValidationException("http variable without url", name);
 
-        return new HttpConfigVariable(url);
+        Boolean rutaCompatible = getRutaCompatibilityMode(config);
+
+        return new HttpConfigVariable(url, rutaCompatible);
     }
 
     private static ConfigVariable constructGitVariable(String name,
@@ -43,7 +45,9 @@ public class ConfigVariableFactory {
 
         String ref = config.get("ref"); // ok if null
 
-        return new GitConfigVariable(url, ref);
+        Boolean rutaCompatible = getRutaCompatibilityMode(config);
+
+        return new GitConfigVariable(url, ref, rutaCompatible);
     }
 
     private static ConfigVariable constructBasicVariable(String name,
@@ -52,6 +56,13 @@ public class ConfigVariableFactory {
         if (value == null)
             throw new ValidationException("text variable with no value", name);
         return new BasicConfigVariable(value);
+    }
+
+    private static Boolean getRutaCompatibilityMode(Map<String, String> config) {
+        String mode = config.get("mode");
+
+        // not enable by default
+        return mode != null && mode.equals("ruta");
     }
 
 }
