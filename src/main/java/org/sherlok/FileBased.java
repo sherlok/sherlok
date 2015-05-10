@@ -32,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Iterator;
@@ -362,6 +363,19 @@ public class FileBased {
         } catch (FileNotFoundException e) {
             throw new ValidationException(map(MSG, "file not found", ERR, path));
         }
+    }
+
+    /**
+     * Compute the relative path from a give absolute path and the resource
+     * directory.
+     */
+    public static String getRelativePathToResources(File absolutePath) {
+        assert absolutePath.isAbsolute();
+
+        Path absolute = absolutePath.toPath();
+        Path base = new File(RUTA_RESOURCES_PATH).getAbsoluteFile()
+                .toPath();
+        return base.relativize(absolute).toString();
     }
 
     /*-

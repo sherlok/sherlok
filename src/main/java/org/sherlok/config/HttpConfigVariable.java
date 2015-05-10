@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
+import org.sherlok.FileBased;
 import org.slf4j.Logger;
 
 /**
@@ -63,6 +64,8 @@ public class HttpConfigVariable implements ConfigVariable {
             file.getParentFile().mkdirs();
 
             try {
+                // FIXME the name of the file should be preserved for some annotators
+                // see http://stackoverflow.com/a/13109832/520217 for implementation details.
                 LOG.trace("Downloading file from " + url);
                 FileUtils.copyURLToFile(new URL(url), file);
             } catch (IOException e) {
@@ -71,7 +74,7 @@ public class HttpConfigVariable implements ConfigVariable {
             }
         }
 
-        return file.getAbsolutePath();
+        return FileBased.getRelativePathToResources(file.getAbsoluteFile());
     }
 
     private File getPath() {

@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.sherlok.FileBased;
 import org.sherlok.utils.ops.FileOps;
 
 public class HttpConfigVariableTest {
@@ -43,7 +44,7 @@ public class HttpConfigVariableTest {
 
     private static String getTestFileContent(String processedValue)
             throws IOException {
-        File file = new File(processedValue);
+        File file = new File(FileBased.RUTA_RESOURCES_PATH, processedValue);
         return FileOps.readContent(file);
     }
 

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.sherlok.FileBased;
 import org.sherlok.mappings.Def;
 import org.sherlok.utils.ops.FileOps;
 
@@ -50,7 +51,8 @@ public class ConfigVariableManagerTest {
         assertEquals(input.size(), output.size());
         assertTrue(output.get(0) + " ends with the proper suffix", output
                 .get(0).endsWith("/resources/file.txt"));
-        String content = FileOps.readContent(new File(output.get(0)));
+        String content = FileOps.readContent(new File(
+                FileBased.RUTA_RESOURCES_PATH, output.get(0)));
         assertEquals(content, FILE_CONTENT_MASTER);
         assertEquals("$", output.get(1));
         assertEquals("$x/resources", output.get(2));

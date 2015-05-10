@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.sherlok.FileBased;
 import org.sherlok.utils.ops.FileOps;
 
 public class GitConfigVariableTest {
@@ -87,7 +88,8 @@ public class GitConfigVariableTest {
     }
 
     private static File getTestFile(String processedValue) {
-        return new File(new File(processedValue), FILE_RELATIVE_PATH);
+        File dir = new File(FileBased.RUTA_RESOURCES_PATH, processedValue);
+        return new File(dir, FILE_RELATIVE_PATH);
     }
 
     private static String getTestFileContent(String processedValue)

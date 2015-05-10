@@ -8,6 +8,7 @@ import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.sherlok.FileBased;
 import org.slf4j.Logger;
 
 /**
@@ -79,7 +80,7 @@ public class GitConfigVariable implements ConfigVariable {
             runCommand(dir, getCheckoutCommand());
         }
 
-        return dir.getAbsolutePath();
+        return FileBased.getRelativePathToResources(dir.getAbsoluteFile());
     }
 
     // TODO move me to a more appropriate location
