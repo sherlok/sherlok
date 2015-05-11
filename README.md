@@ -1,5 +1,7 @@
 # Sherlok
 
+[![Join the chat at https://gitter.im/sherlok/sherlok](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sherlok/sherlok?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/sherlok/sherlok.svg?branch=master)](https://travis-ci.org/sherlok/sherlok)
 
 _Distributed restful text mining._
