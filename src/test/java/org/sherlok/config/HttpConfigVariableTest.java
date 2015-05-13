@@ -17,6 +17,7 @@ package org.sherlok.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,8 @@ public class HttpConfigVariableTest {
 
     private static final String VALID_URL_1 = "https://raw.githubusercontent.com/sherlok/sherlok_dependency_test/master/resources/file.txt";
     private static final String VALID_URL_2 = "https://raw.githubusercontent.com/sherlok/sherlok_dependency_test/develop/resources/file.txt";
+    private static final String FILENAME = "file.txt";
+
     private static final String INVALID_URL = "http://bad_example";
 
     private static final String FILE_CONTENT_1 = "MASTER\n";
@@ -70,6 +73,7 @@ public class HttpConfigVariableTest {
         String content = getTestFileContent(val, rutaMode); // should not throw
         assertEquals("checking content", expectedContent, content);
 
+        assertTrue("the filename should be correct", val.endsWith(FILENAME));
     }
 
     private static String getTestFileContent(String processedValue,
