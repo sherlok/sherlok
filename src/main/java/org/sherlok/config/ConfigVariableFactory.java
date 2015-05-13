@@ -24,15 +24,26 @@ import org.sherlok.utils.ValidationException;
  */
 public class ConfigVariableFactory {
 
+    private static final String MODE_RUTA = "ruta";
+    private static final String FIELD_MODE = "mode";
+    private static final String FIELD_VALUE = "value";
+    private static final String FIELD_REF = "ref";
+    private static final String FIELD_URL = "url";
+    private static final String FIELD_TYPE = "type";
+
+    private static final String TYPE_HTTP = "http";
+    private static final String TYPE_GIT = "git";
+    private static final String TYPE_TEXT = "text";
+
     public static ConfigVariable factory(String name, Map<String, String> config)
             throws ValidationException {
 
-        String type = config.get("type");
-        if (type == null || type.equals("text")) {
+        String type = config.get(FIELD_TYPE);
+        if (type == null || type.equals(TYPE_TEXT)) {
             return constructBasicVariable(name, config);
-        } else if (type.equals("git")) {
+        } else if (type.equals(TYPE_GIT)) {
             return constructGitVariable(name, config);
-        } else if (type.equals("http")) {
+        } else if (type.equals(TYPE_HTTP)) {
             return constructHttpVariable(name, config);
         }
 
@@ -41,7 +52,7 @@ public class ConfigVariableFactory {
 
     private static ConfigVariable constructHttpVariable(String name,
             Map<String, String> config) throws ValidationException {
-        String url = config.get("url");
+        String url = config.get(FIELD_URL);
 
         if (url == null)
             throw new ValidationException("http variable without url", name);
@@ -53,12 +64,12 @@ public class ConfigVariableFactory {
 
     private static ConfigVariable constructGitVariable(String name,
             Map<String, String> config) throws ValidationException {
-        String url = config.get("url");
+        String url = config.get(FIELD_URL);
 
         if (url == null)
             throw new ValidationException("git variable without url", name);
 
-        String ref = config.get("ref"); // ok if null
+        String ref = config.get(FIELD_REF); // ok if null
 
         Boolean rutaCompatible = getRutaCompatibilityMode(config);
 
@@ -67,17 +78,17 @@ public class ConfigVariableFactory {
 
     private static ConfigVariable constructBasicVariable(String name,
             Map<String, String> config) throws ValidationException {
-        String value = config.get("value");
+        String value = config.get(FIELD_VALUE);
         if (value == null)
             throw new ValidationException("text variable with no value", name);
         return new BasicConfigVariable(value);
     }
 
     private static Boolean getRutaCompatibilityMode(Map<String, String> config) {
-        String mode = config.get("mode");
+        String mode = config.get(FIELD_MODE);
 
         // not enable by default
-        return mode != null && mode.equals("ruta");
+        return mode != null && mode.equals(MODE_RUTA);
     }
 
 }
