@@ -18,10 +18,14 @@ package org.sherlok.config;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.sherlok.FileBased;
 import org.slf4j.Logger;
 
@@ -68,6 +72,7 @@ public class HttpConfigVariable implements ConfigVariable {
 
     private final String url;
     private final Boolean rutaCompatible;
+    private String filename = null; // computed when fetching the remote resource
 
     /**
      * Build a new variable.
@@ -89,14 +94,36 @@ public class HttpConfigVariable implements ConfigVariable {
         File file = getPath();
 
         // if needed, download the file
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-
+        if (file == null || !file.exists()) {
             try {
-                // FIXME the name of the file should be preserved for some annotators
-                // see http://stackoverflow.com/a/13109832/520217 for implementation details.
                 LOG.trace("Downloading file from " + url);
-                FileUtils.copyURLToFile(new URL(url), file);
+
+                // open an HTTP connection with the remote server
+                URL remote = new URL(this.url);
+                HttpURLConnection connection = (HttpURLConnection) remote
+                        .openConnection();
+                int status = connection.getResponseCode();
+
+                // make sure the request was successful
+                if (status != HttpURLConnection.HTTP_OK) {
+                    throw new ProcessConfigVariableException(
+                            "Status code from HTTP request is not 200: "
+                                    + status);
+                }
+
+                // save the filename
+                String disposition = connection
+                        .getHeaderField("Content-Disposition");
+                file = extractFileName(disposition);
+
+                // save the remote file
+                InputStream input = connection.getInputStream();
+                FileOutputStream output = FileUtils.openOutputStream(file);
+                IOUtils.copy(input, output);
+
+                output.close();
+                input.close();
+                connection.disconnect();
             } catch (IOException e) {
                 String msg = "Failed to download " + url;
                 throw new ProcessConfigVariableException(msg, e);
@@ -111,10 +138,49 @@ public class HttpConfigVariable implements ConfigVariable {
     }
 
     /**
-     * Path to the downloaded resource
+     * Use the information given by the server if available, otherwise use
+     * fallback.
+     */
+    private File extractFileName(String disposition) {
+        if (disposition != null) {
+            String key = "filename=";
+            int index = disposition.indexOf(key);
+            if (index > 0) {
+                filename = disposition.substring(index + key.length(),
+                        disposition.length() - 1);
+            } else {
+                extractFallbackFileName();
+            }
+        } else {
+            extractFallbackFileName();
+        }
+
+        // it is now safe to return the path to where the file will be saved
+        return getPath();
+    }
+
+    /**
+     * Fallback for filename if the server give us nothing.
+     */
+    private void extractFallbackFileName() {
+        int index = url.lastIndexOf("/");
+        if (index > 0) {
+            filename = url.substring(index + 1, url.length());
+        } else {
+            // no name available in URL... use hash as final fallback
+            filename = getPathId();
+        }
+    }
+
+    /**
+     * Path to the downloaded resource, or null if it was not yet downloaded
      */
     private File getPath() {
-        return new File(PATH_BASE, getPathId());
+        if (filename == null) {
+            return null;
+        } else {
+            return new File(new File(PATH_BASE, getPathId()), filename);
+        }
     }
 
     /**
