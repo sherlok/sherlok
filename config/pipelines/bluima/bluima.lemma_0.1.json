@@ -1,11 +1,11 @@
 {
   "name": "bluima.lemma",
-  "version": "0.1",
+  "version": "1.0.1",
   "description": "lemmatizer",
   "domain": "bluima",
   "script": [
-    "ENGINE TokenAnnotator:0.1;",
-    "ENGINE BlueBioLemmatizer:0.1;"
+    "ENGINE TokenAnnotator:1.0.1;",
+    "ENGINE BlueBioLemmatizer:1.0.1;"
   ],
   "tests": [
     {

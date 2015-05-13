@@ -1,10 +1,10 @@
 {
   "name": "bluima.commons",
   "domain": "bluima",
-  "version": "0.1",
+  "version": "1.0.1",
   "dependencies": [
     {
-      "value": "ch.epfl.bbp.nlp:bluima_commons:0.1"
+      "value": "ch.epfl.bbp.nlp:bluima_commons:1.0.1"
     }
   ],
   "config": {

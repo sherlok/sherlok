@@ -1,19 +1,19 @@
 {
   "name": "bluima_regions",
   "domain": "bluima",
-  "version": "0.1",
+  "version": "1.0.1",
   "dependencies": [
     {
-      "value": "ch.epfl.bbp.nlp:bluima_regions:0.1"
+      "value": "ch.epfl.bbp.nlp:bluima_regions:1.0.1"
     },
     {
-      "value": "ch.epfl.bbp.nlp:bluima_utils:0.1"
+      "value": "ch.epfl.bbp.nlp:bluima_utils:1.0.1"
     },
     {
-      "value": "ch.epfl.bbp.nlp:bluima_units:0.1"
+      "value": "ch.epfl.bbp.nlp:bluima_units:1.0.1"
     },
     {
-      "value": "ch.epfl.bbp.nlp:bluima_jsre:0.1"
+      "value": "ch.epfl.bbp.nlp:bluima_jsre:1.0.1"
     }
   ],
   "config": {

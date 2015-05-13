@@ -1,21 +1,21 @@
 {
   "name": "bluima.regions",
-  "version": "0.1",
+  "version": "1.0.1",
   "description": "annotate brain regions",
   "domain": "bluima",
   "script": [
-    "ENGINE SentenceAnnotator:0.1;",
-    "ENGINE TokenAnnotator:0.1;",
-    "ENGINE PosTagAnnotator:0.1;",
-    "ENGINE BlueBioLemmatizer:0.1;",
-    "ENGINE MeasureRegexAnnotator:0.1;",
-    "ENGINE PruneMeasuresAnnotator:0.1;",
-    "ENGINE LinnaeusAnnotator:0.1;",
-    "ENGINE BrainRegionAnnotator:0.1;",
-    "ENGINE KeepLargestBrainRegionAnnotator:0.1;",
-    "ENGINE ExtractSameBrainRegionCoocurrences:0.1;",
-    "ENGINE JsreBrainRegionFilterAnnotator:0.1;",
-    "ENGINE KeepLargestCooccurrenceAnnotator:0.1;"
+    "ENGINE SentenceAnnotator:1.0.1;",
+    "ENGINE TokenAnnotator:1.0.1;",
+    "ENGINE PosTagAnnotator:1.0.1;",
+    "ENGINE BlueBioLemmatizer:1.0.1;",
+    "ENGINE MeasureRegexAnnotator:1.0.1;",
+    "ENGINE PruneMeasuresAnnotator:1.0.1;",
+    "ENGINE LinnaeusAnnotator:1.0.1;",
+    "ENGINE BrainRegionAnnotator:1.0.1;",
+    "ENGINE KeepLargestBrainRegionAnnotator:1.0.1;",
+    "ENGINE ExtractSameBrainRegionCoocurrences:1.0.1;",
+    "ENGINE JsreBrainRegionFilterAnnotator:1.0.1;",
+    "ENGINE KeepLargestCooccurrenceAnnotator:1.0.1;"
   ],
   "tests": [
     {
