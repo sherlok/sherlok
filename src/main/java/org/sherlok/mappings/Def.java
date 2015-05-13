@@ -163,6 +163,14 @@ public abstract class Def {
         }
     }
 
+    /**
+     * If needed, rebuild configVariables from the raw config if it has changed.
+     * 
+     * It will also perform validation of the configuration variables.
+     * 
+     * @return the variable names associated with their respective
+     *         configuration.
+     */
     private Map<String, ConfigVariable> updateConfigVariableIfNeeded()
             throws ValidationException {
         Integer last = rawConfig.hashCode();

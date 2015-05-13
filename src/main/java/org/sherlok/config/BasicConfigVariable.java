@@ -2,7 +2,7 @@ package org.sherlok.config;
 
 
 /**
- * Simple text variable (used for file URL too)
+ * Simple text variable.
  */
 public class BasicConfigVariable implements ConfigVariable {
 

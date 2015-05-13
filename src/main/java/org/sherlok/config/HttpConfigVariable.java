@@ -13,6 +13,9 @@ import org.slf4j.Logger;
 /**
  * HTTP(S) config variable
  * 
+ * When processed, this variable will download the file pointed by the given URL
+ * and store it locally.
+ * 
  * TODO allow archive extraction through an extra setting
  */
 public class HttpConfigVariable implements ConfigVariable {
@@ -51,6 +54,15 @@ public class HttpConfigVariable implements ConfigVariable {
     private final String url;
     private final Boolean rutaCompatible;
 
+    /**
+     * Build a new variable.
+     * 
+     * @param url
+     *            remote resource URL
+     * @param rutaCompatible
+     *            specify that this variable is used in a RUTA context and need
+     *            to be converted to a relative path
+     */
     public HttpConfigVariable(String url, Boolean rutaCompatible) {
         assert url != null;
         this.url = url;
@@ -83,10 +95,16 @@ public class HttpConfigVariable implements ConfigVariable {
         }
     }
 
+    /**
+     * Path to the downloaded resource
+     */
     private File getPath() {
         return new File(PATH_BASE, getPathId());
     }
 
+    /**
+     * Hash code of this resource
+     */
     private String getPathId() {
         // The hash should have a low collision factor
         return Integer.toHexString(url.hashCode());

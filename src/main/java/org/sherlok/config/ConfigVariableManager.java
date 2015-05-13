@@ -12,10 +12,11 @@ import org.sherlok.mappings.Def;
 import org.slf4j.Logger;
 
 /**
- * Manage configuration variables for the engine definition.
+ * Manage configuration variables for the engine and pipeline definitions.
  * 
- * This includes how resources are fetched, their lifetime on disk and where
- * they are stored.
+ * It will download resources and store them on disk (through
+ * {@link ConfigVariable} objects) and substitute variable names with their
+ * corresponding path to resources.
  */
 public class ConfigVariableManager {
 

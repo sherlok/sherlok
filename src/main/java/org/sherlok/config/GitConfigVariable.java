@@ -14,6 +14,9 @@ import org.slf4j.Logger;
 /**
  * Git config variable
  * 
+ * When processed, this variable will download the given git repository and
+ * store it locally.
+ * 
  * TODO add ability to cleanup copy that are no longer used
  * 
  * TODO add ability to fetch new changes
@@ -64,7 +67,8 @@ public class GitConfigVariable implements ConfigVariable {
      *            can be a SHA, a branch, a tag or null (for default master
      *            branch)
      * @param rutaCompatible
-     *            whether or not the processed value should be absolute or not
+     *            specify that this variable is used in a RUTA context and need
+     *            to be converted to a relative path
      */
     public GitConfigVariable(String url, String ref, Boolean rutaCompatible) {
         assert url != null;
@@ -123,10 +127,16 @@ public class GitConfigVariable implements ConfigVariable {
         return "git checkout " + ref;
     }
 
+    /**
+     * Path to the downloaded resource
+     */
     private File getPath() {
         return new File(PATH_BASE, getPathId());
     }
 
+    /**
+     * Hash code of this resource
+     */
     private String getPathId() {
         // The hash should have a low collision factor
         return Integer.toHexString((url + "@" + ref).hashCode());
