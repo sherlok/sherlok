@@ -35,6 +35,10 @@ public class ConfigVariableFactory {
     private static final String TYPE_GIT = "git";
     private static final String TYPE_TEXT = "text";
 
+    /**
+     * Construct a new configuration variable, or throw an
+     * {@link ValidationException} if some data is missing or incorrect.
+     */
     public static ConfigVariable factory(String name, Map<String, String> config)
             throws ValidationException {
 
@@ -48,6 +52,49 @@ public class ConfigVariableFactory {
         }
 
         throw new ValidationException("unknown type variable", name);
+    }
+
+    /**
+     * Create a cleaner object for the given type.
+     */
+    public static ConfigVariableCleaner cleanerFactory(String type) {
+        if (type.equals(TYPE_GIT)) {
+            return new ConfigVariableCleaner() {
+                @Override
+                public boolean clean() {
+                    return GitConfigVariable.cleanCache();
+                }
+            };
+        } else if (type.equals(TYPE_HTTP)) {
+            return new ConfigVariableCleaner() {
+                @Override
+                public boolean clean() {
+                    return HttpConfigVariable.cleanCache();
+                }
+            };
+        }
+
+        return null;
+    }
+
+    /**
+     * Create a cleaner object for all valid types
+     */
+    public static ConfigVariableCleaner totalCleanerFactor() {
+        return new ConfigVariableCleaner() {
+            @Override
+            public boolean clean() {
+                return GitConfigVariable.cleanCache()
+                        && HttpConfigVariable.cleanCache();
+            }
+        };
+    }
+
+    /**
+     * Polymorphic cleaner
+     */
+    public interface ConfigVariableCleaner {
+        public boolean clean();
     }
 
     private static ConfigVariable constructHttpVariable(String name,

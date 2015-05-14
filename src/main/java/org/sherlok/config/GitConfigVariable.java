@@ -57,7 +57,7 @@ public class GitConfigVariable implements ConfigVariable {
     /**
      * This removes EVERYTHING that was downloaded
      */
-    public static void cleanCache() {
+    public static boolean cleanCache() {
         if (PATH_BASE.exists()) {
             try {
                 // NB: File.delete() is NOT recursive!
@@ -65,8 +65,11 @@ public class GitConfigVariable implements ConfigVariable {
             } catch (IOException e) {
                 String error = "GitConfigVariable couldn't properly clean its cache";
                 LOG.debug(error, e);
+                return false;
             }
         }
+
+        return true;
     }
 
     private final String url;
