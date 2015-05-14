@@ -3,6 +3,7 @@ local_repo
 config/resources/.pipelines/*
 config/resources/.engines/*
 config/resources/test/*
+config/runtime
 src/main/resources/git.properties
 
 # Maven          #
@@ -42,4 +43,4 @@ target/**
 Icon?
 ehthumbs.db
 Thumbs.d
-config/runtime
+
