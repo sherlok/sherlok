@@ -4,7 +4,7 @@
   "version": "1.0.1",
   "dependencies": [
     {
-      "value": "ch.epfl.bbp.nlp:bluima_commons:1.0.1"
+      "value": "ch.epfl.bbp.nlp:bluima_commons:1.0.2-SNAPSHOT"
     }
   ],
   "config": {
@@ -23,7 +23,7 @@
       "name": "LinnaeusAnnotator",
       "class": "ch.epfl.bbp.uima.ae.LinnaeusAnnotator",
       "parameters": {
-        "CONFIG_FILE": [
+        "configFile": [
           "$bluima/linnaeus/properties.conf"
         ]
       }
