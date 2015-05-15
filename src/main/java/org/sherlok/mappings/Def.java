@@ -17,12 +17,19 @@ package org.sherlok.mappings;
 
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
 import static org.sherlok.utils.CheckThat.validateDomain;
+import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.sherlok.config.ConfigVariable;
+import org.sherlok.config.ConfigVariableFactory;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Abstract class for definitions.
@@ -51,6 +58,19 @@ public abstract class Def {
      * {@link FileBased#PIPELINES_PATH}.
      */
     domain = "";
+
+    /**
+     * (internal) configuration variables which support for protocols such as
+     * file, git, ...
+     */
+    @JsonProperty("config")
+    private Map<String, Map<String, String>> rawConfig = map();
+
+    /** configuration variables (based on rawConfigs) */
+    @JsonIgnore
+    private Map<String, ConfigVariable> configVariables = map();
+    @JsonIgnore
+    private Integer rawConfigCacheHash = rawConfig.hashCode();
 
     // get/set
 
@@ -95,6 +115,9 @@ public abstract class Def {
         checkOnlyAlphanumDotUnderscore(name, msgName + " 'name' ");
         checkOnlyAlphanumDotUnderscore(version, msgName + " 'version' ");
         validateDomain(domain, msgName + " 'domain' ");
+
+        // build and validate configuration variables
+        updateConfigVariableIfNeeded();
     }
 
     @JsonIgnore
@@ -114,6 +137,67 @@ public abstract class Def {
     @JsonIgnore
     public String getId() {
         return name + SEPARATOR + version;
+    }
+
+    public Map<String, Map<String, String>> getRawConfig() {
+        return rawConfig;
+    }
+
+    public Def setRawConfig(Map<String, Map<String, String>> configs) {
+        this.rawConfig = configs;
+        return this;
+    }
+
+    public Def addRawConfig(String var, Map<String, String> config) {
+        this.rawConfig.put(var, config);
+        return this;
+    }
+
+    public Map<String, ConfigVariable> getConfigVariables() {
+        try {
+            return updateConfigVariableIfNeeded();
+        } catch (ValidationException e) {
+            LOG.warn("Configuration variables are not valid "
+                    + "and were not validated before!", e);
+            return null;
+        }
+    }
+
+    /**
+     * If needed, rebuild configVariables from the raw config if it has changed.
+     * 
+     * It will also perform validation of the configuration variables.
+     * 
+     * @return the variable names associated with their respective
+     *         configuration.
+     */
+    private Map<String, ConfigVariable> updateConfigVariableIfNeeded()
+            throws ValidationException {
+        Integer last = rawConfig.hashCode();
+        if (!last.equals(rawConfigCacheHash)) { // rawConfig was changed
+            configVariables = buildConfigVariables(rawConfig);
+            rawConfigCacheHash = last;
+        }
+
+        return configVariables;
+    }
+
+    /**
+     * Build and validate the configuration variable
+     */
+    private static Map<String, ConfigVariable> buildConfigVariables(
+            Map<String, Map<String, String>> rawConfig)
+            throws ValidationException {
+        Map<String, ConfigVariable> config = map();
+
+        for (Entry<String, Map<String, String>> entry : rawConfig.entrySet()) {
+            String name = entry.getKey();
+            ConfigVariable val = ConfigVariableFactory.factory(name,
+                    entry.getValue());
+            config.put(name, val);
+        }
+
+        return config;
     }
 
     @Override

@@ -242,6 +242,8 @@ public class PipelineDef extends Def {
                 LOG.warn("no tests for pipeline '{}'", getId());
             }
 
+            // TODO validate usage of variables in script and make sure no
+            // unknown variable is used
         } catch (Throwable e) {
             throw new ValidationException(map(MSG, e.getMessage()));
         }

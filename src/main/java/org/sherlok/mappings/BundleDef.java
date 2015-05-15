@@ -43,7 +43,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 // ensure property output order
 @JsonPropertyOrder(value = { "name", "version", "description", "domain",
-        "dependencies", "repositories", "engines" }, alphabetic = true)
+        "dependencies", "repositories", "engines", "config" }, alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class BundleDef extends Def {
 
@@ -54,7 +54,7 @@ public class BundleDef extends Def {
     private Map<String, String> repositories = map();
 
     private List<EngineDef> engines = list();
-
+    
     /** A Maven dependency to some external UIMA code. */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class BundleDependency {
@@ -332,6 +332,9 @@ public class BundleDef extends Def {
             for (EngineDef e : getEngines()) {
                 e.validate(bundleObject);
             }
+
+            // TODO validate usage of variables in engines and make sure no
+            // unknown variable are used
         } catch (Throwable e) {
             throw new ValidationException("invalid bundle '" + bundleObject
                     + "'", e.getMessage());

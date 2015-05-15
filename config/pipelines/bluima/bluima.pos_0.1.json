@@ -1,12 +1,12 @@
 {
   "name": "bluima.pos",
-  "version": "0.1",
+  "version": "1.0.1",
   "description": "PoS Tagger",
   "domain": "bluima",
   "script": [
-    "ENGINE SentenceAnnotator:0.1;",
-    "ENGINE TokenAnnotator:0.1;",
-    "ENGINE PosTagAnnotator:0.1;"
+    "ENGINE SentenceAnnotator:1.0.1;",
+    "ENGINE TokenAnnotator:1.0.1;",
+    "ENGINE PosTagAnnotator:1.0.1;"
   ],
   "tests": [
     {

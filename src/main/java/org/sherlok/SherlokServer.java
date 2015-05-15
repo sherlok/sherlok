@@ -47,6 +47,8 @@ import javax.servlet.http.Part;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.sherlok.config.ConfigVariableFactory;
+import org.sherlok.config.ConfigVariableFactory.ConfigVariableCleaner;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef;
@@ -82,6 +84,9 @@ public class SherlokServer {
     public static final String BUNDLES = "bundles";
     /** Route and path for Ruta resources */
     public static final String RUTA_RESOURCES = "resources";
+    /** Route and path for cleaning runtime resources */
+    public static final String CLEAN = "clean";
+    public static final String RUNTIME_RESOURCES = "runtime_resources";
 
     public static final int STATUS_OK = 200;
     public static final int STATUS_INVALID = 400;
@@ -465,6 +470,52 @@ public class SherlokServer {
                 } catch (Exception e) {
                     return error("DELETE '" + req.body(), e, resp);
                 }
+            }
+        });
+
+        // ROUTES: CLEANING RUNTIME RESOURCES
+        // ////////////////////////////////////////////////////////////////////
+        delete(new JsonRoute("/" + CLEAN + "/" + RUNTIME_RESOURCES + "/:type") {
+            @Override
+            public Object handle(Request req, Response resp) {
+                resp.type(JSON);
+
+                String type = req.params(":type");
+
+                ConfigVariableCleaner cleaner = ConfigVariableFactory
+                        .cleanerFactory(type);
+                if (cleaner == null) {
+                    return invalid("DELETE runtime_resources",
+                            new ValidationException("unknwon type", type), resp);
+                }
+
+                if (!cleaner.clean()) {
+                    return invalid("DELETE runtime_resources",
+                            new ValidationException("failed to clean type",
+                                    type), resp);
+                }
+
+                resp.status(STATUS_OK);
+                return map("status", "cleaned");
+            }
+        });
+        delete(new JsonRoute("/" + CLEAN + "/" + RUNTIME_RESOURCES) {
+            @Override
+            public Object handle(Request req, Response resp) {
+                resp.type(JSON);
+
+                ConfigVariableCleaner cleaner = ConfigVariableFactory
+                        .totalCleanerFactor();
+
+                if (!cleaner.clean()) {
+                    return invalid("DELETE runtime_resources",
+                            new ValidationException(
+                                    "failed to clean some runtime resources",
+                                    "all type"), resp);
+                }
+
+                resp.status(STATUS_OK);
+                return map("status", "cleaned");
             }
         });
     }
