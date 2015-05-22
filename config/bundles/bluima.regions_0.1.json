@@ -111,6 +111,15 @@
       "parameters": {
         "maximumEnclosingScopeLength": 500
       }
+    },
+    {
+      "name": "BrainregionRules",
+      "class": "org.apache.uima.ruta.engine.RutaEngine",
+      "parameters": {
+        "mainScript": "Main",
+        "scriptPaths": "$bluima/regions/rules",
+        "resourcePaths": "$bluima/regions/rules"
+      }
     }
   ]
 }
