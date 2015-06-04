@@ -17,6 +17,8 @@ package org.sherlok.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.sherlok.config.GitConfigVariableTest.FILE_CONTENT_MASTER;
+import static org.sherlok.config.GitConfigVariableTest.TEST_URL;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 
@@ -33,9 +35,6 @@ import org.sherlok.utils.ops.FileOps;
 public class ConfigVariableManagerTest {
 
     private static final Def TEST_DEF = createValueDef();
-
-    private static final String TEST_URL = "https://github.com/sherlok/sherlok_dependency_test.git";
-    private static final String FILE_CONTENT_MASTER = "MASTER\n";
 
     private static Def createValueDef() {
         Def def = new DummyDef();
@@ -64,15 +63,20 @@ public class ConfigVariableManagerTest {
         List<String> output = ConfigVariableManager.processConfigVariables(
                 input, TEST_DEF);
 
-        assertEquals(input.size(), output.size());
+        assertEquals(
+                "each input value should have a corresponding output value",
+                input.size(), output.size());
         assertTrue(output.get(0) + " ends with the proper suffix", output
                 .get(0).endsWith("/resources/file.txt"));
         String content = FileOps.readContent(new File(
                 FileBased.RUTA_RESOURCES_PATH, output.get(0)));
-        assertEquals(content, FILE_CONTENT_MASTER);
-        assertEquals("$", output.get(1));
-        assertEquals("$x/resources", output.get(2));
-        assertEquals("$$zZZ$$z", output.get(3));
+        assertEquals("the downloaded content should be as expected", content,
+                FILE_CONTENT_MASTER);
+        assertEquals("$$ should be transformed into $", "$", output.get(1));
+        assertEquals("$$x shoud be transformed into $x", "$x/resources",
+                output.get(2));
+        assertEquals("excapting $ should work as intended", "$$zZZ$$z",
+                output.get(3));
     }
     
     private static class DummyDef extends Def {

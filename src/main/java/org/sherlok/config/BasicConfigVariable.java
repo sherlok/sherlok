@@ -15,6 +15,7 @@
  */
 package org.sherlok.config;
 
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Simple text variable.
@@ -24,7 +25,7 @@ public class BasicConfigVariable implements ConfigVariable {
     private final String value;
 
     public BasicConfigVariable(String value) {
-        assert value != null;
+        checkArgument(value != null);
         this.value = value;
     }
 

@@ -15,6 +15,7 @@
  */
 package org.sherlok;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.sherlok.mappings.Def.getName;
@@ -370,11 +371,10 @@ public class FileBased {
      * directory.
      */
     public static String getRelativePathToResources(File absolutePath) {
-        assert absolutePath.isAbsolute();
+        checkArgument(absolutePath.isAbsolute());
 
         Path absolute = absolutePath.toPath();
-        Path base = new File(RUTA_RESOURCES_PATH).getAbsoluteFile()
-                .toPath();
+        Path base = new File(RUTA_RESOURCES_PATH).getAbsoluteFile().toPath();
         return base.relativize(absolute).toString();
     }
 

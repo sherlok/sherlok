@@ -20,23 +20,34 @@ import java.util.Map;
 import org.sherlok.utils.ValidationException;
 
 /**
- * Factory for {@link ConfigVariable}
+ * Factory for {@link ConfigVariable}.
  */
 public class ConfigVariableFactory {
 
+    /**
+     * Special mode for configuration variable: in order to work properly with
+     * in RUTA script, the paths represented by configuration variables need to
+     * be relative to FileBased.RUTA_RESOURCES_PATH instead of absolute paths.
+     * 
+     * MODE_RUTA is a (currently the only) possible value associated with
+     * FIELD_MODE in the config mapping.
+     */
     private static final String MODE_RUTA = "ruta";
+
+    // FIELD_* denote entries in the config mapping
     private static final String FIELD_MODE = "mode";
     private static final String FIELD_VALUE = "value";
     private static final String FIELD_REF = "ref";
     private static final String FIELD_URL = "url";
     private static final String FIELD_TYPE = "type";
 
+    // TYPE_* denote possible values associated with FIELD_TYPE
     private static final String TYPE_HTTP = "http";
     private static final String TYPE_GIT = "git";
     private static final String TYPE_TEXT = "text";
 
     /**
-     * Construct a new configuration variable, or throw an
+     * Construct a new configuration variable from a config mapping, or throw an
      * {@link ValidationException} if some data is missing or incorrect.
      */
     public static ConfigVariable factory(String name, Map<String, String> config)
@@ -92,6 +103,11 @@ public class ConfigVariableFactory {
 
     /**
      * Polymorphic cleaner
+     * 
+     * Classes that implement this interface are responsible for cleaning all
+     * files downloaded by one (or many) download protocol(s).
+     * 
+     * See cleanerFactory for some concrete examples.
      */
     public interface ConfigVariableCleaner {
         public boolean clean();
@@ -131,6 +147,9 @@ public class ConfigVariableFactory {
         return new BasicConfigVariable(value);
     }
 
+    /**
+     * Check if the RUTA mode is activated for some config mapping.
+     */
     private static Boolean getRutaCompatibilityMode(Map<String, String> config) {
         String mode = config.get(FIELD_MODE);
 

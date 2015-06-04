@@ -28,18 +28,26 @@ import org.sherlok.utils.ops.FileOps;
 
 public class GitConfigVariableTest {
 
-    private static final String TEST_URL = "https://github.com/sherlok/sherlok_dependency_test.git";
+    /**
+     * See note about sherlok_dependency_test repository in
+     * {@link ConfigVariable}
+     */
+    public static final String TEST_URL = "https://github.com/sherlok/sherlok_dependency_test.git";
     private static final String TEST_INVALID_URL = "http://bad_example";
     private static final String FILE_RELATIVE_PATH = "resources/file.txt";
 
     private static final String MASTER = "master";
     private static final String DEVELOP = "develop";
-    private static final String SHA = "593c73210f7b7578d27158b302002798ab3b10b4";
+    /**
+     * SHA maps to a special commit where the content of file.txt contains
+     * FILE_CONTENT_SHA
+     */
+    private static final String SHA = "593c73210f7b7578d27158b302002798ab3b10b4"; 
     private static final String TAG = "tag";
     private static final String INVALID_BRANCH = "poleved";
 
-    private static final String FILE_CONTENT_MASTER = "MASTER\n";
-    private static final String FILE_CONTENT_DEVELOP = "DEVELOP\n";
+    public static final String FILE_CONTENT_MASTER = "MASTER\n";
+    public static final String FILE_CONTENT_DEVELOP = "DEVELOP\n";
     private static final String FILE_CONTENT_SHA = "SHA\n";
     private static final String FILE_CONTENT_TAG = "TAG\n";
 
@@ -55,12 +63,14 @@ public class GitConfigVariableTest {
         String val1 = testGetProcessedValueImpl(MASTER, FILE_CONTENT_MASTER, true);
         String val2 = testGetProcessedValueImpl(null, FILE_CONTENT_MASTER, true);
         
-        assertEquals(val1, val2);
+        assertEquals("null should also map to the maste branch", val1, val2);
 
         val1 = testGetProcessedValueImpl(MASTER, FILE_CONTENT_MASTER, false);
         val2 = testGetProcessedValueImpl(null, FILE_CONTENT_MASTER, false);
 
-        assertEquals(val1, val2);
+        assertEquals(
+                "using RUTA mode should not introduce any differences in paths for the same branch",
+                val1, val2);
     }
 
     @Test
@@ -86,7 +96,7 @@ public class GitConfigVariableTest {
             throws ProcessConfigVariableException {
         GitConfigVariable var = new GitConfigVariable(TEST_INVALID_URL, null,
                 true);
-        var.getProcessedValue(); // should fire
+        var.getProcessedValue(); // should fire an exception
     }
 
     @Test(expected = ProcessConfigVariableException.class)
@@ -94,17 +104,17 @@ public class GitConfigVariableTest {
             throws ProcessConfigVariableException {
         GitConfigVariable var = new GitConfigVariable(TEST_URL, INVALID_BRANCH,
                 true);
-        var.getProcessedValue(); // should fire
+        var.getProcessedValue(); // should fire an exception
     }
 
     private String testGetProcessedValueImpl(String ref,
             String expectedContent, Boolean rutaCompatibility)
             throws ProcessConfigVariableException, IOException {
         GitConfigVariable var = new GitConfigVariable(TEST_URL, ref, rutaCompatibility);
-        String val = var.getProcessedValue(); // should not throw
+        String val = var.getProcessedValue(); // should not fire an exception
         assertNotNull(val);
 
-        // should not fire:
+        // should not fire an exception:
         String content = getTestFileContent(val, rutaCompatibility);
         assertEquals("checking content", expectedContent, content);
 

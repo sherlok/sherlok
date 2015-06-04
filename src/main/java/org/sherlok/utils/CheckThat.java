@@ -17,7 +17,6 @@ package org.sherlok.utils;
 
 import static java.util.regex.Pattern.compile;
 import static org.sherlok.mappings.Def.SEPARATOR;
-import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.ValidationException.MSG;
 
