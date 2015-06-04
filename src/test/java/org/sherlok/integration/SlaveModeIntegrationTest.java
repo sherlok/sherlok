@@ -50,10 +50,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  *
  * @author renaud@apache.org
  */
+// FIXME must be tested with disabled config/ folder
 @Ignore
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SlaveModeIntegrationTest {
-    // FIXME must test with disabled config
 
     static final int MASTER_PORT = 9607;
     static final int SLAVE_PORT = 9617;

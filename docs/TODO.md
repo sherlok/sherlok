@@ -1,5 +1,22 @@
 # TODOs
 
+* update to newest Ruta
+
+* test for 
+        "PACKAGE org.apache.uima.jcas.tcas;",
+        "DECLARE Annotation Methods(STRING ontologyId);"
+
+* RR: fix _editor
+* RR: 100% CPU on startup??
+* RR: print error if script syntax is wrong
+    * as UIMA ML how to do this
+
+
+
+* test with empty maven repo
+
+* publish to Maven central
+
 
 
 --- a/config/pipelines/bluima/neuroner/neuroner_0.1.json
@@ -18,6 +35,9 @@
 
 * P1 should work offline, too
 
+* P2 `WARN  Could not validate integrity of download from file:/Users/richarde/.m2/repository/de/tudarmstadt/ukp/dkpro/core/de.tudarmstadt.ukp.dkpro.core.api.segmentation-asl/1.7.0/de.tudarmstadt.ukp.dkpro.core.api.segmentation-asl-1.7.0.jar: Checksum validation failed, no checksums available [o.e.a.i.i.WarnChecksumPolicy 00:05:58]`
+
+
 * P2 [release to github maven repo](http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?lq=1)
 
 * P3 p not highlighted anymore when save
@@ -32,11 +52,6 @@
 * [date parser](http://natty.joestelmach.com/try.jsp)
 * [watson concept insights](http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/doc/concept-insights/)
 * [CLAVIN (Cartographic Location And Vicinity INdexer) open source software package for document geotagging and geoparsing](http://clavin.bericotechnologies.com/)
-
-# DONE
-
-* P3 order of pipelines in right col
-* P2 spinning wheel while running tests
 
 
 ---

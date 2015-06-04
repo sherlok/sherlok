@@ -16,6 +16,10 @@
       <name>Renaud Richardet</name>
       <email>renaud.richardet@gmail.com</email>
     </developer>
+    <developer>
+      <name>Marco Antognini</name>
+      <email>marco.antognini@epfl.ch</email>
+    </developer>
   </developers>
   <licenses>
     <license>
@@ -190,12 +194,20 @@
 
   <repositories>
     <repository>
+      <id>maven1</id>
+      <url>http://repo1.maven.org/maven2/</url>
+    </repository>
+    <!--<repository>
       <id>sherlok_deps</id>
       <url>https://raw.githubusercontent.com/sherlok/sherlok_mavenrepo/master/</url>
     </repository>
     <repository>
       <id>dkpro</id>
       <url>http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/</url>
+    </repository>-->
+    <repository>
+      <id>jitpack</id>
+      <url>https://jitpack.io</url>
     </repository>
   </repositories>
 
@@ -354,5 +366,71 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <!-- create javadocs -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+              <goal>jar</goal>
+              </goals>
+            </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.3</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+              <stagingProfileId>f5eabb25d981</stagingProfileId>
+            </configuration>
+          </plugin>
+          <!--GPG for Nexus -->
+           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals>
+              <goal>sign</goal>
+              </goals>
+            </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
+
+
   </profiles>
 </project>

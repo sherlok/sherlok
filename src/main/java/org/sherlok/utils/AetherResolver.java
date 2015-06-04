@@ -36,6 +36,9 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
+import org.eclipse.aether.transfer.AbstractTransferListener;
+import org.eclipse.aether.transfer.TransferCancelledException;
+import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.slf4j.Logger;
@@ -86,7 +89,7 @@ public class AetherResolver {
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(
                 session, localRepo));
 
-        // session.setTransferListener(new ConsoleTransferListener());
+        session.setTransferListener(new ConsoleTransferListener());
         // session.setRepositoryListener(new ConsoleRepositoryListener());
         // uncomment to generate dirty trees
         // session.setDependencyGraphTransformer( null );
@@ -118,6 +121,19 @@ public class AetherResolver {
                     id_url.getValue()).build());
         }
         return repos;
+    }
+
+    /** To log dependencies downloads */
+    public static class ConsoleTransferListener extends
+            AbstractTransferListener {
+
+        @Override
+        public void transferStarted(TransferEvent ev)
+                throws TransferCancelledException {
+            LOG.info("downloading " + ev.getResource().getFile().getName());
+        }
+
+        // transferProgressed fails
     }
 
     /** A dependency visitor that logs the graph */

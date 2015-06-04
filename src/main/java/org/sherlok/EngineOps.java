@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -139,28 +141,48 @@ public class EngineOps {
             // find super class (if still implementing AnalysisComponent)
             Class<?> superklass = klass.getSuperclass();
             if (AnalysisComponent.class.isAssignableFrom(superklass)) {
-                LOG.trace("klass " + klass.getName() + " has superklass: "
+                LOG.trace("Class " + klass.getName() + " has superklass: "
                         + superklass.getName());
                 klass = (Class<? extends AnalysisComponent>) superklass;
             } else {
-                LOG.trace("klass " + klass.getName()
+                LOG.trace("Class " + klass.getName()
                         + " has no matching superclass.");
                 klass = null;
             }
-
         }
 
-        // TODO is it possible that a subclass redefines a annotated field?
+        // TODO Marco is it possible that a subclass redefines a annotated field?
         // If yes, we don't handle it properly ATM: the loop should start from
         // the top type instead.
 
         return params;
+    }
+    
+    public static void dumpClasspath(ClassLoader loader)
+    {
+        System.out.println("Classloader " + loader + ":");
+
+        if (loader instanceof URLClassLoader)
+        {
+            URLClassLoader ucl = (URLClassLoader)loader;
+            System.out.println("\t" + Arrays.toString(ucl.getURLs()));
+        }
+        else
+            System.out.println("\t(cannot display components as not a URLClassLoader)");
+
+        if (loader.getParent() != null)
+            dumpClasspath(loader.getParent());
     }
 
     @SuppressWarnings("unchecked")
     private static Class<? extends AnalysisComponent> extractAnalysisComponentClass(
             EngineDef engineDef) throws ValidationException {
         try {
+            
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            dumpClasspath(cl);
+            
+            System.out.println("xxx "+engineDef.getClassz());
             return (Class<? extends AnalysisComponent>) Class.forName(engineDef
                     .getClassz());
         } catch (ClassNotFoundException e) {
