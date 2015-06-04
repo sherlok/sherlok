@@ -15,6 +15,7 @@
  */
 package org.sherlok.config;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
@@ -32,8 +33,6 @@ import org.slf4j.Logger;
  * When processed, this variable will download the given git repository and
  * store it locally.
  * 
- * TODO add ability to cleanup copy that are no longer used
- * 
  * TODO add ability to fetch new changes
  */
 public class GitConfigVariable implements ConfigVariable {
@@ -49,9 +48,9 @@ public class GitConfigVariable implements ConfigVariable {
         // Create the runtime location for git repositories and make sure
         // we can use it.
         PATH_BASE.mkdirs();
-        assert PATH_BASE.isDirectory();
-        assert PATH_BASE.canRead();
-        assert PATH_BASE.canWrite();
+        checkArgument(PATH_BASE.isDirectory());
+        checkArgument(PATH_BASE.canRead());
+        checkArgument(PATH_BASE.canWrite());
     }
 
     /**
@@ -89,7 +88,7 @@ public class GitConfigVariable implements ConfigVariable {
      *            to be converted to a relative path
      */
     public GitConfigVariable(String url, String ref, Boolean rutaCompatible) {
-        assert url != null;
+        checkArgument(url != null);
         this.url = url;
         this.ref = ref != null ? ref : "master";
         this.rutaCompatible = rutaCompatible;

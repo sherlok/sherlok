@@ -17,6 +17,16 @@ package org.sherlok.config;
 
 /**
  * Configuration variable for bundles
+ * 
+ * For unit tests purpose, a very light git repository was created:
+ * https://github.com/sherlok/sherlok_dependency_test
+ * 
+ * It can be used for testing {@link GitConfigVariable} but also
+ * {@link HttpConfigVariable}.
+ * 
+ * TODO add ability to cleanup copy that are no longer used: after a pipeline or
+ * a bundle is updated or remove, some resources might no longer be referenced
+ * by any configuration variable and therefore could be removed from cache.
  */
 public interface ConfigVariable {
     /**

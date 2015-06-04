@@ -16,6 +16,12 @@
       <version>2.6.1-json</version>
       <scope>provided</scope>
     </dependency>
+    <!-- TODO workaround https://gist.githubusercontent.com/mantognini/2fbeec6fb86aa5290b89/raw/651009b68e72163141f24e982d0bf3bfaddce3ea/stack1 -->
+    <dependency>
+ 	  <groupId>net.sf.trove4j</groupId>
+ 	  <artifactId>trove4j</artifactId>
+ 	  <version>2.0.2</version>
+ 	</dependency>
   <#list deps as dep>
     <dependency>
       <groupId>${dep.groupId}</groupId>

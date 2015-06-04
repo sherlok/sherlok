@@ -93,6 +93,33 @@
           "ch.epfl.bbp.uima.types.BrainRegion"
         ]
       }
+    },
+    {
+      "name": "FilterCoocurrencesByTriggerword",
+      "class": "ch.epfl.bbp.uima.ae.relations.FilterCoocurrencesByTriggerword"
+    },
+    {
+      "name": "FilterCoocurrencesIfTooManyEntities",
+      "class": "ch.epfl.bbp.uima.ae.relations.FilterCoocurrencesIfTooManyEntities",
+      "parameters": {
+        "maximumEntities": 7 
+      }
+    },
+    {
+      "name": "FilterCoocurrencesInLongSentences",
+      "class": "ch.epfl.bbp.uima.ae.relations.FilterCoocurrencesInLongSentences",
+      "parameters": {
+        "maximumEnclosingScopeLength": 500
+      }
+    },
+    {
+      "name": "BrainregionRules",
+      "class": "org.apache.uima.ruta.engine.RutaEngine",
+      "parameters": {
+        "mainScript": "Main",
+        "scriptPaths": "$bluima/regions/rules",
+        "resourcePaths": "$bluima/regions/rules"
+      }
     }
   ]
 }

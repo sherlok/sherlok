@@ -274,7 +274,6 @@
           </properties>
           <excludes>
             <exclude>pom.xml</exclude>
-            <exclude>mvnw.bat</exclude>
             <exclude>release.sh</exclude>
             <exclude>start_server.sh</exclude>
             <exclude>**/README</exclude>

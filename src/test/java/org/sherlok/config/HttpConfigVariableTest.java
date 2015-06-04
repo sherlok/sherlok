@@ -18,6 +18,8 @@ package org.sherlok.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.sherlok.config.GitConfigVariableTest.FILE_CONTENT_DEVELOP;
+import static org.sherlok.config.GitConfigVariableTest.FILE_CONTENT_MASTER;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,14 +31,15 @@ import org.sherlok.utils.ops.FileOps;
 
 public class HttpConfigVariableTest {
 
-    private static final String VALID_URL_1 = "https://raw.githubusercontent.com/sherlok/sherlok_dependency_test/master/resources/file.txt";
-    private static final String VALID_URL_2 = "https://raw.githubusercontent.com/sherlok/sherlok_dependency_test/develop/resources/file.txt";
+    /**
+     * See note about sherlok_dependency_test repository in
+     * {@link ConfigVariable}
+     */
+    private static final String VALID_URL_MASTER = "https://raw.githubusercontent.com/sherlok/sherlok_dependency_test/master/resources/file.txt";
+    private static final String VALID_URL_DEVELOP = "https://raw.githubusercontent.com/sherlok/sherlok_dependency_test/develop/resources/file.txt";
     private static final String FILENAME = "file.txt";
 
     private static final String INVALID_URL = "http://bad_example";
-
-    private static final String FILE_CONTENT_1 = "MASTER\n";
-    private static final String FILE_CONTENT_2 = "DEVELOP\n";
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -47,13 +50,14 @@ public class HttpConfigVariableTest {
     @Test
     public final void testGetProcessedValueRutaCompatible()
             throws ProcessConfigVariableException, IOException {
-        testGetProcessedValueImpl(VALID_URL_1, FILE_CONTENT_1, true);
+        testGetProcessedValueImpl(VALID_URL_MASTER, FILE_CONTENT_MASTER, true);
     }
 
     @Test
     public final void testGetProcessedValue()
             throws ProcessConfigVariableException, IOException {
-        testGetProcessedValueImpl(VALID_URL_2, FILE_CONTENT_2, false);
+        testGetProcessedValueImpl(VALID_URL_DEVELOP, FILE_CONTENT_DEVELOP,
+                false);
     }
 
     @Test(expected = ProcessConfigVariableException.class)

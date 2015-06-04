@@ -15,6 +15,7 @@
  */
 package org.sherlok.config;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
@@ -35,6 +36,22 @@ import org.slf4j.Logger;
  * When processed, this variable will download the file pointed by the given URL
  * and store it locally.
  * 
+ * <pre>
+ * The location of download is constructed as follows:
+ *   $PATH_BASE/getPathId()/$filename
+ * where:
+ *  - PATH_BASE is a static settings for all HTTP variable;
+ *  - getPathId() returns the hash of the URL;
+ *  - and filename is computed as follows:
+ *      - if the server send some information about the filename, 
+ *        via the "Content-Disposition" header field, then this information
+ *        is used;
+ *      - otherwise, if the part after the last '/' of the URL is used as
+ *        a filename, if it exists
+ *      - and if the two above methods fail, we use the hash of the URL
+ *        as a final fallback.
+ * </pre>
+ * 
  * TODO allow archive extraction through an extra setting
  */
 public class HttpConfigVariable implements ConfigVariable {
@@ -50,9 +67,9 @@ public class HttpConfigVariable implements ConfigVariable {
         // Create the runtime location for git repositories and make sure
         // we can use it.
         PATH_BASE.mkdirs();
-        assert PATH_BASE.isDirectory();
-        assert PATH_BASE.canRead();
-        assert PATH_BASE.canWrite();
+        checkArgument(PATH_BASE.isDirectory());
+        checkArgument(PATH_BASE.canRead());
+        checkArgument(PATH_BASE.canWrite());
     }
 
     /**
@@ -87,7 +104,7 @@ public class HttpConfigVariable implements ConfigVariable {
      *            to be converted to a relative path
      */
     public HttpConfigVariable(String url, Boolean rutaCompatible) {
-        assert url != null;
+        checkArgument(url != null);
         this.url = url;
         this.rutaCompatible = rutaCompatible;
     }
@@ -143,6 +160,10 @@ public class HttpConfigVariable implements ConfigVariable {
     /**
      * Use the information given by the server if available, otherwise use
      * fallback.
+     * 
+     * @param disposition
+     *            the value associated with the Content-Disposition header field
+     *            send by the server
      */
     private File extractFileName(String disposition) {
         if (disposition != null) {
