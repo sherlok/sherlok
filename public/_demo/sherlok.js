@@ -19,7 +19,7 @@ var Sherlok = {
       var txt = sofa["sofaString"];
 
       // collect annotations
-      var blacklist = ["Sofa", "DocumentAnnotation"];
+      var blacklist = ["Sofa", "DocumentAnnotation", "GeniaPOSTag", "Token", "Sentence", "FSArray"];
       var annots = [];
 
       var annotationSet = annotated_json["_views"]["_InitialView"];
