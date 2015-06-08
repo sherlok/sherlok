@@ -98,7 +98,6 @@
     color: #c14240;
 }
 
-
 .np_location { /*forest*/
     background-color: rgb(206, 212, 180);
     border: 1px solid rgb(175, 180, 153);
@@ -108,6 +107,18 @@
     background-color: #f3c2c2;
     border: 1px solid #c99797;
     color: #c14240;
+}
+
+.np_Cooccurrence { /*darkgreen*/
+    background-color: rgb(186, 221, 188);
+    border: 1px solid #9bc08c;
+    color: rgb(80, 104, 82);
+}
+
+.np_BrainRegion { /*orange*/
+    background-color: rgb(254, 228, 189);
+    border: 1px solid rgb(252, 205, 127);
+    color: rgb(89, 32, 3);
 }
 
 
