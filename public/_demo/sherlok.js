@@ -1,23 +1,32 @@
+function isInArray(value, array) {
+  return array.indexOf(value) > -1;
+}
+
 var Sherlok = {
 
   annotate: function (pipelineId, text_to_annotate, element_id) {
-
+    
     $.post("/annotate/" + pipelineId, {"text": text_to_annotate}, function(annotated_json) {
 
-      var txt = annotated_json["annotations"]["1"]["sofaString"];
+      var sofa = annotated_json["_referenced_fss"]["1"];
+      var txt = sofa["sofaString"];
 
       // collect annotations
       var blacklist = ["Sofa", "DocumentAnnotation"];
       var annots = [];
-      annotated_json["@cas_views"]["1"].map(function(fs){
-        var annot = annotated_json["annotations"][fs];
-        if (blacklist.indexOf(annot["@type"]) == -1){
-          var begin = annot["begin"] || 0, end = annot["end"];
-          var value = annot["value"];
-          annots[annots.length] = {begin: begin, end: end, value: value};
-        }
-      });
 
+      var annotationSet = annotated_json["_views"]["_InitialView"];
+      for (type in annotationSet) {
+        if (!isInArray(type, blacklist)) {
+          for (k in annotationSet[type]) {
+            var annot = annotationSet[type][k];
+            var begin = annot["begin"] || 0, end = annot["end"];
+            var value = annot["value"] || type; // if no "value", use type instead.
+            annots[annots.length] = {begin: begin, end: end, value: value};
+          }
+        }
+      }
+    
       // highlight text (add spans)
       var newTxt = "";
       var last = txt.length;
