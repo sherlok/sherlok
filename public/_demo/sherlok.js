@@ -2,13 +2,20 @@ function isInArray(value, array) {
   return array.indexOf(value) > -1;
 }
 
+function isInt(value) {
+  return !isNaN(value) && 
+         parseInt(Number(value)) == value && 
+         !isNaN(parseInt(value, 10));
+}
+
 var Sherlok = {
 
   annotate: function (pipelineId, text_to_annotate, element_id) {
     
     $.post("/annotate/" + pipelineId, {"text": text_to_annotate}, function(annotated_json) {
 
-      var sofa = annotated_json["_referenced_fss"]["1"];
+      var refs = annotated_json["_referenced_fss"];
+      var sofa = refs["1"];
       var txt = sofa["sofaString"];
 
       // collect annotations
@@ -20,7 +27,14 @@ var Sherlok = {
         if (!isInArray(type, blacklist)) {
           for (k in annotationSet[type]) {
             var annot = annotationSet[type][k];
-            var begin = annot["begin"] || 0, end = annot["end"];
+
+            // handle references
+            if (isInt(annot)) {
+              annot = refs[annot];
+            }
+            
+            var begin = annot["begin"] || 0;
+            var end   = annot["end"];
             var value = annot["value"] || type; // if no "value", use type instead.
             annots[annots.length] = {begin: begin, end: end, value: value};
           }
