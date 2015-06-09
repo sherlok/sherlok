@@ -57,7 +57,7 @@ var Sherlok = {
       var txt = sofa["sofaString"];
 
       // collect settings
-      var blacklist = ["Sofa", "DocumentAnnotation", "GeniaPOSTag", "Token", "Sentence", "FSArray", "Cooccurrence", "Measure"];
+      var blacklist = ["Sofa", "DocumentAnnotation", "GeniaPOSTag", "Token", "Sentence", "FSArray", "Cooccurrence"];
       var annots = [];
 
       // collect annotations
