@@ -104,6 +104,16 @@ var Sherlok = {
       newTxt = txt.substring(0, last) + newTxt;
       $("#"+element_id).html(newTxt);
       $('[data-toggle="popover"]').popover({html: true}); 
+
+    }).fail(function(xhr, textStatus, errorThrown) {
+
+        $("#"+element_id).html(
+            '<div class="alert alert-danger fade in">' +
+            '<a href="#" class="close" data-dismiss="alert">&times;</a>' +
+            '<strong>' + errorThrown + '</strong> ' + xhr.responseText +
+            '</div>'
+        );
+
     });
   }
 }
