@@ -8,6 +8,19 @@ function isInt(value) {
          !isNaN(parseInt(value, 10));
 }
 
+// http://stackoverflow.com/a/5047731/520217
+function textToHTML(text)
+{
+    return ((text || "") + "")  // make sure it's a string;
+        .replace(/"/g, "&quot;")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\t/g, "    ")
+        .replace(/ /g, "&#8203;&nbsp;&#8203;")
+        .replace(/\r\n|\r|\n/g, "<br />");
+}
+
 var Sherlok = {
 
   annotate: function (pipelineId, text_to_annotate, element_id) {
@@ -37,7 +50,8 @@ var Sherlok = {
             var begin = annot["begin"] || 0;
             var end   = annot["end"];
             var value = annot["value"] || type; // if no "value", use type instead.
-            annots[annots.length] = {begin: begin, end: end, value: value};
+            var desc  = textToHTML(JSON.stringify(annot, null, 2));
+            annots[annots.length] = {begin: begin, end: end, value: value, desc: desc};
           }
         }
       }
@@ -48,12 +62,22 @@ var Sherlok = {
       $.each(annots.sort(predicatBy("end")), function(index3, a){
         console.log(a);
         if (a.end <= last){
-          newTxt = '<span class="inline-a np_'+ a.value.toLowerCase() + '" title="'+a.value+'">' + txt.substring(a.begin, a.end) + '</span>' +  txt.substring(a.end, last) + newTxt;
+          
+          newTxt =
+              '<a class="inline-a np_' + a.value.toLowerCase() + '" ' +
+                    'data-toggle="popover" data-trigger="hover" data-placement="bottom" ' +
+                    'data-content="' + a.desc + '" ' +
+                    'title="' + a.value + '">' +
+                txt.substring(a.begin, a.end) +
+              '</a>' +
+              txt.substring(a.end, last) + newTxt; 
+
           last = a.begin;
         }
       });
       newTxt = txt.substring(0, last) + newTxt;
       $("#"+element_id).html(newTxt);
+      $('[data-toggle="popover"]').popover({html: true}); 
     });
   }
 }
