@@ -50,6 +50,7 @@ var Sherlok = {
             var begin = annot["begin"] || 0;
             var end   = annot["end"];
             var value = annot["value"] || type; // if no "value", use type instead.
+            if (isInt(value)) value = type;
             var desc  = textToHTML(JSON.stringify(annot, null, 2));
             annots[annots.length] = {begin: begin, end: end, value: value, desc: desc};
           }
