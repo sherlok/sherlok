@@ -48,7 +48,7 @@ var Sherlok = {
       $.each(annots.sort(predicatBy("end")), function(index3, a){
         console.log(a);
         if (a.end <= last){
-          newTxt = '<span class="inline-a np_'+ a.value + '" title="'+a.value+'">' + txt.substring(a.begin, a.end) + '</span>' +  txt.substring(a.end, last) + newTxt;
+          newTxt = '<span class="inline-a np_'+ a.value.toLowerCase() + '" title="'+a.value+'">' + txt.substring(a.begin, a.end) + '</span>' +  txt.substring(a.end, last) + newTxt;
           last = a.begin;
         }
       });
