@@ -97,8 +97,6 @@
     border: 1px solid #c99797;
     color: #c14240;
 }
-
-
 .np_location { /*forest*/
     background-color: rgb(206, 212, 180);
     border: 1px solid rgb(175, 180, 153);
@@ -109,7 +107,32 @@
     border: 1px solid #c99797;
     color: #c14240;
 }
+.np_brainregionprop { /*darkgreen*/
+    background-color: rgb(186, 221, 188);
+    border: 1px solid #9bc08c;
+    color: rgb(80, 104, 82);
+}
+.np_cooccurrence { /*darkgreen*/
+    background-color: rgb(186, 221, 188);
+    border: 1px solid #9bc08c;
+    color: rgb(80, 104, 82);
+}
+.np_neurotransmitterprop { /*forest*/
+    background-color: rgb(206, 212, 180);
+    border: 1px solid rgb(175, 180, 153);
+    color: rgb(67, 70, 56);
+}
+.np_proteinname { /*red*/
+    background-color: #f3c2c2;
+    border: 1px solid #c99797;
+    color: #c14240;
+}
 
+/* multiline tooltip */
+.tooltip-inner {
+    white-space:pre;
+    max-width:none;
+}
 
 /*FOOTER */
 /* Sticky footer styles http://getbootstrap.com/examples/sticky-footer/sticky-footer.css
