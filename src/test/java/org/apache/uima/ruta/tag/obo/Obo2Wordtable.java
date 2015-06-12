@@ -22,12 +22,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.sherlok.utils.Create;
+import org.sherlok.utils.SyncNeuroner;
 
 
 /**
  * Coverts three HBP OBO ontologies into Ruta WORDTABLES to be consumed by
  * NeuroNER.
- * 
+ * @see SyncNeuroner
  * @author richarde
  */
 public class Obo2Wordtable {

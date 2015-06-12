@@ -15,6 +15,7 @@
  */
 package org.sherlok;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.io.Files.createTempDir;
 import static java.lang.System.currentTimeMillis;
 import static org.sherlok.mappings.Def.createId;
@@ -65,6 +66,7 @@ import spark.Route;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.base.Preconditions;
 
 /**
  * REST-endpoint for Sherlok
@@ -216,8 +218,8 @@ public class SherlokServer {
                     for (PipelineTest test : pipeline.getPipelineDef()
                             .getTests()) {
                         String actual = pipeline.annotate(test.getInput());
-                        SherlokTests.assertEquals(test.getExpected(),
-                                actual, test.getComparison());
+                        SherlokTests.assertEquals(test.getExpected(), actual,
+                                test.getComparison());
                     }
                     return map("status", "passed");
 
@@ -696,6 +698,13 @@ public class SherlokServer {
         }
     }
 
+    public static double getJavaVersion() {
+        String version = System.getProperty("java.version"); // e.g. 1.7.0_10
+        int pos = version.indexOf('.');
+        pos = version.indexOf('.', pos + 1);
+        return Double.parseDouble(version.substring(0, pos));
+    }
+
     // MAIN stuff (to start Sherlok server)
     // ////////////////////////////////////////////////////////////////////////////
     public static final int DEFAULT_PORT = 9600;
@@ -714,6 +723,8 @@ public class SherlokServer {
     }
 
     public static void main(String[] args) throws Exception {
+        checkArgument(getJavaVersion() >= 1.7d,
+                "Sherlok needs at least Java 1.7, you have " + getJavaVersion());
         CliArguments argParser = new CliArguments();
         new JCommander(argParser, args);
         init(argParser.port, argParser.address, argParser.masterUrl,

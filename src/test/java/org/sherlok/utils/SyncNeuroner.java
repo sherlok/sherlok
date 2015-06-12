@@ -23,6 +23,7 @@ import static org.sherlok.FileBased.parsePipeline;
 import java.io.File;
 import java.util.List;
 
+import org.apache.uima.ruta.tag.obo.Obo2Wordtable;
 import org.sherlok.FileBased;
 import org.sherlok.mappings.PipelineDef;
 
@@ -31,6 +32,7 @@ import com.google.common.io.Files;
 /**
  * Copies resources fiels and main script from Ruta workbench into Sherlok
  * 
+ * @see Obo2Wordtable as well
  * @author richarde
  */
 public class SyncNeuroner {
