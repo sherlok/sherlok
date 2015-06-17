@@ -3,8 +3,8 @@ function isInArray(value, array) {
 }
 
 function isInt(value) {
-  return !isNaN(value) && 
-         parseInt(Number(value)) == value && 
+  return !isNaN(value) &&
+         parseInt(Number(value)) == value &&
          !isNaN(parseInt(value, 10));
 }
 
@@ -49,7 +49,7 @@ var Sherlok = {
     }
     var target = document.getElementById(element_id)
     var spinner = new Spinner(spinnerOps).spin(target);
-    
+
     $.post("/annotate/" + pipelineId, {"text": text_to_annotate}, function(annotated_json) {
 
       var refs = annotated_json["_referenced_fss"];
@@ -71,7 +71,7 @@ var Sherlok = {
             if (isInt(annot)) {
               annot = refs[annot];
             }
-            
+
             var begin = annot["begin"] || 0;
             var end   = annot["end"];
             var value = annot["value"] || type; // if no "value", use type instead.
@@ -81,29 +81,29 @@ var Sherlok = {
           }
         }
       }
-    
+
       // highlight text (add spans)
       var newTxt = "";
       var last = txt.length;
       $.each(annots.sort(predicatBy("end")), function(index3, a){
         console.log(a);
         if (a.end <= last){
-          
+
           newTxt =
-              '<a class="inline-a np_' + a.value.toLowerCase() + '" ' +
+              '<a class="inline-a np_' + String(a.value).toLowerCase() + '" ' +
                     'data-toggle="popover" data-trigger="hover" data-placement="bottom" ' +
                     'data-content="' + a.desc + '" ' +
                     'title="' + a.value + '">' +
                 txt.substring(a.begin, a.end) +
               '</a>' +
-              txt.substring(a.end, last) + newTxt; 
+              txt.substring(a.end, last) + newTxt;
 
           last = a.begin;
         }
       });
       newTxt = txt.substring(0, last) + newTxt;
       $("#"+element_id).html(newTxt);
-      $('[data-toggle="popover"]').popover({html: true}); 
+      $('[data-toggle="popover"]').popover({html: true});
 
     }).fail(function(xhr, textStatus, errorThrown) {
 

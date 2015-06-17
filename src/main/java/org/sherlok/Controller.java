@@ -53,9 +53,13 @@ public class Controller {
      * {@link AetherResolver#LOCAL_REPO_PATH} folder, using {@link FileBased}.
      */
     public Controller load() throws ValidationException {
-
-        Controller c = _load(FileBased.allBundleDefs(),
-                FileBased.allPipelineDefs());
+        Controller c;
+        try {
+            c = _load(FileBased.allBundleDefs(), FileBased.allPipelineDefs());
+        } catch (ValidationException ve) {
+            throw new ValidationException(
+                    "could not load pipelines or bundles: " + ve.getMessage());
+        }
 
         LOG.info(
                 "Done loading from local File store ({}): {} bundles, {} engines, {} pipelines",

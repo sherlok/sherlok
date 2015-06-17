@@ -242,18 +242,18 @@ public class FileBased {
             String msg = "Unrecognized field \"" + upe.getPropertyName()
                     + "\" in file '" + f.getName() + "',  "
                     + upe.getMessageSuffix();
-            throw new ValidationException(msg, upe);
+            throw new ValidationException(msg);
 
         } catch (JsonMappingException jme) {
 
             StringBuilder sb = new StringBuilder();
             sb.append("cannot read ");
             jme.getPathReference(sb);
-            sb.append(" in " + f.getName() + ": ");
+            sb.append(" in '" + f.getName() + "': ");
             sb.append(" " + jme.getOriginalMessage());
 
             throw new ValidationException(sb.toString().replaceAll(
-                    "org\\.sherlok\\.mappings\\.\\w+Def\\[", "["), jme);
+                    "org\\.sherlok\\.mappings\\.\\w+Def\\[", "["));
 
         } catch (JsonParseException jpe) {
             throw new ValidationException("Could not read JSON"

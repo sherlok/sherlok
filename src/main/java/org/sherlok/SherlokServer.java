@@ -66,7 +66,6 @@ import spark.Route;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Preconditions;
 
 /**
  * REST-endpoint for Sherlok
