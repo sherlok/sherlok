@@ -52,9 +52,9 @@ public class AetherResolver {
     public static final String LOCAL_REPO_PATH = "local_repo";
 
     /** Maven repo hosted on Github to cache most common artifacts */
-    public static final String SHERLOK_REPO_ID = "sherlok_deps";
+    //public static final String SHERLOK_REPO_ID = "sherlok_deps";
     /** Maven repo hosted on Github to cache most common artifacts */
-    public static final String SHERLOK_REPO_URL = "https://raw.githubusercontent.com/renaud/sherlok_mavenrepo/master/";
+    //public static final String SHERLOK_REPO_URL = "https://raw.githubusercontent.com/renaud/sherlok_mavenrepo/master/";
 
     public static RepositorySystem newRepositorySystem() {
         DefaultServiceLocator locator = MavenRepositorySystemUtils
@@ -106,9 +106,6 @@ public class AetherResolver {
             repos.add(new RemoteRepository.Builder("local_default", "default",
                     localRepo.toURI().toURL().toString()).build());
         }
-        // Sherlok repo
-        repos.add(new RemoteRepository.Builder(SHERLOK_REPO_ID, "default",
-                SHERLOK_REPO_URL).build());
         // Maven central
         repos.add(new RemoteRepository.Builder("central", "default",
                 "http://central.maven.org/maven2/").build());

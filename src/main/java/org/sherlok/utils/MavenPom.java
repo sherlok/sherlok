@@ -15,8 +15,6 @@
  */
 package org.sherlok.utils;
 
-import static org.sherlok.utils.AetherResolver.SHERLOK_REPO_ID;
-import static org.sherlok.utils.AetherResolver.SHERLOK_REPO_URL;
 import static org.sherlok.utils.Create.list;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -105,11 +103,6 @@ public class MavenPom {
 
         // order matters, so that sherlok github repo can be inserted first
         Set<RepoDefDTO> repoDefs = new LinkedHashSet<RepoDefDTO>();
-        // add sherlok repository first
-        RepoDefDTO rds = new RepoDefDTO(SHERLOK_REPO_ID, SHERLOK_REPO_URL);
-        if (repoDefs.add(rds))
-            LOG.trace("adding sherlok repo id '{}', url '{}' to pom", rds.id,
-                    rds.url);
         for (BundleDef bundleDef : bundleDefs) {
             for (Entry<String, String> id_url : bundleDef.getRepositories()
                     .entrySet()) {
