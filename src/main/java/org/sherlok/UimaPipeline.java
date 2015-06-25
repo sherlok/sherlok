@@ -16,6 +16,7 @@
 package org.sherlok;
 
 import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
+import static org.apache.uima.ruta.engine.RutaEngine.PARAM_ADDITIONAL_ENGINES;
 import static org.apache.uima.ruta.engine.RutaEngine.PARAM_DESCRIPTOR_PATHS;
 import static org.apache.uima.ruta.engine.RutaEngine.PARAM_MAIN_SCRIPT;
 import static org.apache.uima.ruta.engine.RutaEngine.PARAM_RESOURCE_PATHS;
@@ -25,6 +26,7 @@ import static org.apache.uima.util.FileUtils.saveString2File;
 import static org.sherlok.EngineOps.generateXmlDescriptor;
 import static org.sherlok.utils.CheckThat.validateId;
 import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.ByteArrayOutputStream;
@@ -34,6 +36,8 @@ import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.UIMAException;
@@ -56,6 +60,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.TypeDescription;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.ruta.engine.RutaEngine;
+import org.apache.uima.ruta.ontologies.OntoActionExtension;
 import org.apache.uima.util.CasPool;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
@@ -214,6 +219,17 @@ public class UimaPipeline {
                 (TypeSystemImpl) filteredTs).setPrettyPrint(true);
     }
 
+    static final Map<String, String> CHAR_MAPPING = map();
+    static {
+        CHAR_MAPPING.put("LPAREN", "(");
+        CHAR_MAPPING.put("RPAREN", ")");
+        CHAR_MAPPING.put("STAR", "*");
+        CHAR_MAPPING.put("PLUS", "+");
+        CHAR_MAPPING.put("SEMI", ";");
+        CHAR_MAPPING.put("LCURLY", "{");
+        CHAR_MAPPING.put("RCURLY", "}");
+    }
+
     private void initEngines() throws UIMAException, ValidationException {
         // redirect stdout to catch Ruta script errors
         ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
@@ -244,6 +260,11 @@ public class UimaPipeline {
                 throw new ValidationException("Ruta script error", maybeErr);
             for (String line : maybeOut.split("\n")) {
                 if (line.startsWith("Error in line")) {
+                    // translate error messages
+                    for (Entry<String, String> e : CHAR_MAPPING.entrySet()) {
+                        line = line.replaceAll(e.getKey(), "'" + e.getValue()
+                                + "'");
+                    }
                     throw new ValidationException("Ruta script error on line",
                             line);
                 }
@@ -320,6 +341,7 @@ public class UimaPipeline {
             cas.setDocumentText(text);
             cas.setDocumentLanguage(language);
 
+            LOG.trace("annotating: " + text);
             SimplePipeline.runPipeline(cas, aes);
 
             if (LOG.isTraceEnabled()) {
@@ -380,7 +402,8 @@ public class UimaPipeline {
             scriptLines = ConfigVariableManager.processConfigVariables(
                     scriptLines, pipelineDef);
         } catch (NoSuchVariableException | ProcessConfigVariableException e) {
-            throw new ValidationException(e);
+            throw new ValidationException("could not initialize pipeline '"
+                    + pipelineDef + "'", e);
         }
 
         // load engines
@@ -394,8 +417,8 @@ public class UimaPipeline {
                 String engineId = extractEngineId(scriptLine);
 
                 // create ae and write xml descriptor
-                String engineDescription = generateXmlDescriptor(
-                        engineId, engineDefs);
+                String engineDescription = generateXmlDescriptor(engineId,
+                        engineDefs);
                 engineDescriptions.add(engineDescription);
 
                 // update script line
@@ -453,11 +476,14 @@ public class UimaPipeline {
         scriptFile.getParentFile().mkdirs();
         saveString2File(script, scriptFile);
 
+        String[] extensions = { OntoActionExtension.class.getName() };
+
         aeds.add(createEngineDescription(RutaEngine.class, //
                 PARAM_SCRIPT_PATHS, scriptFile.getParent(), //
                 PARAM_RESOURCE_PATHS, FileBased.RUTA_RESOURCES_PATH, //
                 PARAM_DESCRIPTOR_PATHS, FileBased.RUTA_ENGINE_CACHE_PATH,//
-                RutaEngine.PARAM_ADDITIONAL_ENGINES, engineDescriptions,//
+                PARAM_ADDITIONAL_ENGINES, engineDescriptions,//
+                RutaEngine.PARAM_ADDITIONAL_EXTENSIONS, extensions,//
                 PARAM_MAIN_SCRIPT, scriptName));
     }
 

@@ -1,0 +1,13 @@
+format-version: 1.1
+data-version: 0.1
+date: 23:01:2015 15:31
+default-namespace: EXAMPLE
+ontology: Example ontology
+
+[Term]
+id: EXAMPLE:0000001
+name: rabbit
+
+[Term]
+id: EXAMPLE:0000002
+name: snake

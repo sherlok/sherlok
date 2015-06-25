@@ -84,8 +84,7 @@ public class ConfigVariableManager {
 
     // Process configuration variables
     private static String processConfigVariables(String value, Def def)
-            throws NoSuchVariableException,
-            ProcessConfigVariableException {
+            throws NoSuchVariableException, ProcessConfigVariableException {
 
         // Find all variables
         Matcher matcher = VARIABLE_PATTERN.matcher(value);
@@ -116,7 +115,7 @@ public class ConfigVariableManager {
             ProcessConfigVariableException {
         ConfigVariable var = config.get(name);
         if (var == null) {
-            LOG.debug("unknown variable " + name);
+            LOG.debug("unknown variable '" + name + "'");
             throw new NoSuchVariableException(name);
         }
         return var.getProcessedValue();

@@ -21,8 +21,18 @@ import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.util.JCasUtil;
+import org.apache.uima.jcas.JCas;
+import org.apache.uima.ruta.engine.Ruta;
+import org.apache.uima.ruta.engine.RutaEngine;
+import org.apache.uima.ruta.ontologies.OntoActionExtension;
+import org.apache.uima.ruta.type.DebugScriptApply;
 import org.junit.Test;
 import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef;
@@ -35,6 +45,48 @@ import org.slf4j.Logger;
 
 public class UimaPipelineTest {
     private static Logger LOG = getLogger(UimaPipelineTest.class);
+
+    @Test
+    public void testOntologyRuta() throws Exception {
+        String document = "A rabbit fights a snake to save her babies and wins in one of nature's most epic battles";
+        String script = "Document{->ONTO(\"examples/example_ontology.obo\", DebugScriptApply, \"element\")};\n";
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put(RutaEngine.PARAM_ADDITIONAL_EXTENSIONS,
+                new String[] { OntoActionExtension.class.getName() });
+        parameters.put(RutaEngine.PARAM_RESOURCE_PATHS,
+                new String[] { "config/resources/" });
+
+        JCas jCas = JCasFactory.createJCas();
+        jCas.setDocumentText(document);
+
+        Ruta.apply(jCas.getCas(), script, parameters);
+
+        Collection<DebugScriptApply> dsa = JCasUtil.select(jCas,
+                DebugScriptApply.class);
+        assertEquals(2, dsa.size());
+        for (DebugScriptApply d : dsa) {
+            System.out.println(d);
+        }
+    }
+
+    @Test
+    public void testNeuronerNtOBOOntology() throws Exception {
+
+        UimaPipeline pipeline = new PipelineLoader(new Controller().load())
+                .resolvePipeline("neuroner", null);
+        LOG.debug(pipeline.toString());
+        String json = pipeline.annotate("glutamatergic neuron");
+        LOG.debug(json);
+        SherlokTests.assertEquals(
+                map("NeurotransmitterProp",
+                        list(new JsonAnnotation()
+                                .setBegin(0)
+                                .setEnd(13)
+                                .addProperty("ontologyId",
+                                        "HBP_NEUROTRANSMITTER:0000004"))),
+                json, Comparison.exact);
+    }
 
     @Test
     public void testDog() throws Exception {

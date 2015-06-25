@@ -36,14 +36,14 @@
     <url>http://github.com/sherlok/sherlok</url>
   </scm>
   <distributionManagement>
-      <snapshotRepository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      </snapshotRepository>
-      <repository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-      </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
   </distributionManagement>
 
   <properties>
@@ -80,6 +80,11 @@
       <groupId>org.apache.uima</groupId>
       <artifactId>ruta-core</artifactId>
       <version>2.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.renaud</groupId>
+      <artifactId>ruta-ontologies</artifactId>
+      <version>5ada79c897</version>
     </dependency>
 
     <!-- AETHER TODO: remove some? -->
@@ -189,13 +194,15 @@
   </dependencies>
 
   <repositories>
-    <repository>
-      <id>sherlok_deps</id>
-      <url>https://raw.githubusercontent.com/renaud/sherlok_mavenrepo/master/</url>
-    </repository>
+    <!-- models for dkpro -->
     <repository>
       <id>dkpro</id>
       <url>http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/</url>
+    </repository>
+    <!-- JitPack builds GitHub projects on demand and publishes packages -->
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
     </repository>
   </repositories>
 
@@ -251,7 +258,7 @@
           <execution>
             <goals>
               <goal>revision</goal>
-             </goals>
+            </goals>
           </execution>
         </executions>
         <configuration>
@@ -259,7 +266,7 @@
           <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
         </configuration>
       </plugin>
-      <!-- add licence at top of each file, run it with 'mvn license:format'-->
+      <!-- add licence at top of each file, run it with 'mvn license:format' -->
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
@@ -300,13 +307,14 @@
         <artifactId>appassembler-maven-plugin</artifactId>
         <version>1.8.1</version>
         <configuration>
-          <!-- Add Java property for log to prevent ValidationException from
-               org.sherlok.UimaPipeline.initEngines(UimaPipeline.java:243)
-               (line numbering from 156718b0d11d5402e73de45406666a854fa09c5a)
-               because MalletLogger might write on syserr if this property
-               is not set and resources/logging.properties is not found.
-               Note that log.properties doesn't have to exist to make this work. -->
-          <extraJvmArguments>-Djava.util.logging.config.file=log.properties -Dfile.encoding=UTF8</extraJvmArguments>
+          <!-- Add Java property for log to prevent ValidationException from 
+            org.sherlok.UimaPipeline.initEngines(UimaPipeline.java:243) (line numbering 
+            from 156718b0d11d5402e73de45406666a854fa09c5a) because MalletLogger might 
+            write on syserr if this property is not set and resources/logging.properties 
+            is not found. Note that log.properties doesn't have to exist to make this 
+            work. -->
+          <extraJvmArguments>-Djava.util.logging.config.file=log.properties
+            -Dfile.encoding=UTF8</extraJvmArguments>
           <programs>
             <program>
               <mainClass>org.sherlok.SherlokServer</mainClass>
@@ -323,9 +331,8 @@
   </build>
 
   <profiles>
-    <!-- TEST COVERAGE REPORTS, run it like:
-      mvn clean test jacoco:report -P test_coverage
-      then open target/site/jacoco/index.html -->
+    <!-- TEST COVERAGE REPORTS, run it like: mvn clean test jacoco:report 
+      -P test_coverage then open target/site/jacoco/index.html -->
     <profile>
       <id>test_coverage</id>
       <build>

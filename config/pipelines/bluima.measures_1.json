@@ -1,0 +1,40 @@
+{
+  "name" : "bluima.measures",
+  "version" : "1",
+  "description" : "Allows to extract measures (numerical values combined with units, like 35 nM or 102.3 ± 15 millivolts) from free text.",
+  "script" : [
+ "ENGINE SentenceAnnotator:1.0.1;"
+, "ENGINE TokenAnnotator:1.0.1;"
+, "ENGINE PosTagAnnotator:1.0.1;"
+, "ENGINE BlueBioLemmatizer:1.0.1;"
+, ""
+, "ENGINE MeasureRegexAnnotator:1.0.1;"
+, "ENGINE PruneMeasuresAnnotator:1.0.1;"
+ ],
+  "output" : {
+    "include_annotations" : [ "ch.epfl.bbp.uima.types.Measure" ]
+  },
+  "tests" : [ {
+    "input" : "test test 2.4 milliseconds test test",
+    "expected" : {
+      "Measure" : [ {
+        "begin" : 10,
+        "end" : 26,
+        "properties" : {
+          "unit" : "milliseconds",
+          "value" : 2.4
+        }
+      } ]
+    }
+  }, {
+    "input" : "test test 413.25e2 mol test test"
+  }, {
+    "input" : "test test 5x10(-6) g test test"
+  }, {
+    "input" : "test test 24 seconds test test"
+  }, {
+    "input" : "test test 6USD test test"
+  }, {
+    "input" : "test test 17,17 minutes test test"
+  } ]
+}

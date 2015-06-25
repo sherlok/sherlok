@@ -38,7 +38,7 @@ app.directive('renderAnnotations', function($compile) {
   return {
     link: function(scope, element, attr) {
       scope.$watchGroup(['test.input', 'test.expected'], function(newTest, oldValue) {
-        if (newTest) {
+        if (newTest & newTest[0]) {
           Sherlok.annotateElement(newTest[0], newTest[1], function(html, types){
             element[0].innerHTML = html;
             $compile(element.contents())(scope);
@@ -158,8 +158,9 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
 
   // TESTS
   $scope.runAllTests = function(){
-    if ($scope.activePipe.tests.length == 0){
-      toast($mdToast, 'no tests for this pipeline!');
+    if ($scope.activePipe.tests.length == 0 || !$scope.activePipe.tests[0].input){
+      toast($mdToast, 'No tests for this pipeline. Click [edit] to add some!');
+      $scope.testing = false; // reactivates button
       return;
     }
     $scope.testing = true;

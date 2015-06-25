@@ -55,7 +55,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 // ensure property output order
 @JsonPropertyOrder(value = { "name", "version", "description", "language",
-        "domain", "loadOnStartup", "scriptLines", "output", "tests" }, alphabetic = true)
+        "domain", "loadOnStartup", "scriptLines", "config", "output", "tests" }, alphabetic = true)
 @JsonInclude(NON_DEFAULT)
 public class PipelineDef extends Def {
 
