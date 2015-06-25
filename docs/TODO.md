@@ -1,6 +1,10 @@
 # TODOs
 
 
+http://localhost:9600/annotate/hbp.methods?text=The%20Golgi%20staining%20protocol,%20but%20B
+{
+  "message" : "could not find Pipeline with Id 'hbp.methods:0000000000000000000000000000000'"
+}
 
 --- a/config/pipelines/bluima/neuroner/neuroner_0.1.json
 +++ b/config/pipelines/bluima/neuroner/neuroner_0.1.json

@@ -23,7 +23,6 @@ import static org.sherlok.FileBased.parsePipeline;
 import java.io.File;
 import java.util.List;
 
-import org.apache.uima.ruta.tag.obo.Obo2Wordtable;
 import org.sherlok.FileBased;
 import org.sherlok.mappings.PipelineDef;
 
