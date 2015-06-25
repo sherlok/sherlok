@@ -3,48 +3,38 @@
   "version" : "0.1",
   "description" : "named entity recognizer for neuronal cells, based on UIMA Ruta rules",
   "domain" : "bluima/neuroner",
-  "config": {
-    "bluima": {
-      "type": "git", 
-      "url": "https://github.com/BlueBrain/bluima_resources.git",
-      "ref": "master",
-      "mode" : "ruta"
-    }
-  },
   "script" : [
  "PACKAGE neuroner;"
 , ""
 , "Document{-> RETAINTYPE(BREAK)};"
 , ""
-, "DECLARE NeuronTrigger, NeuronProperty; // acts as a trigger"
+, "DECLARE NeuronTrigger; // acts as a trigger"
+, "DECLARE Annotation NeuronProperty(STRING name, STRING ontologyId); "
 , "DECLARE NeuronProperty Function;"
-, "DECLARE NeuronProperty Morphology;"
 , "DECLARE NeuronProperty BrainRegionProp; // so as not to be confused w/ other BrainRegion"
 , "DECLARE ProteinName; // is further aggregated below"
 , ""
 , ""
 , "// DEVELOPMENTAL STAGES"
-, "WORDTABLE developmentalWt  = '$bluima/neuroner/hbp_developmental_ontology.csv';"
-, "DECLARE NeuronProperty Developmental(STRING name, STRING ontologyId); "
-, "Document{-> MARKTABLE(Developmental, 1, developmentalWt, true, 2, \"\", 2, \"ontologyId\" = 2)};"
+, "DECLARE NeuronProperty Developmental; "
+, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_developmental_ontology.obo\", Developmental, \"ontologyId\")};"
 , ""
 , "// NEUROTRANSMITTER"
-, "WORDTABLE neurotransmitterWt = '$bluima/neuroner/hbp_neurotransmitter_ontology.csv';"
 , "DECLARE NeuronProperty NeurotransmitterProp(STRING name, STRING ontologyId);"
-, "Document{-> MARKTABLE(NeurotransmitterProp, 1, neurotransmitterWt, true, 2, \"\", 2, \"ontologyId\" = 2)};"
+, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_neurotransmitter_ontology.obo\", NeurotransmitterProp, \"ontologyId\")};"
 , ""
 , "// LAYER"
-, "//\"[Ll]ayers? ([1-6][AaBb]?([/-][1-6][AaBb]?)?|[iIvV]+([/-][iIvV]+)?)\" -> Layer;"
-, "WORDTABLE layerWt = '$bluima/neuroner/hbp_layer_ontology.csv';"
-, "DECLARE NeuronProperty Layer(STRING name, STRING ontologyId);"
-, "Document{-> MARKTABLE(Layer, 1, layerWt, true, 2, \"\", 2, \"ontologyId\" = 2)};"
+, "DECLARE NeuronProperty Layer;"
+, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_layer_ontology.obo\", Layer, \"ontologyId\")};"
+, ""
+, "// MORPHOLOGY"
+, "DECLARE NeuronProperty Morphology;"
+, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_morphology_ontology.obo\", Morphology, \"ontologyId\")};"
 , ""
 , "// SPECIES"
 , "WORDTABLE speciesWt = '$bluima/neuroner/ncbi_species_top1000.csv';"
-, "DECLARE NeuronProperty Species(STRING name, STRING ontologyId);"
+, "DECLARE NeuronProperty Species;"
 , "Document{-> MARKTABLE(Species, 1, speciesWt, true, 2, \"\", 2, \"ontologyId\" = 2)};"
-, ""
-, ""
 , ""
 , "// ORIENTATION"
 , "DECLARE NeuronProperty Orientation;"
@@ -61,11 +51,10 @@
 , ""
 , "// DICTIONARY MATCHING"
 , "// we use a single compiled trie to match word lists (found in resources folder)"
-, "WORDLIST generated = '$bluima/neuroner/generated.mtwl';"
+, "WORDLIST generated = '$neuroner/resources/bluima/neuroner/generated.mtwl';"
 , "Document{->TRIE("
 , "\"neuron_triggers.txt\" = NeuronTrigger,"
 , "\"functions.txt\" = Function,"
-, "\"morphology.txt\" = Morphology,"
 , "\"proteins_ns_dan.txt\" = ProteinName,"
 , "\"proteins_obo_pro.txt\" = ProteinName,"
 , "\"regions_adverbs_al.txt\" = BrainRegionProp,"
@@ -76,39 +65,74 @@
 , ""
 , ""
 , "// PROTEIN"
-, "// aggregate protein names (as it was matched above) with a trigger "
+, "// aggregate protein names (as it was matched above) with a ProteinTrigger "
 , "DECLARE ProteinTrigger;"
-, "\"(?i)expressing|principal|containing|immuno(nega|posi|reac)tive|positive\" -> ProteinTrigger;"
+, "\"(?i)(contain|secret|releas|bind|synthesiz|express|contain)ing|principal|immuno(nega|posi|reac)tive|(reac|posi)tive|immunoreactivity|"
+, "reactive|labeled|stained\" -> ProteinTrigger;"
 , "DECLARE NeuronProperty ProteinProp;"
-, "(ProteinName \"-\"? ProteinTrigger){-> MARK(ProteinProp)};"
+, "(ProteinName \"-\"? ProteinTrigger?){-> CREATE(ProteinProp, \"ontologyId\" = ProteinName)};"
+, "(ProteinTrigger \"-\"? ProteinName ){-> CREATE(ProteinProp, \"ontologyId\" = ProteinName)};"
 , "(ProteinTrigger ProteinName (COMMA ProteinName)?){-> MARK(ProteinProp)};"
-, "//TODO (ProteinTrigger){-> MARK(ProteinProp, 1, 2)} (\"-\"? ProteinName);"
+, "// also apply to NT"
+, "(NeurotransmitterProp \"-\"? ProteinTrigger){-> SHIFT(NeurotransmitterProp,1,3)};"
 , ""
-, ""
-, "(NeuronTrigger \"and\" NeuronTrigger){-> SHIFT(NeuronTrigger)};"
+, "// aggregate multiple triggers together"
+, "(NeuronTrigger \"and\"? NeuronTrigger){-> SHIFT(NeuronTrigger)};"
 , ""
 , "//////////////////////////////////////////////////////////"
 , ""
 , "DECLARE Neuron;"
-, "// gather NeuronProperty occurring around Neuron"
-, "(NeuronProperty* NeuronTrigger NeuronProperty*) {-> MARK(Neuron)} ;"
-, "(NeuronProperty+ (COMMA | \"and\" | (COMMA \"and\")))* {-> MARK(Neuron, 1, 3)} NeuronProperty+ NeuronTrigger;"
+, "//(NeuronProperty* NeuronTrigger NeuronProperty*) {-> MARK(Neuron)} ;"
+, ""
+, "// context before and after a neuron trigger"
+, "DECLARE PreNeuron, PostNeuron;"
+, ""
+, "// gather NeuronProperty occurring before and after Neuron into Pre and PostNeuron"
+, "NeuronProperty+{-> MARK(PreNeuron, 1, 1)} NeuronTrigger;"
+, "(NeuronProperty+ (COMMA | \"and\" | (COMMA \"and\")))* {-> MARK(PreNeuron, 1, 2)} NeuronProperty+ NeuronTrigger;"
+, "((\"in\" | \"of\" | \"with\") \"the\"? NeuronProperty+)* {-> MARK(PostNeuron)};"
+, ""
+, "// aggregate Pre and PostNeurons into Neuron, remove them"
+, "PreNeuron NeuronTrigger PostNeuron {-> MARK(Neuron, 1, 3)};"
+, "NeuronTrigger PostNeuron {-> MARK(Neuron, 1, 2)};"
+, "PreNeuron NeuronTrigger {-> MARK(Neuron, 1, 2)};"
+, "//PreNeuron{-> DEL};"
+, "//PostNeuron{-> DEL};"
 , ""
 , "// remove single isolated Neuron, unless \"cell\""
 , "NeuronTrigger{NOT(REGEXP(\"[Cc]ells?\")) -> MARK(Neuron, 1, 1)}; "
 , ""
-, "Neuron{CONTAINS(BREAK) -> DEL};"
+, "// remove neuron that have line breaks "
+, "Neuron{CONTAINS(BREAK) -> DEL}; // TODO check above with pdf (new lines?)"
 , "// keep only longest Neuron"
-, "Neuron{PARTOF(Neuron) -> DEL};"
-, "// TODO remove cells without NeuronProperty"
+, "Neuron{PARTOF(Neuron) -> DEL}; // TODO remove cells without NeuronProperty"
 , ""
 , "// Find up to 3 unmatched words preceding a Neuron to see what is still missing"
-, "// DECLARE Sentence; PERIOD #{-> MARK(Sentence)} PERIOD;"
 , "DECLARE Missing, InBetweenMissing;"
-, "NeuronProperty (ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)}(Neuron|NeuronTrigger);"
-, "NeuronProperty (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)}(Neuron|NeuronTrigger);"
-, "NeuronProperty (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)}(Neuron|NeuronTrigger);"
+, "NeuronProperty (ANY{-PARTOF(NeuronProperty)})                                                           {-> MARK(Missing, 2, 2)} (Neuron|NeuronTrigger);"
+, "NeuronProperty (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)})                              {-> MARK(Missing, 2, 2)} (Neuron|NeuronTrigger);"
+, "NeuronProperty (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)} (Neuron|NeuronTrigger);"
+, "NeuronTrigger  (ANY{-PARTOF(NeuronProperty)})                                                           {-> MARK(Missing, 2, 2)} PostNeuron;"
+, "Neuron         (ANY{-PARTOF(NeuronProperty)})                                                           {-> MARK(Missing, 2, 2)} PostNeuron;"
+, "NeuronTrigger  (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)})                              {-> MARK(Missing, 2, 2)} PostNeuron;"
+, "Neuron         (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)})                              {-> MARK(Missing, 2, 2)} PostNeuron;"
+, "NeuronTrigger  (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)} PostNeuron;"
+, "Neuron         (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)} PostNeuron;"
  ],
+  "config" : {
+    "bluima" : {
+      "type" : "git",
+      "url" : "https://github.com/BlueBrain/bluima_resources.git",
+      "ref" : "master",
+      "mode" : "ruta"
+    },
+    "neuroner" : {
+      "type" : "git",
+      "url" : "https://github.com/renaud/neuroNER.git",
+      "ref" : "master",
+      "mode" : "ruta"
+    }
+  },
   "output" : {
     "include_annotations" : [ "neuroner.*" ]
   },
@@ -120,15 +144,13 @@
         "end" : 7,
         "properties" : {
           "ontologyId" : "HBP_LAYER:0000005"
-        },
-        "ontologyId" : "HBP_LAYER:0000005"
+        }
       }, {
         "begin" : 12,
         "end" : 21,
         "properties" : {
           "ontologyId" : "HBP_LAYER:0000003"
-        },
-        "ontologyId" : "HBP_LAYER:0000003"
+        }
       } ],
       "Size" : [ {
         "begin" : 22,
@@ -159,6 +181,46 @@
       "Neuron" : [ {
         "begin" : 0,
         "end" : 39
+      } ]
+    }
+  }, {
+    "input" : "parvalbumin basket cell",
+    "expected" : {
+      "ProteinProp" : [ {
+        "begin" : 0,
+        "end" : 11,
+        "properties" : {
+          "ontologyId" : "parvalbumin"
+        }
+      } ],
+      "Morphology" : [ {
+        "begin" : 12,
+        "end" : 18,
+        "properties" : {
+          "ontologyId" : "HBP_MORPHOLOGY:0000019"
+        }
+      } ]
+    }
+  }, {
+    "input" : "Parvalbumin-expressing neurons",
+    "expected" : {
+      "ProteinProp" : [ {
+        "begin" : 0,
+        "end" : 22,
+        "properties" : {
+          "ontologyId" : "Parvalbumin"
+        }
+      } ]
+    }
+  }, {
+    "input" : "neuron expressing parvalbumin",
+    "expected" : {
+      "ProteinProp" : [ {
+        "begin" : 18,
+        "end" : 29,
+        "properties" : {
+          "ontologyId" : "parvalbumin"
+        }
       } ]
     }
   } ]

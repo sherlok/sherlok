@@ -42,6 +42,7 @@ public class ConfigVariableFactory {
     private static final String FIELD_TYPE = "type";
 
     // TYPE_* denote possible values associated with FIELD_TYPE
+    // TODO use enum
     private static final String TYPE_HTTP = "http";
     private static final String TYPE_GIT = "git";
     private static final String TYPE_TEXT = "text";
@@ -65,9 +66,7 @@ public class ConfigVariableFactory {
         throw new ValidationException("unknown type variable", name);
     }
 
-    /**
-     * Create a cleaner object for the given type.
-     */
+    /** Create a cleaner object for the given type */
     public static ConfigVariableCleaner cleanerFactory(String type) {
         if (type.equals(TYPE_GIT)) {
             return new ConfigVariableCleaner() {

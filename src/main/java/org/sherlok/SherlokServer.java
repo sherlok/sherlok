@@ -232,7 +232,7 @@ public class SherlokServer {
 
         // ROUTES: RELOAD
         // ////////////////////////////////////////////////////////////////////////////
-        get(new JsonRoute("/reload") {
+        get(new JsonRoute("/reload") { // FIXME merge with clean
             @Override
             public Object handle(Request req, Response resp) {
                 try {
