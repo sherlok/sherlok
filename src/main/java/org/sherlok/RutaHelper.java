@@ -76,11 +76,15 @@ public class RutaHelper {
 
                 Matcher m = TYPES.matcher(instruction.trim());
                 if (m.find()) {
-
-                    String superType = CAS.TYPE_NAME_ANNOTATION; // default val
+                    // set as default the UIMA root type
+                    String superType = CAS.TYPE_NAME_ANNOTATION; 
                     try { // see if custom superType was defined
                         superType = m.group("superType").trim();
                     } catch (Exception e) { // ok, since might be absent
+                    }
+                    // org.apache.uima.jcas.tcas.Annotation --> Annotation
+                    if (superType.equals("Annotation")){//FIXME better check
+                        superType=CAS.TYPE_NAME_ANNOTATION;
                     }
 
                     List<TypeFeatureDTO> features = list();

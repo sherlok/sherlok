@@ -84,7 +84,7 @@
     <dependency>
       <groupId>com.github.renaud</groupId>
       <artifactId>ruta-ontologies</artifactId>
-      <version>5ada79c897</version>
+      <version>34ce8a5860</version>
     </dependency>
 
     <!-- AETHER TODO: remove some? -->
