@@ -6,14 +6,10 @@
   "script" : [
  "PACKAGE neuroner;"
 , ""
-, "Document{-> RETAINTYPE(BREAK)};"
+, "Document{-> RETAINTYPE(BREAK)}; // retains breaking lines, so that two neurons on two different lines do not collide"
 , ""
-, "DECLARE NeuronTrigger; // acts as a trigger"
-, "DECLARE Annotation NeuronProperty(STRING name, STRING ontologyId); "
-, "DECLARE NeuronProperty Function;"
-, "DECLARE NeuronProperty BrainRegionProp; // so as not to be confused w/ other BrainRegion"
-, "DECLARE ProteinName; // is further aggregated below"
-, ""
+, "DECLARE NeuronTrigger;  // acts as a trigger"
+, "DECLARE Annotation NeuronProperty(STRING name, STRING ontologyId); // base class for properties "
 , ""
 , "// DEVELOPMENTAL STAGES"
 , "DECLARE NeuronProperty Developmental; "
@@ -32,7 +28,7 @@
 , "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_morphology_ontology.obo\", Morphology, \"ontologyId\")};"
 , ""
 , "// SPECIES"
-, "WORDTABLE speciesWt = '$bluima/neuroner/ncbi_species_top1000.csv';"
+, "WORDTABLE speciesWt = '$neuroner/resources/bluima/neuroner/ncbi_species_top1000.csv';"
 , "DECLARE NeuronProperty Species;"
 , "Document{-> MARKTABLE(Species, 1, speciesWt, true, 2, \"\", 2, \"ontologyId\" = 2)};"
 , ""
@@ -44,15 +40,21 @@
 , "DECLARE NeuronProperty Size;"
 , "\"(?i)large|medium|small|narrow|giant\" -> Size;"
 , ""
-, "// ELECTROPYHSIOLOGY"
+, "// ELECTROPHYSIOLOGY"
+, "DECLARE Annotation EphysTrigger(STRING name, STRING ontologyId);"
+, "DECLARE Annotation EphysProp(STRING name, STRING ontologyId);"
+, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_electrophysiology-triggers_ontology.robo\", EphysTrigger, \"ontologyId\")};"
+, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_electrophysiology_ontology.robo\", EphysProp, \"ontologyId\")};"
 , "DECLARE NeuronProperty Electrophysiology;"
-, "\"(?i)((continu(ally|ous)?|delayed) )?(((ir)?regular|fast|late|burst(ing)?|classical|delayed)[ -])?((non[- ]?)?(accomm?odating|adapting|spiking|firing|irregular|stuttering))\" -> Electrophysiology;"
-, ""
+, "(EphysTrigger|EphysProp)+ {-> MARK(Electrophysiology)};"
 , ""
 , "// DICTIONARY MATCHING"
+, "DECLARE NeuronProperty Function;"
+, "DECLARE NeuronProperty BrainRegionProp; // so as not to be confused w/ other BrainRegion annotations"
+, "DECLARE ProteinName;                    // is further aggregated below"
 , "// we use a single compiled trie to match word lists (found in resources folder)"
 , "WORDLIST generated = '$neuroner/resources/bluima/neuroner/generated.mtwl';"
-, "Document{->TRIE("
+, "Document{ ->TRIE("
 , "\"neuron_triggers.txt\" = NeuronTrigger,"
 , "\"functions.txt\" = Function,"
 , "\"proteins_ns_dan.txt\" = ProteinName,"
@@ -68,29 +70,27 @@
 , "// aggregate protein names (as it was matched above) with a ProteinTrigger "
 , "DECLARE ProteinTrigger;"
 , "\"(?i)(contain|secret|releas|bind|synthesiz|express|contain)ing|principal|immuno(nega|posi|reac)tive|(reac|posi)tive|immunoreactivity|"
-, "reactive|labeled|stained\" -> ProteinTrigger;"
+, "reactive|labeled|stained|[Cc]re\" -> ProteinTrigger;"
 , "DECLARE NeuronProperty ProteinProp;"
-, "(ProteinName \"-\"? ProteinTrigger?){-> CREATE(ProteinProp, \"ontologyId\" = ProteinName)};"
+, "(ProteinName \"-\"? ProteinTrigger? ProteinTrigger?){-> CREATE(ProteinProp, \"ontologyId\" = ProteinName)};"
 , "(ProteinTrigger \"-\"? ProteinName ){-> CREATE(ProteinProp, \"ontologyId\" = ProteinName)};"
 , "(ProteinTrigger ProteinName (COMMA ProteinName)?){-> MARK(ProteinProp)};"
-, "// also apply to NT"
+, "// also apply protein rules to neurotransmitters"
 , "(NeurotransmitterProp \"-\"? ProteinTrigger){-> SHIFT(NeurotransmitterProp,1,3)};"
 , ""
 , "// aggregate multiple triggers together"
 , "(NeuronTrigger \"and\"? NeuronTrigger){-> SHIFT(NeuronTrigger)};"
 , ""
-, "//////////////////////////////////////////////////////////"
 , ""
-, "DECLARE Neuron;"
-, "//(NeuronProperty* NeuronTrigger NeuronProperty*) {-> MARK(Neuron)} ;"
-, ""
-, "// context before and after a neuron trigger"
-, "DECLARE PreNeuron, PostNeuron;"
+, "// AGGREGATE ///////////////////////////////////////////////////////////////////////////////////////////////"
+, "DECLARE Neuron;                // matches the whole span of a neuron definition"
+, "DECLARE PreNeuron, PostNeuron; // context before and after a neuron trigger"
 , ""
 , "// gather NeuronProperty occurring before and after Neuron into Pre and PostNeuron"
 , "NeuronProperty+{-> MARK(PreNeuron, 1, 1)} NeuronTrigger;"
 , "(NeuronProperty+ (COMMA | \"and\" | (COMMA \"and\")))* {-> MARK(PreNeuron, 1, 2)} NeuronProperty+ NeuronTrigger;"
-, "((\"in\" | \"of\" | \"with\") \"the\"? NeuronProperty+)* {-> MARK(PostNeuron)};"
+, "((\"in\" | \"of\" | \"with\") \"the\"? NeuronProperty+)+ {-> MARK(PostNeuron)};"
+, "NeuronTrigger NeuronProperty+ {-> MARK(PostNeuron, 2, 2)};"
 , ""
 , "// aggregate Pre and PostNeurons into Neuron, remove them"
 , "PreNeuron NeuronTrigger PostNeuron {-> MARK(Neuron, 1, 3)};"
@@ -107,6 +107,8 @@
 , "// keep only longest Neuron"
 , "Neuron{PARTOF(Neuron) -> DEL}; // TODO remove cells without NeuronProperty"
 , ""
+, ""
+, "// MISSING ///////////////////////////////////////////////////////////////////////////////////////////////"
 , "// Find up to 3 unmatched words preceding a Neuron to see what is still missing"
 , "DECLARE Missing, InBetweenMissing;"
 , "NeuronProperty (ANY{-PARTOF(NeuronProperty)})                                                           {-> MARK(Missing, 2, 2)} (Neuron|NeuronTrigger);"
@@ -118,14 +120,10 @@
 , "Neuron         (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)})                              {-> MARK(Missing, 2, 2)} PostNeuron;"
 , "NeuronTrigger  (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)} PostNeuron;"
 , "Neuron         (ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)} ANY{-PARTOF(NeuronProperty)}) {-> MARK(Missing, 2, 2)} PostNeuron;"
+, ""
+, "//TODO Missing{IF((end-begin) < 2)->DEL};"
  ],
   "config" : {
-    "bluima" : {
-      "type" : "git",
-      "url" : "https://github.com/BlueBrain/bluima_resources.git",
-      "ref" : "master",
-      "mode" : "ruta"
-    },
     "neuroner" : {
       "type" : "git",
       "url" : "https://github.com/renaud/neuroNER.git",
@@ -199,6 +197,10 @@
         "properties" : {
           "ontologyId" : "HBP_MORPHOLOGY:0000019"
         }
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 23
       } ]
     }
   }, {
@@ -210,6 +212,10 @@
         "properties" : {
           "ontologyId" : "Parvalbumin"
         }
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 30
       } ]
     }
   }, {
@@ -221,6 +227,114 @@
         "properties" : {
           "ontologyId" : "parvalbumin"
         }
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 29
+      } ]
+    }
+  }, {
+    "input" : "parvalbumin neuron",
+    "expected" : {
+      "ProteinProp" : [ {
+        "begin" : 0,
+        "end" : 11,
+        "properties" : {
+          "ontologyId" : "parvalbumin"
+        }
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 18
+      } ]
+    }
+  }, {
+    "input" : "slow non-adapting spiking cell",
+    "expected" : {
+      "EphysTrigger" : [ {
+        "begin" : 5,
+        "end" : 17,
+        "properties" : {
+          "ontologyId" : "HBP_EPHYS_TRIGGER:0000009"
+        }
+      }, {
+        "begin" : 9,
+        "end" : 17,
+        "properties" : {
+          "ontologyId" : "HBP_EPHYS_TRIGGER:0000008"
+        }
+      }, {
+        "begin" : 18,
+        "end" : 25,
+        "properties" : {
+          "ontologyId" : "HBP_EPHYS_TRIGGER:0000003"
+        }
+      } ],
+      "Electrophysiology" : [ {
+        "begin" : 0,
+        "end" : 25
+      } ],
+      "EphysProp" : [ {
+        "begin" : 0,
+        "end" : 4,
+        "properties" : {
+          "ontologyId" : "HBP_EPHYS:0000100"
+        }
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 30
+      } ]
+    }
+  }, {
+    "input" : "a cell irregularly bursting bbbb",
+    "expected" : {
+      "EphysTrigger" : [ {
+        "begin" : 19,
+        "end" : 27
+      } ],
+      "Electrophysiology" : [ {
+        "begin" : 7,
+        "end" : 27
+      } ],
+      "EphysProp" : [ {
+        "begin" : 7,
+        "end" : 18
+      } ],
+      "Neuron" : [ {
+        "begin" : 2,
+        "end" : 27
+      } ]
+    }
+  }, {
+    "input" : "cells in the reticular nucleus of the thalamus",
+    "expected" : {
+      "BrainRegionProp" : [ {
+        "begin" : 13,
+        "end" : 46
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 46
+      } ]
+    }
+  }, {
+    "input" : "SAPAP1-Cre expressing cells",
+    "expected" : {
+      "ProteinProp" : [ {
+        "begin" : 0,
+        "end" : 21,
+        "properties" : {
+          "ontologyId" : "SAPAP1"
+        }
+      } ],
+      "ProteinName" : [ {
+        "begin" : 0,
+        "end" : 6
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 27
       } ]
     }
   } ]
