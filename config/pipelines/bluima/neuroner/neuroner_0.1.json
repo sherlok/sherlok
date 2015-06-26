@@ -51,7 +51,7 @@
 , "// DICTIONARY MATCHING"
 , "DECLARE NeuronProperty Function;"
 , "DECLARE NeuronProperty BrainRegionProp; // so as not to be confused w/ other BrainRegion annotations"
-, "DECLARE ProteinName;                    // is further aggregated below"
+, "DECLARE Annotation ProteinName(STRING name, STRING ontologyId); // is further aggregated below"
 , "// we use a single compiled trie to match word lists (found in resources folder)"
 , "WORDLIST generated = '$neuroner/resources/bluima/neuroner/generated.mtwl';"
 , "Document{ ->TRIE("
@@ -67,6 +67,7 @@
 , ""
 , ""
 , "// PROTEIN"
+, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/GeneNames.obo\", ProteinName, \"ontologyId\")};"
 , "// aggregate protein names (as it was matched above) with a ProteinTrigger "
 , "DECLARE ProteinTrigger;"
 , "\"(?i)(contain|secret|releas|bind|synthesiz|express|contain)ing|principal|immuno(nega|posi|reac)tive|(reac|posi)tive|immunoreactivity|"
@@ -335,6 +336,28 @@
       "Neuron" : [ {
         "begin" : 0,
         "end" : 27
+      } ]
+    }
+  }, {
+    "input" : "PV-cre cell",
+    "expected" : {
+      "ProteinProp" : [ {
+        "begin" : 0,
+        "end" : 6,
+        "properties" : {
+          "ontologyId" : "PV"
+        }
+      } ],
+      "ProteinName" : [ {
+        "begin" : 0,
+        "end" : 2,
+        "properties" : {
+          "ontologyId" : "NCBI_GENE:19293"
+        }
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 11
       } ]
     }
   } ]
