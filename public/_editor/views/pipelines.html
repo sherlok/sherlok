@@ -120,7 +120,7 @@
           </md-toolbar>
           <md-progress-linear ng-show="testing" md-mode="indeterminate"></md-progress-linear>
           <div ng-repeat="test in activePipe.tests">
-            <div layout="row" class="test_row">
+            <div layout="row" class="test_row status_{{test.status}}">
               <span render-annotations></span>
               <span flex></span>
               <span ng-click="test.visible=!test.visible"> [edit]</span>

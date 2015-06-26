@@ -179,14 +179,16 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
       $scope.testing = false; // reactivates button
     }).error(function (testResults, status) {
       toast($mdToast, 'some tests failed');
-      console.log(testResults);
+      console.log('testResults', testResults);
       var f = testResults.failed;
       $scope.activePipe.testsFailed = Object.keys(f).length;
       $scope.activePipe.testsOk = $scope.activePipe.tests.length - $scope.activePipe.testsFailed;
       for (var id in f) {
-        if (f.hasOwnProperty(id)) {
+        $scope.activePipe.tests[id].status = 'failed';
+        try {
           $scope.activePipe.tests[id].actual = f[id].system;
         }
+        catch(err) { /*nope*/};
       }
       $scope.testing = false;
     })
