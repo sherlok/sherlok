@@ -16,6 +16,13 @@
     <div treecontrol class="tree-classic" tree-model="resourcesTree" on-selection="showResource(node)">
       {{node.name}}
     </div>
+    <br/><br/><br/>
+    <md-toolbar >
+      <h2 class="md-toolbar-tools">
+        <span flex>Remote Resources</span>
+        <md-button ng-click="cleanRemoteResources()" aria-label="clean remote resource">Clean</md-button>
+      </h2>
+    </md-toolbar>
   </div>
 
   <!-- ACTIVE RESOURCE -->

@@ -349,7 +349,7 @@ app.controller('resources', function ResourceController($scope, $route, $http, $
     }).error(function (data, status) {
       alert('Could not update resource, '+ JSON.stringify(data));
       loadResources(); // refresh
-    })
+    });
   }
 
   $scope.showUploadDialog = function(ev) {
@@ -382,6 +382,18 @@ app.controller('resources', function ResourceController($scope, $route, $http, $
       },
       templateUrl: 'views/upload.html',
     });
+  };
+
+  $scope.cleanRemoteResources = function(ev) {
+    $http({
+      method: 'DELETE',
+      url: '/clean/remote_resources'
+    }).success(function (data) {
+      toast($mdToast, 'remote resources cleaned');
+    }).error(function (data, status) {
+      alert('Could not clean remote resource, '+ JSON.stringify(data));
+      loadResources(); // refresh
+    })
   };
 });
 
