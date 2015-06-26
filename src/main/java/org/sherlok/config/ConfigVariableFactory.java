@@ -15,14 +15,18 @@
  */
 package org.sherlok.config;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.util.Map;
 
 import org.sherlok.utils.ValidationException;
+import org.slf4j.Logger;
 
 /**
  * Factory for {@link ConfigVariable}.
  */
 public class ConfigVariableFactory {
+    protected static final Logger LOG = getLogger(ConfigVariableFactory.class);
 
     /**
      * Special mode for configuration variable: in order to work properly with
@@ -84,12 +88,11 @@ public class ConfigVariableFactory {
             };
         }
 
+        LOG.debug("no ConfigVariableCleaner found for type '{}'", type);
         return null;
     }
 
-    /**
-     * Create a cleaner object for all valid types
-     */
+    /** Create a cleaner object for all valid types */
     public static ConfigVariableCleaner totalCleanerFactor() {
         return new ConfigVariableCleaner() {
             @Override
@@ -106,7 +109,8 @@ public class ConfigVariableFactory {
      * Classes that implement this interface are responsible for cleaning all
      * files downloaded by one (or many) download protocol(s).
      * 
-     * See cleanerFactory for some concrete examples.
+     * See {@link ConfigVariableFactory#cleanerFactory()} for some concrete
+     * examples.
      */
     public interface ConfigVariableCleaner {
         public boolean clean();
@@ -146,14 +150,11 @@ public class ConfigVariableFactory {
         return new BasicConfigVariable(value);
     }
 
-    /**
-     * Check if the RUTA mode is activated for some config mapping.
-     */
+    /** Check if the RUTA mode is activated for some config mapping. */
     private static Boolean getRutaCompatibilityMode(Map<String, String> config) {
         String mode = config.get(FIELD_MODE);
 
         // not enable by default
         return mode != null && mode.equals(MODE_RUTA);
     }
-
 }

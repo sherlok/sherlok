@@ -62,8 +62,8 @@ public class Controller {
         }
 
         LOG.info(
-                "Done loading from local File store ({}): {} bundles, {} engines, {} pipelines",
-                new Object[] { AetherResolver.LOCAL_REPO_PATH,
+                "Done loading from local File store ('{}'): {} bundles, {} engines and {} pipelines",
+                new Object[] { FileBased.CONFIG_DIR_PATH,
                         bundleDefs.size(), engineDefs.size(),
                         pipelineDefs.size() });
         return c;

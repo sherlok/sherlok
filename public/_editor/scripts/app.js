@@ -38,7 +38,7 @@ app.directive('renderAnnotations', function($compile) {
   return {
     link: function(scope, element, attr) {
       scope.$watchGroup(['test.input', 'test.expected'], function(newTest, oldValue) {
-        if (newTest & newTest[0]) {
+        if (newTest) {
           Sherlok.annotateElement(newTest[0], newTest[1], function(html, types){
             element[0].innerHTML = html;
             $compile(element.contents())(scope);

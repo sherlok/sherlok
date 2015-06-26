@@ -79,6 +79,7 @@ public class PipelineLoader {
     private static final Logger LOG = getLogger(PipelineLoader.class);
 
     private final Controller controller;
+    /** caches resolved {@link UimaPipeline}s so can be reused for annotating */
     private Map<String, UimaPipeline> uimaPipelinesCache = map();
 
     public PipelineLoader(Controller controller) {
@@ -358,10 +359,12 @@ public class PipelineLoader {
         }
     }
 
+    /** clears (flushes) that pipeline from the cache */
     public void removeFromCache(String pipelineId) {
         uimaPipelinesCache.remove(pipelineId);
     }
 
+    /** clears (flushes) all cached pipelines */
     public void clearCache() {
         uimaPipelinesCache.clear();
     }

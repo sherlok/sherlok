@@ -67,7 +67,7 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
  */
 public class FileBased {
 
-    private static final String CONFIG_DIR_PATH = "config/";
+    /* package */static final String CONFIG_DIR_PATH = "config/";
 
     public static final String BUNDLES_PATH = CONFIG_DIR_PATH
             + SherlokServer.BUNDLES + "/";

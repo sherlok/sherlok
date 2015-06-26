@@ -127,12 +127,18 @@
               <span ng-click="activePipe.tests.splice($index, 1)"> [del]</span>
             </div>
             <div class="test-edit" ng-show="test.visible">
-              <div>Text:</div>
-              <textarea           ng-model="test.input"    rows="2"></textarea>
-              <div>Expected:</div>
-              <textarea json-text ng-model="test.expected" rows="8"></textarea>
-              <div>Actual:</div>
-              <textarea json-text ng-model="test.actual"   rows="8"></textarea>
+              <h4>Text:</h4>
+              <textarea               ng-model="test.input"    rows="2"></textarea>
+              <div layout="row">
+                <div flex="50">
+                  <h4>Expected:</h4>
+                  <textarea json-text ng-model="test.expected" rows="18"></textarea>
+                </div>
+                <div flex="50">
+                  <h4>Actual:</h4>
+                  <textarea json-text ng-model="test.actual"   rows="18"></textarea>
+                </div>
+              </div>
               <md-button ng-click="runAllTests()" aria-label="run tests">run tests</md-button>
             </div>
             <md-divider/>

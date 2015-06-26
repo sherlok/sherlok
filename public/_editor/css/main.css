@@ -80,6 +80,10 @@ md-input-group > textarea, md-input-container > textarea, textarea.max-wide {
     padding: 5px;
 }
 
+.test-edit {
+    padding: 15px;
+}
+
 .test-edit textarea {
     padding: 5px;
     width: 100%;

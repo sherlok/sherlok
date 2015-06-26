@@ -60,7 +60,7 @@ span.np_Neuron {
     border: 1px solid rgb(229, 211, 211);
     color: rgb(185, 74, 72);
 }
-.np_Electrophysiology { /*yellow*/
+.np_Electrophysiology, .np_EphysTrigger, .np_EphysProp { /*yellow*/
     background-color: #fafdb6;
     border: 1px solid #d9d598;
     color: #cda12a;

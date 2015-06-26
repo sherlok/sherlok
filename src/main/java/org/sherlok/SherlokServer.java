@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.io.Files.createTempDir;
 import static java.lang.System.currentTimeMillis;
 import static org.sherlok.mappings.Def.createId;
+import static org.sherlok.utils.AetherResolver.LOCAL_REPO_PATH;
 import static org.sherlok.utils.CheckThat.checkOnlyAlphanumDotUnderscore;
 import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
@@ -87,7 +88,7 @@ public class SherlokServer {
     public static final String RUTA_RESOURCES = "resources";
     /** Route and path for cleaning runtime resources */
     public static final String CLEAN = "clean";
-    public static final String RUNTIME_RESOURCES = "runtime_resources";
+    public static final String REMOTE_RESOURCES = "remote_resources";
 
     public static final int STATUS_OK = 200;
     public static final int STATUS_INVALID = 400;
@@ -226,27 +227,6 @@ public class SherlokServer {
                     return invalid("test failed: ", ve, resp);
                 } catch (Exception e) {
                     return error("test error: ", e, resp);
-                }
-            }
-        });
-
-        // ROUTES: RELOAD
-        // ////////////////////////////////////////////////////////////////////////////
-        get(new JsonRoute("/reload") { // FIXME merge with clean
-            @Override
-            public Object handle(Request req, Response resp) {
-                try {
-                    String clean = req.queryParams("clean");
-                    if (clean != null) {
-                        pipelineLoader.cleanLocalRepo();
-                    }
-                    controller.load();
-                    pipelineLoader.clearCache();
-                    return map("status", "reloaded");
-                } catch (ValidationException ve) {
-                    return invalid("reload", ve, resp);
-                } catch (Exception e) {
-                    return error("reload", e, resp);
                 }
             }
         });
@@ -474,9 +454,39 @@ public class SherlokServer {
             }
         });
 
-        // ROUTES: CLEANING RUNTIME RESOURCES
+        // ROUTES: CLEANING
         // ////////////////////////////////////////////////////////////////////
-        delete(new JsonRoute("/" + CLEAN + "/" + RUNTIME_RESOURCES + "/:type") {
+        delete(new JsonRoute("/" + CLEAN + "/" + PIPELINES) { // PIPELINES
+            @Override
+            public Object handle(Request req, Response resp) {
+                try {
+                    pipelineLoader.clearCache();
+                    return map("status", PIPELINES + " reloaded");
+                } catch (Exception e) {
+                    return error(CLEAN + "/" + PIPELINES, e, resp);
+                }
+            }
+        });
+        delete(new JsonRoute("/" + CLEAN + "/" + LOCAL_REPO_PATH) { // LOCAL
+                                                                    // REPOSITORY
+            @Override
+            public Object handle(Request req, Response resp) {
+                try {
+                    String clean = req.queryParams("clean");
+                    if (clean != null) {
+                        pipelineLoader.cleanLocalRepo();
+                    }
+                    controller.load();
+                    pipelineLoader.clearCache();
+                    return map("status", LOCAL_REPO_PATH + " reloaded");
+                } catch (ValidationException ve) {
+                    return invalid(CLEAN + "/" + LOCAL_REPO_PATH, ve, resp);
+                } catch (Exception e) {
+                    return error(CLEAN + "/" + LOCAL_REPO_PATH, e, resp);
+                }
+            }
+        });
+        delete(new JsonRoute("/" + CLEAN + "/" + REMOTE_RESOURCES + "/:type") {
             @Override
             public Object handle(Request req, Response resp) {
                 resp.type(JSON);
@@ -486,21 +496,21 @@ public class SherlokServer {
                 ConfigVariableCleaner cleaner = ConfigVariableFactory
                         .cleanerFactory(type);
                 if (cleaner == null) {
-                    return invalid("DELETE runtime_resources",
-                            new ValidationException("unknwon type", type), resp);
+                    return invalid(CLEAN + "/" + REMOTE_RESOURCES + "/" + type,
+                            new ValidationException("unknown type", type), resp);
                 }
 
                 if (!cleaner.clean()) {
-                    return invalid("DELETE runtime_resources",
+                    return invalid(CLEAN + "/" + REMOTE_RESOURCES + "/" + type,
                             new ValidationException("failed to clean type",
                                     type), resp);
                 }
-
+                pipelineLoader.clearCache();
                 resp.status(STATUS_OK);
                 return map("status", "cleaned");
             }
         });
-        delete(new JsonRoute("/" + CLEAN + "/" + RUNTIME_RESOURCES) {
+        delete(new JsonRoute("/" + CLEAN + "/" + REMOTE_RESOURCES) {
             @Override
             public Object handle(Request req, Response resp) {
                 resp.type(JSON);
@@ -509,12 +519,12 @@ public class SherlokServer {
                         .totalCleanerFactor();
 
                 if (!cleaner.clean()) {
-                    return invalid("DELETE runtime_resources",
+                    return invalid(CLEAN + "/" + REMOTE_RESOURCES,
                             new ValidationException(
                                     "failed to clean some runtime resources",
                                     "all type"), resp);
                 }
-
+                pipelineLoader.clearCache();
                 resp.status(STATUS_OK);
                 return map("status", "cleaned");
             }

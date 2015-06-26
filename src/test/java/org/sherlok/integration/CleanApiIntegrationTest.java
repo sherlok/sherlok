@@ -19,7 +19,7 @@ import static com.jayway.restassured.RestAssured.delete;
 import static org.junit.Assert.assertTrue;
 import static org.sherlok.SherlokServer.CLEAN;
 import static org.sherlok.SherlokServer.DEFAULT_IP;
-import static org.sherlok.SherlokServer.RUNTIME_RESOURCES;
+import static org.sherlok.SherlokServer.REMOTE_RESOURCES;
 import static org.sherlok.SherlokServer.STATUS_OK;
 
 import java.io.File;
@@ -41,7 +41,7 @@ public class CleanApiIntegrationTest {
 
     static final int TEST_PORT = 9610;
     static final String CLEAN_API_URL = "http://localhost:" + TEST_PORT + "/"
-            + CLEAN + "/" + RUNTIME_RESOURCES;
+            + CLEAN + "/" + REMOTE_RESOURCES;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
