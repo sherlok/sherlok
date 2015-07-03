@@ -4,43 +4,9 @@
   "description" : "Example that annotates using an ontology",
   "domain" : "examples",
   "script" : [
- "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_neurotransmitter_ontology.obo\", DebugScriptApply, \"element\")};"
+ "DECLARE Annotation Neurotransmitter(STRING name, STRING ontologyId);"
+, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_neurotransmitter_ontology.obo\", Neurotransmitter, \"ontologyId\")};"
  ],
-  "output" : { },
-  "tests" : [ {
-    "input" : "GABAergic neuron, glutamatergic neuron bla bla GABAergic horizontal cells woo di dopaminergic neurons.",
-    "expected" : {
-      "DebugScriptApply" : [ {
-        "begin" : 0,
-        "end" : 9,
-        "properties" : {
-          "element" : "HBP_NEUROTRANSMITTER:0000003",
-          "time" : 0
-        }
-      }, {
-        "begin" : 18,
-        "end" : 31,
-        "properties" : {
-          "element" : "HBP_NEUROTRANSMITTER:0000004",
-          "time" : 0
-        }
-      }, {
-        "begin" : 47,
-        "end" : 56,
-        "properties" : {
-          "element" : "HBP_NEUROTRANSMITTER:0000003",
-          "time" : 0
-        }
-      }, {
-        "begin" : 81,
-        "end" : 93,
-        "properties" : {
-          "element" : "HBP_NEUROTRANSMITTER:0000007",
-          "time" : 0
-        }
-      } ]
-    }
-  } ],
   "config" : {
     "neuroner" : {
       "type" : "git",
@@ -48,5 +14,36 @@
       "ref" : "master",
       "mode" : "ruta"
     }
-  }
+  },
+  "output" : { },
+  "tests" : [ {
+    "input" : "GABAergic neuron, glutamatergic neuron bla bla GABAergic horizontal cells woo di dopaminergic neurons.",
+    "expected" : {
+      "Neurotransmitter" : [ {
+        "begin" : 0,
+        "end" : 9,
+        "properties" : {
+          "ontologyId" : "HBP_NEUROTRANSMITTER:0000003"
+        }
+      }, {
+        "begin" : 18,
+        "end" : 31,
+        "properties" : {
+          "ontologyId" : "HBP_NEUROTRANSMITTER:0000004"
+        }
+      }, {
+        "begin" : 47,
+        "end" : 56,
+        "properties" : {
+          "ontologyId" : "HBP_NEUROTRANSMITTER:0000003"
+        }
+      }, {
+        "begin" : 81,
+        "end" : 93,
+        "properties" : {
+          "ontologyId" : "HBP_NEUROTRANSMITTER:0000007"
+        }
+      } ]
+    }
+  } ]
 }

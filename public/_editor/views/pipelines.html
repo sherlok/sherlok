@@ -95,8 +95,63 @@
         </div>
 
         <!-- TAB #2: EMBED -->
-        <div role="tabpanel" id="tab2-content" ng-switch-when="1">
-            TODO
+        <div role="tabpanel" id="tab2-content" ng-switch-when="1" class="embed">
+
+          <h4>Add test text:</h4>
+          <textarea class="max-wide" ng-model="annotate.text" rows="4"></textarea>
+
+          <h4>Test directly in browser</h4>
+          <a href="http://localhost:9600/annotate/{{activePipe.name}}?text={{annotate.text}}" target="_blank">localhost:9600/annotate/{{activePipe.name}}?text=...</a>
+
+          <h4>CURL</h4>
+          <pre>curl -XPOST 'localhost:9600/annotate/{{activePipe.name}}' \
+--header "Content-Type: application/json" \
+--data '
+{
+  "text": "{{annotate.text}}"
+}'</pre>
+<hr/>
+
+          <h4>Javascript</h4>
+          <p>Download <a href="https://rawgit.com/sherlok/sherlok/master/public/_editor/scripts/sherlok.js">library</a></p>
+          <p>Usage:<pre>var text = '{{annotate.text}}';
+sherlok.annotate('{{activePipe.name}}', null, text, function(data){
+  console.log(data);
+  // optional, to display text highlighted
+  Sherlok.annotateElement(text, data["_views"]["_InitialView"], function(html){
+    console.log(html);
+    document.getElementById('content').innerHTML = html;
+  });
+});</pre></p>
+          <p>Complete html:<xmp><!DOCTYPE html>
+<html>
+<head>
+    <title>Demo</title>
+    <link rel='stylesheet' type='text/css' href='https://rawgit.com/sherlok/sherlok/master/public/_editor/css/annotations.css'>
+    <script type='text/javascript' src='https://rawgit.com/sherlok/sherlok/master/public/_editor/scripts/sherlok.js'></script>
+</head>
+<body>
+    <script type="text/javascript">
+        var text = 'GABAergic neuron, glutamatergic neuron bla bla GABAergic horizontal cells woo di dopaminergic neurons.';
+        Sherlok.annotate('03.ruta.ontologies', null, text, function(data){
+          console.log(data);
+          // optional, to display text highlighted
+          Sherlok.annotateElement(text, data["_views"]["_InitialView"], function(html){
+            console.log(html);
+            document.getElementById('content').innerHTML = html;
+          });
+        });
+</script>
+</body>
+<div id="content"></div>
+</html>
+</xmp></p>
+
+          <h4>Python</h4>
+          <p>Installation: <pre>pip install --upgrade sherlok</pre></p>
+          <p>Usage:<pre>from sherlok import Sherlok
+text = '{{annotate.text}}'
+print list(Sherlok().annotate('{{activePipe.name}}', text))</pre></p>
         </div>
 
         <!-- TAB #3: EDIT -->

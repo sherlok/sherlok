@@ -554,6 +554,7 @@ public class SherlokServer {
         // annotate
         try {
             resp.type(JSON);
+            resp.header("Access-Control-Allow-Origin", "*");
 
             long start = currentTimeMillis(); // stats
             UimaPipeline pipeline = pipelineLoader.resolvePipeline(

@@ -127,6 +127,14 @@ a.no-format{
     background-color: red;
 }
 
+.embed { /* embedding panel */
+    padding: 10px;
+}
+.embed pre, .embed xmp {
+    border: 1px solid gray;
+    padding: 5px;
+}
+
 /* toast with different color */
 /*md-toast.md-default-theme {
     background-color: #00FF99;
