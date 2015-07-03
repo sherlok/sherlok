@@ -256,8 +256,10 @@ public class UimaPipeline {
             if (maybeErr.length() > 0)
                 LOG.error(maybeOut);
 
-            if (maybeErr.length() > 0)
+            if (maybeErr.length() > 0) {
+                LOG.info("Ruta script error" + maybeErr);
                 throw new ValidationException("Ruta script error", maybeErr);
+            }
             for (String line : maybeOut.split("\n")) {
                 if (line.startsWith("Error in line")) {
                     // translate error messages
@@ -351,7 +353,8 @@ public class UimaPipeline {
                     Annotation a = it.next();
                     StringBuffer sb = new StringBuffer();
                     a.prettyPrint(2, 2, sb, false);
-                    LOG.trace("''{}'' {}", a.getCoveredText(), sb.toString());
+                    LOG.trace("'{}'\t{}", a.getCoveredText(), sb.toString()
+                            .replaceAll("[\r\n] *", "\t"));
                 }
             }
 
@@ -359,7 +362,7 @@ public class UimaPipeline {
             jsonSerializer.serialize(cas, sw);
 
             String json = sw.toString();
-            // rename JSON field, for readibility
+            // rename JSON field, for readability
             json = json.replaceFirst("@cas_feature_structures", "annotations");
             return json;
 
