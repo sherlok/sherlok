@@ -251,10 +251,14 @@ public class UimaPipeline {
             String maybeErr = baosErr.toString();
             System.setErr(origErr); // restore
 
+            if (maybeErr.startsWith("Adding annotator")) {
+                maybeErr = "";// fix for StanfordNLP output FIXME
+            }
+
             if (maybeOut.length() > 0)
                 LOG.info(maybeOut);
             if (maybeErr.length() > 0)
-                LOG.error(maybeOut);
+                LOG.error(maybeErr);
 
             if (maybeErr.length() > 0) {
                 LOG.info("Ruta script error" + maybeErr);

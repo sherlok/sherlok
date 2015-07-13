@@ -1,0 +1,17 @@
+{
+  "name" : "dkpro.stanford.sentiment.en",
+  "version" : "1.7.0",
+  "description" : "Stanford sentiment analysis English",
+  "domain" : "stanford",
+  "dependencies" : [  {
+    "value" : "com.github.sherlok:dkpro.sentiment:1.7.0a"
+  } ],
+  "engines" : [ {
+      "name": "stanford.StanfordSentimentAnalyzer",
+      "description": "Wrapper for edu.stanford.nlp.pipeline.SentimentAnnotator which assigns 5 scores to each sentence",
+      "class": "de.tudarmstadt.ukp.dkpro.core.stanfordnlp.StanfordSentimentAnalyzer"
+  }],
+  "repositories" : {
+    "jitpack.io" : "https://jitpack.io/"
+  }
+}

@@ -103,9 +103,9 @@ public class SherlokServer {
             createTempDir().getAbsolutePath());
 
     // LOGO, see http://www.kammerl.de/ascii/AsciiSignature.php font 'thin'
-    private static final String LOGO = "\n,---.|              |         |    \n`---.|---.,---.,---.|    ,---.|__/ \n    ||   ||---'|    |    |   ||  \\ \n`---'`   '`---'`    `---'`---'`   `\n\n";
+    private static final String LOGO = "\n,---.|              |         |    \n`---.|---.,---.,---.|    ,---.|__/ \n    ||   ||---'|    |    |   ||  \\ \n`---'`   '`---'`    `---'`---'`   `\n";
     private static final String VERSION = "Sherlok Server        v. "
-            + getGitCommitId();
+            + getGitCommitId() + "\n";
     static { // print at server startup
         System.out.println(LOGO + VERSION);
     }
