@@ -30,6 +30,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.mappings.PipelineDef;
+import org.sherlok.mappings.SherlokError;
 import org.sherlok.utils.ValidationException;
 
 import spark.utils.IOUtils;
@@ -117,14 +118,13 @@ public class FileBasedTest {
 
     @Test
     public void testReadNonexistentFile() throws Exception {
-        String name = randomUUID().toString();
+        String name = "random_" + randomUUID().toString() + ".txt";
         try {
             FileBased.read(new File(name), PipelineDef.class);
-        } catch (ValidationException ve) {
-            assertEquals("Pipeline does not exist",//
-                    ve.getMap().get("message").toString());
-            assertEquals(name,//
-                    ve.getMap().get("error_value").toString());
+        } catch (SherlokError ve) {
+            assertEquals("Pipeline does not exist.",//
+                    ve.getMessage());
+            assertEquals(name, ve.getObject());
             return;
         }
         throw new RuntimeException("should return; above!");

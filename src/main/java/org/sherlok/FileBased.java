@@ -234,15 +234,9 @@ public class FileBased {
 
         } catch (FileNotFoundException io) {
             throw new SherlokError()
-                    .setMessage("object does not exists")
-                    .setObject(clazz.getSimpleName().replaceAll("Def$", ""))
-                    .setDetails(
-                            io.getMessage()
-                                    .replaceFirst(PIPELINES_PATH, "")
-                                    .replaceFirst(
-                                            //
-                                            "\\(No such file or directory\\)",
-                                            "").trim());
+                    .setMessage(clazz.getSimpleName().replaceAll("Def$", "") +" does not exist.")
+                    .setObject(f.getName())
+                    .setDetails(io.toString());
 
         } catch (UnrecognizedPropertyException upe) {
             throw new SherlokError()
