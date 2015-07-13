@@ -53,6 +53,7 @@ public class SherlokTestsTest {
     }
 
     @Test
+    @Ignore
     @SuppressWarnings("static-access")
     public void testAllPipelines() throws Exception {
 

@@ -18,9 +18,6 @@ package org.sherlok;
 import static org.sherlok.SherlokServer.BUNDLES;
 import static org.sherlok.SherlokServer.PIPELINES;
 import static org.sherlok.SherlokServer.RUTA_RESOURCES;
-import static org.sherlok.utils.Create.map;
-import static org.sherlok.utils.ValidationException.ERR;
-import static org.sherlok.utils.ValidationException.MSG;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +27,7 @@ import java.util.List;
 
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.utils.ValidationException;
+import org.sherlok.mappings.SherlokException;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,7 +56,7 @@ public class SlaveController extends SealedController {
      * Sherlok server
      */
     @Override
-    public SlaveController load() throws ValidationException {
+    public SlaveController load() throws SherlokException {
         final ObjectMapper MAPPER = new ObjectMapper();
 
         // GET from master
@@ -74,12 +71,18 @@ public class SlaveController extends SealedController {
                     new TypeReference<List<BundleDef>>() {
                     });
         } catch (Exception e) {
-            throw new ValidationException(map(MSG,
-                    "failed to load bundles and pipelines from master",
-                    "master_url", masterUrl, ERR, e.getMessage()));
+            throw new SherlokException(
+                    "failed to load remote bundles and pipelines from master_url, "
+                            + e.getMessage()).setObject(masterUrl).setDetails(
+                    e.getStackTrace());
         }
 
-        Controller c = _load(remoteBundleDefs, remotePipelineDefs);
+        Controller c;
+        try {
+            c = _load(remoteBundleDefs, remotePipelineDefs);
+        } catch (SherlokException e) {
+            throw e.setWhen("loading pipelines and bundles (note: remote loading ok)");
+        }
 
         LOG.debug(
                 "SLAVE: Done loading from master '{}': {} bundles, {} engines, {} pipelines. Using tmp dir '{}'",
@@ -93,15 +96,16 @@ public class SlaveController extends SealedController {
 
     /** get the resource from Master */
     @Override
-    InputStream getResource(String path) throws ValidationException {
+    InputStream getResource(String path) throws SherlokException {
+        String urlStr = masterUrl + RUTA_RESOURCES + "/" + path;
         try {
-            URL url = new URL(masterUrl + RUTA_RESOURCES + "/" + path);
+            URL url = new URL(urlStr);
             return url.openStream();
         } catch (MalformedURLException e) {
-            throw new ValidationException(e);
+            throw new SherlokException("malformed url", urlStr);
         } catch (IOException e) {
-            throw new ValidationException(map(MSG,
-                    "could not load resource from Master", ERR, path));
+            throw new SherlokException("could not load resource from Master",
+                    path);
         }
     }
 

@@ -14,7 +14,7 @@
   </appender>
 
   <!-- set to TRACE, DEBUG, INFO, etc. -->
-  <root level="DEBUG">
+  <root level="TRACE">
     <appender-ref ref="STDOUT" />
   </root>
 

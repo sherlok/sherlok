@@ -19,7 +19,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.Map;
 
-import org.sherlok.utils.ValidationException;
+import org.sherlok.mappings.SherlokException;
 import org.slf4j.Logger;
 
 /**
@@ -53,10 +53,10 @@ public class ConfigVariableFactory {
 
     /**
      * Construct a new configuration variable from a config mapping, or throw an
-     * {@link ValidationException} if some data is missing or incorrect.
+     * {@link SherlokException} if some data is missing or incorrect.
      */
     public static ConfigVariable factory(String name, Map<String, String> config)
-            throws ValidationException {
+            throws SherlokException {
 
         String type = config.get(FIELD_TYPE);
         if (type == null || type.equals(TYPE_TEXT)) {
@@ -67,7 +67,8 @@ public class ConfigVariableFactory {
             return constructHttpVariable(name, config);
         }
 
-        throw new ValidationException("unknown type variable", name);
+        throw new SherlokException().setMessage("unknown type variable '" + name
+                + "'");
     }
 
     /** Create a cleaner object for the given type */
@@ -117,11 +118,11 @@ public class ConfigVariableFactory {
     }
 
     private static ConfigVariable constructHttpVariable(String name,
-            Map<String, String> config) throws ValidationException {
+            Map<String, String> config) throws SherlokException {
         String url = config.get(FIELD_URL);
 
         if (url == null)
-            throw new ValidationException("http variable without url", name);
+            throw new SherlokException("http variable without url '" + name + "'");
 
         Boolean rutaCompatible = getRutaCompatibilityMode(config);
 
@@ -129,11 +130,11 @@ public class ConfigVariableFactory {
     }
 
     private static ConfigVariable constructGitVariable(String name,
-            Map<String, String> config) throws ValidationException {
+            Map<String, String> config) throws SherlokException {
         String url = config.get(FIELD_URL);
 
         if (url == null)
-            throw new ValidationException("git variable without url", name);
+            throw new SherlokException("git variable without url '" + name + "'");
 
         String ref = config.get(FIELD_REF); // ok if null
 
@@ -143,10 +144,10 @@ public class ConfigVariableFactory {
     }
 
     private static ConfigVariable constructBasicVariable(String name,
-            Map<String, String> config) throws ValidationException {
+            Map<String, String> config) throws SherlokException {
         String value = config.get(FIELD_VALUE);
         if (value == null)
-            throw new ValidationException("text variable with no value", name);
+            throw new SherlokException("text variable with no value '" + name + "'");
         return new BasicConfigVariable(value);
     }
 

@@ -26,8 +26,6 @@ import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
 import static org.sherlok.utils.Create.set;
-import static org.sherlok.utils.ValidationException.ERR;
-import static org.sherlok.utils.ValidationException.MSG;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
@@ -62,10 +60,10 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
+import org.sherlok.mappings.SherlokException;
 import org.sherlok.utils.AetherResolver;
 import org.sherlok.utils.MavenPom;
 import org.sherlok.utils.Strings;
-import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
 import freemarker.template.TemplateException;
@@ -104,7 +102,7 @@ public class PipelineLoader {
      * @return the {@link UimaPipeline}
      */
     public synchronized UimaPipeline resolvePipeline(String pipelineName,
-            String version) throws ValidationException {
+            String version) throws SherlokException {
 
         // 0. resolve version (fallback) if version=null
         if (version == null || version.equals("null")) {
@@ -144,7 +142,7 @@ public class PipelineLoader {
     }
 
     /** Just loads that pipeline. No caching. */
-    UimaPipeline load(PipelineDef pipelineDef) throws ValidationException {
+    UimaPipeline load(PipelineDef pipelineDef) throws SherlokException {
 
         pipelineDef.validate("could not validate pipeline wit Id '"
                 + pipelineDef.getId() + "',"); // just to make sure...
@@ -154,6 +152,9 @@ public class PipelineLoader {
         Set<BundleDef> bundleDefsToResolve = set();
         for (String pengineId : pipelineDef.getEnginesFromScript()) {
             EngineDef en = controller.getEngineDef(pengineId);
+            if (en == null) {
+                throw new SherlokException();
+            }
             validateNotNull(en, "could not find engine '" + pengineId
                     + "' as defined in pipeline '" + pipelineDef.getId() + "'");
             BundleDef b = en.getBundle();
@@ -169,11 +170,12 @@ public class PipelineLoader {
             solveDependencies(pipelineDef.getName(), pipelineDef.getVersion(),
                     bundleDefsToResolve, engineDefsUsedInP.size());
         } catch (ArtifactResolutionException e) {
-            throw new ValidationException(map(MSG, "Failed to load pipeline: "
-                    + e.getMessage(), ERR, pipelineDef.getId()));
+            throw new SherlokException(
+                    "Failed to resolve solve pipeline dependencies").setObject(
+                    pipelineDef.getId()).setDetails(e.getMessage());
         } catch (DependencyCollectionException e) {
-            throw new ValidationException("could not collect dependency: "
-                    + e.getMessage(), e);
+            throw new SherlokException("Failed to collect pipeline dependencies")
+                    .setObject(pipelineDef.getId()).setDetails(e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e); // should not happen
         }
@@ -182,9 +184,10 @@ public class PipelineLoader {
         UimaPipeline uimaPipeline;
         try {
             uimaPipeline = new UimaPipeline(pipelineDef, engineDefsUsedInP);
-        } catch (IOException | UIMAException e) {
-            throw new ValidationException(
-                    "could not initialize UIMA pipeline: " + e.getMessage(), e);
+        } catch (IOException | UIMAException e) {// other SherlokErrors catched
+            throw new SherlokException("could not initialize UIMA pipeline")
+                    .setObject(pipelineDef.toString()).setDetails(
+                            e.getStackTrace());
         }
 
         return uimaPipeline;
@@ -201,7 +204,7 @@ public class PipelineLoader {
     static void solveDependencies(String pipelineName, String version,
             Set<BundleDef> bundleDefs, int nrEngines) throws IOException,
             TemplateException, ArtifactResolutionException,
-            DependencyCollectionException, IOException, ValidationException {
+            DependencyCollectionException, IOException, SherlokException {
 
         // create fake POM that contains all bundle deps
         String fakePom = MavenPom.writePom(bundleDefs, pipelineName, version);

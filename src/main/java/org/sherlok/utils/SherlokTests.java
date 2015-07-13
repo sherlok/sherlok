@@ -15,11 +15,6 @@
  */
 package org.sherlok.utils;
 
-import static org.sherlok.utils.Create.map;
-import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
-import static org.sherlok.utils.ValidationException.EXPECTED;
-import static org.sherlok.utils.ValidationException.SYSTEM;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +23,7 @@ import java.util.Map.Entry;
 import org.json.JSONException;
 import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef.PipelineTest.Comparison;
+import org.sherlok.mappings.SherlokException;
 import org.sherlok.mappings.SherlokResult;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,7 +32,7 @@ public class SherlokTests {
 
     public static Map<String, List<JsonAnnotation>> assertEquals(
             Map<String, List<JsonAnnotation>> expecteds, String actualsString,
-            Comparison comparison) throws ValidationException, JSONException,
+            Comparison comparison) throws SherlokException, JSONException,
             JsonProcessingException {
 
         // parse
@@ -44,8 +40,8 @@ public class SherlokTests {
         try {
             actuals = SherlokResult.parse(actualsString).getAnnotations();
         } catch (IOException e) {
-            throw new ValidationException("could not parse actual annotations "
-                    + actualsString, e);
+            throw new SherlokException("could not parse actual annotations")
+                    .setObject(actualsString).setDetails(e.getStackTrace());
         }
 
         // validate
@@ -62,8 +58,8 @@ public class SherlokTests {
                 // Get the corresponding annotations and make sure they exists
                 List<JsonAnnotation> actualValues = actuals.get(expectedKey);
                 if (actualValues == null) {
-                    throw new ValidationException(map(ERR_NOTFOUND,
-                            expectedKey, EXPECTED, expecteds, SYSTEM, actuals));
+                    throw new SherlokException("could not find expected key",
+                            expectedKey);// TODO check
                 }
 
                 for (JsonAnnotation expected : expectedValues) {
@@ -81,8 +77,9 @@ public class SherlokTests {
 
                     // Make sure that such (begin, end) pair was found
                     if (actual == null) {
-                        throw new ValidationException(map(ERR_NOTFOUND,
-                                expected, EXPECTED, expecteds, SYSTEM, actuals));
+                        throw new SherlokException(
+                                "could not find expected annotation",
+                                expected.toString());// TODO
                     }
 
                     // Make sure that each expected properties exist
@@ -100,7 +97,7 @@ public class SherlokTests {
                         // expected and actual properties. Hence the "at least"
                         // test is not perfect.
                         if (!actualProperty.equals(expectedProperty.getValue())) {
-                            throw new ValidationException("actual property <"
+                            throw new SherlokException("actual property <"
                                     + actualProperty
                                     + "> is not equal to expected property <"
                                     + expectedProperty + ">");
@@ -108,27 +105,30 @@ public class SherlokTests {
                     }
                 }
             }
-            
+
             break;
 
         case exact:// FIXME implement exact comparison
             for (Entry<String, List<JsonAnnotation>> exp : expecteds.entrySet()) {
                 String eType = exp.getKey();
                 if (!actuals.containsKey(eType)) {
-                    throw new ValidationException(map(ERR_NOTFOUND, eType,
-                            EXPECTED, expecteds, SYSTEM, actuals));
+                    throw new SherlokException("could not find expected key",
+                            eType);
+
                 } else {
                     for (JsonAnnotation a : exp.getValue()) {
                         boolean found = false;
                         for (JsonAnnotation sa : actuals.get(eType)) {
                             // FIXME currently it is not recursive
                             if (sa.equals(a)) {
-                                found = true;break;
+                                found = true;
+                                break;
                             }
                         }
                         if (!found) {
-                            throw new ValidationException(map(ERR_NOTFOUND, a,
-                                    EXPECTED, expecteds, SYSTEM, actuals));
+                            throw new SherlokException(
+                                    "could not find expected annotation",
+                                    a.toString());
                         }
                     }
                 }
@@ -139,14 +139,14 @@ public class SherlokTests {
         // compare 2-ways; give explicit error msg
         for (Entry<String, List<Annotation>> exp : expecteds.entrySet()) {
             if (!systems.values().contains(exp)) {
-                throw new ValidationException(map(ERR_NOTFOUND, exp,
+                throw new SherlokException(map(ERR_NOTFOUND, exp,
                         EXPECTED, expecteds, SYSTEM, systems));
             }
         }
         for (List<Annotation> sysAs : systems.values()) {
             for (Annotation sysa : sysAs) {
                 if (!expecteds.values().contains(sysa)) {
-                    throw new ValidationException(map(ERR_UNEXPECTED, sysa,
+                    throw new SherlokException(map(ERR_UNEXPECTED, sysa,
                             EXPECTED, expecteds, SYSTEM, systems));
                 }
             }
@@ -156,5 +156,4 @@ public class SherlokTests {
         }
         return actuals;
     }
-
 }

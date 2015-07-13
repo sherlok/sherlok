@@ -30,8 +30,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.mappings.SherlokError;
-import org.sherlok.utils.ValidationException;
+import org.sherlok.mappings.SherlokException;
 
 import spark.utils.IOUtils;
 
@@ -40,7 +39,7 @@ public class FileBasedTest {
 
     static final String uploadFile = "testUploadFile.txt";
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void test01_GetInexistentFile() throws Exception {
         FileBased.getResource("test/" + uploadFile);
     }
@@ -121,7 +120,7 @@ public class FileBasedTest {
         String name = "random_" + randomUUID().toString() + ".txt";
         try {
             FileBased.read(new File(name), PipelineDef.class);
-        } catch (SherlokError ve) {
+        } catch (SherlokException ve) {
             assertEquals("Pipeline does not exist.",//
                     ve.getMessage());
             assertEquals(name, ve.getObject());
@@ -137,16 +136,15 @@ public class FileBasedTest {
 
         try {
             FileBased.read(new File(name), PipelineDef.class);
-        } catch (ValidationException ve) {
+        } catch (SherlokException ve) {
             assertTrue(ve.getMessage().startsWith("cannot read "));
             return;
         }
         throw new RuntimeException("should return; above!");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testDeleteInexistingBundle() throws Exception {
         FileBased.deleteBundle(randomUUID().toString());
     }
-
 }

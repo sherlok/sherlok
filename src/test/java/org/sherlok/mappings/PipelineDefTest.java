@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.sherlok.FileBased;
 import org.sherlok.mappings.PipelineDef.PipelineOutput;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
-import org.sherlok.utils.ValidationException;
 
 public class PipelineDefTest {
 
@@ -81,7 +80,7 @@ public class PipelineDefTest {
     }
 
     /** Should not have includes and filters at the same time */
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testFilters() throws Exception {
         PipelineDef p = new PipelineDef().setOutput(new PipelineOutput()
                 .setAnnotationFilters(list("filter")).setAnnotationIncludes(

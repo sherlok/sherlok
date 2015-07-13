@@ -20,27 +20,27 @@ import static org.sherlok.utils.CheckThat.validateDomain;
 import static org.sherlok.utils.CheckThat.validateId;
 
 import org.junit.Test;
+import org.sherlok.mappings.SherlokException;
 import org.sherlok.utils.CheckThat;
-import org.sherlok.utils.ValidationException;
 
 public class CheckThatTest {
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testNull() throws Exception {
         checkOnlyAlphanumDotUnderscore(null, "");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testEmpty() throws Exception {
         checkOnlyAlphanumDotUnderscore("", "");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testStar() throws Exception {
         checkOnlyAlphanumDotUnderscore("*_", "");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testParenthesis() throws Exception {
         checkOnlyAlphanumDotUnderscore("(asd)", "");
     }
@@ -52,34 +52,34 @@ public class CheckThatTest {
 
     // DOMAIN
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testDomainNull() throws Exception {
-        validateDomain(null, "");
+        validateDomain(null);
     }
 
     @Test
     public void testDomainEmpty() throws Exception {
-        validateDomain("", "");// this is OK!
+        validateDomain("");// this is OK!
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testDomainStar() throws Exception {
-        validateDomain("*_", "");
+        validateDomain("*_");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testDomainDotDot() throws Exception {
-        validateDomain("a..b", "");
+        validateDomain("a..b");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testDomainParenthesis() throws Exception {
-        validateDomain("(asd)", "");
+        validateDomain("(asd)");
     }
 
     @Test
     public void testDomain() throws Exception {
-        validateDomain("abAC/09.32/no__in23", "");
+        validateDomain("abAC/09.32/no__in23");
     }
 
     // ID
@@ -94,17 +94,17 @@ public class CheckThatTest {
         validateId("a_b:c_d", "");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testValidIdTwoColumns() throws Exception {
         validateId("a:_b:c_d", "");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testValidIdEmpty() throws Exception {
         validateId("ab:", "");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testValidIdMissingColumn() throws Exception {
         validateId("a_bc_d", "");
     }
@@ -125,23 +125,23 @@ public class CheckThatTest {
         CheckThat.validateJavaIdentifier("a.b.C9", "errr12");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testJavaIdentifierFailDot() throws Exception {
         CheckThat.validateJavaIdentifier(".C", "cannot start with a dot");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testJavaIdentifierFailDot2() throws Exception {
         CheckThat.validateJavaIdentifier("C.", "cannot end with a dot");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testJavaIdentifierFailDotDot() throws Exception {
         CheckThat.validateJavaIdentifier("b..C",
                 "cannot have two dots following each other");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testJavaIdentifierFailNumber() throws Exception {
         CheckThat.validateJavaIdentifier("b.9C", "cannot start with a number");
     }
@@ -155,12 +155,12 @@ public class CheckThatTest {
         CheckThat.validateTypeIdentifier("aAa.b.Cc.*", "e5");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testTypeIdentifierFail() throws Exception {
         CheckThat.validateJavaIdentifier("aAa.b.Cc.", "cannot end with dot");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testTypeIdentifierFail2() throws Exception {
         CheckThat
                 .validateJavaIdentifier("aAa.b.Cc*", "cannot end with asterix");

@@ -17,10 +17,6 @@ package org.sherlok.mappings;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 
-import java.util.Map;
-
-import org.sherlok.utils.ValidationException;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,15 +31,19 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder(value = { "when", "message", "object", "remedy", "details" })
 @JsonIgnoreProperties(value = { "stackTrace", "localizedMessage" })
 @JsonInclude(NON_DEFAULT)
-public class SherlokError extends ValidationException {
+public class SherlokException extends Exception {
     private static final long serialVersionUID = 2101833257950070947L;
 
-    public SherlokError(Map<String, ?> m) { // FIXME delete
-        super(m);
+    public SherlokException() {
     }
 
-    public SherlokError() {
-        // TODO Auto-generated constructor stub
+    public SherlokException(String message) {
+        this._message = message;
+    }
+
+    public SherlokException(String message, String object) {
+        this._message = message;
+        this.object = object;
     }
 
     /** In which circumstances did something go wrong? */
@@ -62,12 +62,14 @@ public class SherlokError extends ValidationException {
 
     /** Suggestion on how to fix the error, if available */
     private String remedy;
+    /** The REST route, if available */
+    private String route;
 
     public String getWhen() {
         return when;
     }
 
-    public SherlokError setWhen(String when) {
+    public SherlokException setWhen(String when) {
         this.when = when;
         return this;
     }
@@ -76,7 +78,7 @@ public class SherlokError extends ValidationException {
         return _message;
     }
 
-    public SherlokError setMessage(String message) {
+    public SherlokException setMessage(String message) {
         this._message = message;
         return this;
     }
@@ -85,12 +87,12 @@ public class SherlokError extends ValidationException {
         return details;
     }
 
-    public SherlokError setDetails(String details) {
+    public SherlokException setDetails(String details) {
         this.details = details;
         return this;
     }
 
-    public SherlokError setDetails(StackTraceElement[] elements) {
+    public SherlokException setDetails(StackTraceElement[] elements) {
 
         StringBuilder msg = new StringBuilder();
         for (int i = 0, n = elements.length; i < n && n < 5; i++) {
@@ -106,7 +108,7 @@ public class SherlokError extends ValidationException {
         return object;
     }
 
-    public SherlokError setObject(String object) {
+    public SherlokException setObject(String object) {
         this.object = object;
         return this;
     }
@@ -115,13 +117,23 @@ public class SherlokError extends ValidationException {
         return remedy;
     }
 
-    public SherlokError setRemedy(String remedy) {
+    public SherlokException setRemedy(String remedy) {
         this.remedy = remedy;
         return this;
+    }
+
+    public SherlokException setRoute(String route) {
+        this.route = route;
+        return this;
+    }
+
+    public String getRoute() {
+        return route;
     }
 
     /** To display errors nicely as JSON */
     public Object toJson() {
         return this;
     }
+
 }

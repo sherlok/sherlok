@@ -25,7 +25,6 @@ import java.util.Map.Entry;
 
 import org.sherlok.config.ConfigVariable;
 import org.sherlok.config.ConfigVariableFactory;
-import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -111,10 +110,10 @@ public abstract class Def {
     }
 
     @JsonIgnore
-    public void validate(String msgName) throws ValidationException {
-        checkOnlyAlphanumDotUnderscore(name, msgName + " 'name' ");
-        checkOnlyAlphanumDotUnderscore(version, msgName + " 'version' ");
-        validateDomain(domain, msgName + " 'domain' ");
+    public void validate() throws SherlokException {
+        checkOnlyAlphanumDotUnderscore(name, "name");
+        checkOnlyAlphanumDotUnderscore(version, "version");
+        validateDomain(domain);
 
         // build and validate configuration variables
         updateConfigVariableIfNeeded();
@@ -156,7 +155,7 @@ public abstract class Def {
     public Map<String, ConfigVariable> getConfigVariables() {
         try {
             return updateConfigVariableIfNeeded();
-        } catch (ValidationException e) {
+        } catch (SherlokException e) {
             LOG.warn("Configuration variables are not valid "
                     + "and were not validated before!", e);
             return null;
@@ -172,7 +171,7 @@ public abstract class Def {
      *         configuration.
      */
     private Map<String, ConfigVariable> updateConfigVariableIfNeeded()
-            throws ValidationException {
+            throws SherlokException {
         Integer last = rawConfig.hashCode();
         if (!last.equals(rawConfigCacheHash)) { // rawConfig was changed
             configVariables = buildConfigVariables(rawConfig);
@@ -187,7 +186,7 @@ public abstract class Def {
      */
     private static Map<String, ConfigVariable> buildConfigVariables(
             Map<String, Map<String, String>> rawConfig)
-            throws ValidationException {
+            throws SherlokException {
         Map<String, ConfigVariable> config = map();
 
         for (Entry<String, Map<String, String>> entry : rawConfig.entrySet()) {

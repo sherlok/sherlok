@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.sherlok.FileBased;
 import org.sherlok.mappings.BundleDef.BundleDependency;
 import org.sherlok.mappings.BundleDef.EngineDef;
-import org.sherlok.utils.ValidationException;
 
 public class BundleDefTest {
 
@@ -69,20 +68,20 @@ public class BundleDefTest {
 
     @Test
     public void testValidateBundle() throws Exception {
-        new BundleDef().setName("a").setVersion("b").validate("");
+        new BundleDef().setName("a").setVersion("b").validate();
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     // $ in domain
     public void testValidateBundle1() throws Exception {
         new BundleDef().setName("a").setVersion("b").setDomain("a$b")
-                .validate("");
+                .validate();
     }
 
     @Test
     public void testValidateBundle2() throws Exception {
         new BundleDef().setName("a").setVersion("b").setDomain("a/b")
-                .validate("");
+                .validate();
     }
 
     @Test

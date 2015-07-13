@@ -25,8 +25,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
+import org.sherlok.mappings.SherlokException;
 import org.sherlok.mappings.SherlokResult;
-import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class RutaTests {
         new UimaPipeline(pd, new ArrayList<EngineDef>());
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testValidateRutaScriptMissingColumn() throws Exception {
 
         PipelineDef pd = (PipelineDef) new PipelineDef()//
@@ -52,7 +52,7 @@ public class RutaTests {
         new UimaPipeline(pd, new ArrayList<EngineDef>());
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     @Ignore
     // FIXME testValidateRutaScriptWrongKeyword
     public void testValidateRutaScriptWrongKeyword() throws Exception {

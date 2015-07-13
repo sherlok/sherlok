@@ -22,9 +22,6 @@ import static org.sherlok.utils.CheckThat.validateDomain;
 import static org.sherlok.utils.CheckThat.validateTypeIdentifier;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
-import static org.sherlok.utils.ValidationException.ERR;
-import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
-import static org.sherlok.utils.ValidationException.MSG;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,7 +30,6 @@ import java.util.Set;
 
 import org.sherlok.Controller;
 import org.sherlok.mappings.BundleDef.EngineDef;
-import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -209,14 +205,13 @@ public class PipelineDef extends Def {
 
     // Utilities //////////////////////////////////////////////////////////////
 
-    @Override
-    public void validate(String errorMsg) throws ValidationException {
-        super.validate(errorMsg);
+    public void validate(String context) throws SherlokException {
         try {
+            super.validate();
             validateArgument(language != null, "'language' can not be null");
             validateArgument(language.length() > 0,
                     "'language' can not be empty");
-            validateDomain(domain, errorMsg);
+            validateDomain(domain);
 
             // output
             validateArgument(
@@ -244,8 +239,8 @@ public class PipelineDef extends Def {
 
             // TODO validate usage of variables in script and make sure no
             // unknown variable is used
-        } catch (Throwable e) {
-            throw new ValidationException(map(MSG, e.getMessage()));
+        } catch (SherlokException e) {
+            throw e.setObject(this.toString()).setWhen(context);
         }
     }
 
@@ -256,14 +251,11 @@ public class PipelineDef extends Def {
      * @param engineIds
      *            the engine ids of the controller
      */
-    public void validateEngines(Set<String> engineIds)
-            throws ValidationException {
+    public void validateEngines(Set<String> engineIds) throws SherlokException {
         for (String engineFromScript : getEnginesFromScript()) {
             if (!engineIds.contains(engineFromScript)) {
-                throw new ValidationException(map(ERR,
-                        "engine declared in pipeline '" + getId()
-                                + "' but not found", ERR_NOTFOUND,
-                        engineFromScript));
+                throw new SherlokException("engine declared in pipeline '"
+                        + getId() + "' but not found", engineFromScript);
             }
         }
     }

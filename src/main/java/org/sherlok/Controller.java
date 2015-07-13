@@ -31,9 +31,8 @@ import javax.servlet.http.Part;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.mappings.SherlokError;
+import org.sherlok.mappings.SherlokException;
 import org.sherlok.utils.AetherResolver;
-import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
 /**
@@ -54,11 +53,11 @@ public class Controller {
      * Loads {@link BundleDef}s and {@link PipelineDef}s from
      * {@link AetherResolver#LOCAL_REPO_PATH} folder, using {@link FileBased}.
      */
-    public Controller load() throws ValidationException {
+    public Controller load() throws SherlokException {
         Controller c;
         try {
             c = _load(FileBased.allBundleDefs(), FileBased.allPipelineDefs());
-        } catch (SherlokError e) {
+        } catch (SherlokException e) {
             throw e.setWhen("loading pipelines and bundles");
         }
 
@@ -71,7 +70,7 @@ public class Controller {
 
     /** Loads bundles and pipelines into this controller */
     protected Controller _load(Collection<BundleDef> bundles,
-            Collection<PipelineDef> pipelines) throws ValidationException {
+            Collection<PipelineDef> pipelines) throws SherlokException {
 
         // BUNDLES AND ENGINES
         bundleDefs = map(); // reinit
@@ -80,14 +79,14 @@ public class Controller {
             b.validate(b.toString());
             String key = b.getId();
             if (bundleDefs.containsKey(key)) {
-                throw new ValidationException("duplicate bundle ids", key);
+                throw new SherlokException("duplicate bundle ids", key);
             } else {
                 // validate all engines
                 for (EngineDef en : b.getEngines()) {
-                    en.validate(en.toString());
+                    en.validate();
                     en.setBundle(b); // this reference is needed later on
                     if (engineDefs.containsKey(en.getId())) {
-                        throw new ValidationException("duplicate engine ids",
+                        throw new SherlokException("duplicate engine ids",
                                 en.getId());
                     }
                 }
@@ -117,8 +116,7 @@ public class Controller {
             }
             // no duplicate pipeline ids
             if (pipelineDefs.containsKey(pd.getId())) {
-                throw new ValidationException("duplicate pipeline id",
-                        pd.getId());
+                throw new SherlokException("duplicate pipeline id", pd.getId());
             } else {
                 pipelineDefs.put(pd.getId(), pd);
             }
@@ -139,7 +137,7 @@ public class Controller {
         return pipelineDefs.values();
     }
 
-    Collection<String> listResources() throws ValidationException {
+    Collection<String> listResources() throws SherlokException {
         return FileBased.allResources();
     }
 
@@ -165,13 +163,13 @@ public class Controller {
         return pipelineDefs.get(pipelineId);
     }
 
-    InputStream getResource(String path) throws ValidationException {
+    InputStream getResource(String path) throws SherlokException {
         return FileBased.getResource(path);
     }
 
     // PUT /////////////////////////////////////////////////////////////
     /** @return the put'ed {@link BundleDef}'s id */
-    String putBundle(String bundleStr) throws ValidationException {
+    String putBundle(String bundleStr) throws SherlokException {
         BundleDef b = FileBased.putBundle(bundleStr);
         // update cached bundles and engines
         bundleDefs.put(b.getId(), b);
@@ -183,29 +181,29 @@ public class Controller {
     }
 
     /** @return the put'ed {@link PipelineDef}'s id */
-    String putPipeline(String pipelineStr) throws ValidationException {
+    String putPipeline(String pipelineStr) throws SherlokException {
         PipelineDef p = FileBased.putPipeline(pipelineStr, engineDefs.keySet());
         pipelineDefs.put(p.getId(), p);
         return p.getId();
     }
 
-    void putResource(String path, Part part) throws ValidationException {
+    void putResource(String path, Part part) throws SherlokException {
         FileBased.putResource(path, part);
     }
 
     // DELETE /////////////////////////////////////////////////////////////
-    void deleteBundleDef(String bundleId) throws ValidationException {
+    void deleteBundleDef(String bundleId) throws SherlokException {
         if (!bundleDefs.containsKey(bundleId)) {
-            throw new ValidationException("bundle not found", bundleId);
+            throw new SherlokException("bundle not found", bundleId);
         } else {
             bundleDefs.remove(bundleId);
             FileBased.deleteBundle(bundleId);
         }
     }
 
-    void deletePipelineDef(String pipelineId) throws ValidationException {
+    void deletePipelineDef(String pipelineId) throws SherlokException {
         if (!pipelineDefs.containsKey(pipelineId)) {
-            throw new ValidationException("pipeline  not found", pipelineId);
+            throw new SherlokException("pipeline  not found", pipelineId);
         } else {
             String domain = pipelineDefs.get(pipelineId).getDomain();
             pipelineDefs.remove(pipelineId);
@@ -213,7 +211,7 @@ public class Controller {
         }
     }
 
-    void deleteResource(String path) throws ValidationException {
+    void deleteResource(String path) throws SherlokException {
         FileBased.deleteResource(path);
     }
 }

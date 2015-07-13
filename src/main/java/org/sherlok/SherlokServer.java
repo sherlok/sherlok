@@ -25,11 +25,6 @@ import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateNotNull;
 import static org.sherlok.utils.Create.list;
 import static org.sherlok.utils.Create.map;
-import static org.sherlok.utils.ValidationException.ERR_NOTFOUND;
-import static org.sherlok.utils.ValidationException.EXPECTED;
-import static org.sherlok.utils.ValidationException.MSG;
-import static org.sherlok.utils.ValidationException.STATUS;
-import static org.sherlok.utils.ValidationException.SYSTEM;
 import static org.slf4j.LoggerFactory.getLogger;
 import static spark.Spark.delete;
 import static spark.Spark.externalStaticFileLocation;
@@ -55,10 +50,9 @@ import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
-import org.sherlok.mappings.SherlokError;
+import org.sherlok.mappings.SherlokException;
 import org.sherlok.utils.LogMessagesCache;
 import org.sherlok.utils.SherlokTests;
-import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
 
 import spark.Request;
@@ -97,6 +91,7 @@ public class SherlokServer {
     public static final int STATUS_INVALID = 400;
     public static final int STATUS_MISSING = 404;
     public static final int STATUS_SERVER_ERROR = 500;
+    public static final String STATUS = "status";
 
     public static final String JSON = "application/json";
 
@@ -122,7 +117,7 @@ public class SherlokServer {
 
     /** Called at server startup (main). Registers all {@link Route}s */
     public static void init(int port, String ip, String masterUrl,
-            boolean sealed) throws ValidationException {
+            boolean sealed) throws SherlokException {
 
         // CONFIG
         // ////////////////////////////////////////////////////////////////////////////
@@ -181,11 +176,11 @@ public class SherlokServer {
                                             systemStr, test.getComparison());
                             passed.put(
                                     i,
-                                    map(EXPECTED, test.getExpected(), SYSTEM,
-                                            system));
-                        } catch (ValidationException e) {
+                                    map("expected", test.getExpected(),
+                                            "system", system));
+                        } catch (SherlokException e) {
                             isPassed = false;
-                            failed.put(i, e.getMap());
+                            failed.put(i, e.setWhen(test.toString()));
                         }
                     }
                     if (isPassed) {
@@ -195,11 +190,12 @@ public class SherlokServer {
                         return map("passed", passed, "failed", failed);
                     }
 
-                } catch (ValidationException ve) {
-                    return invalid("TEST pipeline '" + req.body() + "'", ve,
-                            resp);
+                } catch (SherlokException se) {
+                    return invalid("GET /" + TEST + " pipeline '" + req.body()
+                            + "'", se, resp);
                 } catch (Exception e) {
-                    return error("TEST '" + req.body(), e, resp);
+                    return error("GET /" + TEST + " pipeline '" + req.body()
+                            + "'", e, resp);
                 }
             }
         });
@@ -228,10 +224,11 @@ public class SherlokServer {
                     }
                     return map("status", "passed");
 
-                } catch (ValidationException ve) {
-                    return invalid("test failed: ", ve, resp);
+                } catch (SherlokException se) {
+                    return invalid("GET /" + TEST + "/" + pipelineName, se,
+                            resp);
                 } catch (Exception e) {
-                    return error("test error: ", e, resp);
+                    return error("GET /" + TEST + "/" + pipelineName, e, resp);
                 }
             }
         });
@@ -261,9 +258,10 @@ public class SherlokServer {
                         resp.type(JSON);
                         return pDef;
                     } else
-                        throw new ValidationException(map(MSG, "pipeline id",
-                                ERR_NOTFOUND, id));
-                } catch (ValidationException ve) {
+                        throw new SherlokException("pipeline id not found")
+                                .setObject(id);
+                } catch (SherlokException ve) {
+
                     return invalid("GET pipeline '" + name + "'", ve, resp);
                 } catch (Exception e) {
                     return error("GET pipeline '" + name + "'", e, resp);
@@ -279,7 +277,7 @@ public class SherlokServer {
                     resp.status(STATUS_OK);
                     resp.type(JSON);
                     return map(STATUS, "created", "pipeline_id", newId);
-                } catch (ValidationException ve) {
+                } catch (SherlokException ve) {
                     return invalid("POST pipeline '" + req.body() + "'", ve,
                             resp);
                 } catch (Exception e) {
@@ -299,7 +297,7 @@ public class SherlokServer {
                     resp.status(STATUS_OK);
                     resp.type(JSON);
                     return map(STATUS, "deleted", "pipeline_id", id);
-                } catch (ValidationException ve) {
+                } catch (SherlokException ve) {
                     return invalid("DELETE pipeline '" + name + "'", ve, resp);
                 } catch (Exception e) {
                     return error("DELETE '" + name, e, resp);
@@ -332,10 +330,10 @@ public class SherlokServer {
                         resp.type(JSON);
                         return b;
                     } else {
-                        throw new ValidationException(map(MSG, "bundle id",
-                                ERR_NOTFOUND, id));
+                        throw new SherlokException("bundle id not found")
+                                .setObject(id);
                     }
-                } catch (ValidationException ve) {
+                } catch (SherlokException ve) {
                     return invalid("GET bundle '" + name + "'", ve, resp);
                 } catch (Exception e) {
                     return error("GET bundle '" + name + "'", e, resp);
@@ -350,7 +348,7 @@ public class SherlokServer {
                     resp.status(STATUS_OK);
                     resp.type(JSON);
                     return map(STATUS, "created", "bundle_id", newId);
-                } catch (ValidationException ve) {
+                } catch (SherlokException ve) {
                     return invalid("POST bundle '" + req.body() + "'", ve, resp);
                 } catch (Exception e) {
                     return error("POST '" + req.body(), e, resp);
@@ -368,7 +366,7 @@ public class SherlokServer {
                     resp.status(STATUS_OK);
                     resp.type(JSON);
                     return map(STATUS, "deleted", "bundle_id", id);
-                } catch (ValidationException ve) {
+                } catch (SherlokException ve) {
                     return invalid("DELETE bundle '" + name + "'", ve, resp);
                 } catch (Exception e) {
                     return error("DELETE bundle '" + name, e, resp);
@@ -402,7 +400,7 @@ public class SherlokServer {
                     resp.header("Content-Disposition",
                             "attachment; filename=\"" + fileName + "\"");
                     return "";
-                } catch (ValidationException ve) {
+                } catch (SherlokException ve) {
                     resp.status(STATUS_MISSING);
                     resp.type(JSON);
                     return ve.toJson();
@@ -425,15 +423,13 @@ public class SherlokServer {
                     try {
                         part = req.raw().getPart("file");
                     } catch (Exception e) {
-                        return invalid(
-                                "POST resource: Invalid part 'file'",
-                                new ValidationException(map("error",
-                                        e.getMessage())), resp);
+                        return invalid("POST resource: Invalid part 'file'",
+                                new SherlokException(e.getMessage()), resp);
                     }
                     controller.putResource(path, part);
                     resp.status(STATUS_OK);
                     return map(STATUS, "created", "resource_path", path);
-                } catch (ValidationException ve) {
+                } catch (SherlokException ve) {
                     return invalid("POST resource '" + req.body() + "'", ve,
                             resp);
                 } catch (Exception e) {
@@ -450,7 +446,7 @@ public class SherlokServer {
                     resp.status(STATUS_OK);
                     resp.type(JSON);
                     return map(STATUS, "deleted", "resource_path", path);
-                } catch (ValidationException ve) {
+                } catch (SherlokException ve) {
                     return invalid("DELETE resource '" + req.body() + "'", ve,
                             resp);
                 } catch (Exception e) {
@@ -484,7 +480,7 @@ public class SherlokServer {
                     controller.load();
                     pipelineLoader.clearCache();
                     return map("status", LOCAL_REPO_PATH + " reloaded");
-                } catch (ValidationException ve) {
+                } catch (SherlokException ve) {
                     return invalid(CLEAN + "/" + LOCAL_REPO_PATH, ve, resp);
                 } catch (Exception e) {
                     return error(CLEAN + "/" + LOCAL_REPO_PATH, e, resp);
@@ -502,13 +498,14 @@ public class SherlokServer {
                         .cleanerFactory(type);
                 if (cleaner == null) {
                     return invalid(CLEAN + "/" + REMOTE_RESOURCES + "/" + type,
-                            new ValidationException("unknown type", type), resp);
+                            new SherlokException("unknown type")
+                                    .setObject(type), resp);
                 }
 
                 if (!cleaner.clean()) {
                     return invalid(CLEAN + "/" + REMOTE_RESOURCES + "/" + type,
-                            new ValidationException("failed to clean type",
-                                    type), resp);
+                            new SherlokException("failed to clean type")
+                                    .setObject(type), resp);
                 }
                 pipelineLoader.clearCache();
                 resp.status(STATUS_OK);
@@ -525,9 +522,9 @@ public class SherlokServer {
 
                 if (!cleaner.clean()) {
                     return invalid(CLEAN + "/" + REMOTE_RESOURCES,
-                            new ValidationException(
-                                    "failed to clean some runtime resources",
-                                    "all type"), resp);
+                            new SherlokException(
+                                    "failed to clean some runtime resources"),
+                            resp);
                 }
                 pipelineLoader.clearCache();
                 resp.status(STATUS_OK);
@@ -555,10 +552,10 @@ public class SherlokServer {
         try {
             checkOnlyAlphanumDotUnderscore(pipelineName,
                     "'pipeline' req parameter");
-            validateNotNull(text, "'text' req parameter should not be null");
+            validateNotNull(text, "'text' request parameter");
             validateArgument(text.length() > 0,
                     "'text' req parameter should not be empty");
-        } catch (ValidationException ve) {
+        } catch (SherlokException ve) {
             Object inv = invalid("annotate text  '" + text + "'", ve, resp);
             try {
                 return FileBased.writeAsString(inv);
@@ -590,7 +587,7 @@ public class SherlokServer {
 
             return sb.toString();
 
-        } catch (ValidationException ve) {
+        } catch (SherlokException ve) {
             Object inv = invalid("annotate text  '" + text + "'", ve, resp);
             try {
                 return FileBased.writeAsString(inv);
@@ -629,7 +626,7 @@ public class SherlokServer {
 
     /** Ensures that no file or directory in pluginFolder can collide with API */
     private static void validatePluginsNames(String pluginFolder)
-            throws ValidationException {
+            throws SherlokException {
 
         File external = new File(pluginFolder);
         validateArgument(external.exists(),
@@ -658,19 +655,20 @@ public class SherlokServer {
 
     /** validates name and version @return id */
     private static String check(String name, String version)
-            throws ValidationException {
+            throws SherlokException {
         checkOnlyAlphanumDotUnderscore(name, "'name'");
         checkOnlyAlphanumDotUnderscore(version, "'version'");
         return createId(name, version);
     }
 
     /** Set {@link Response} as invalid. */
-    private static Object invalid(String errorMsg, ValidationException ve,
+    private static Object invalid(String route, SherlokException se,
             Response resp) {
-        LOG.info("could not " + errorMsg + " " + ve.getMessage(), ve);
+        se.setRoute(route);
+        LOG.info("could not process '" + route + "', " + se.getMessage(), se);
         resp.status(STATUS_INVALID);
         resp.type(JSON);
-        return ve.toJson();
+        return se.toJson();
     }
 
     /** Set {@link Response} as erroneous. */
@@ -756,7 +754,7 @@ public class SherlokServer {
         try {
             init(argParser.port, argParser.address, argParser.masterUrl,
                     argParser.sealed);
-        } catch (SherlokError e) {
+        } catch (SherlokException e) {
             System.err.println("fatal error: " + e.toString());
         }
     }

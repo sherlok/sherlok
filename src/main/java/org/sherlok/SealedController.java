@@ -15,11 +15,9 @@
  */
 package org.sherlok;
 
-import static org.sherlok.utils.Create.map;
-
 import javax.servlet.http.Part;
 
-import org.sherlok.utils.ValidationException;
+import org.sherlok.mappings.SherlokException;
 
 /**
  * Blocks PUT and DELETE methods from {@link Controller}.
@@ -36,28 +34,28 @@ public class SealedController extends Controller {
     }
 
     // PUT /////////////////////////////////////////////////////////////
-    String putBundle(String bundleStr) throws ValidationException {
-        throw new ValidationException(map(getErrorMsg(), "PUT Bundle"));
+    String putBundle(String bundleStr) throws SherlokException {
+        throw new SherlokException(getErrorMsg(), "PUT Bundle");
     }
 
-    String putPipeline(String pipelineStr) throws ValidationException {
-        throw new ValidationException(map(getErrorMsg(), "PUT Pipeline"));
+    String putPipeline(String pipelineStr) throws SherlokException {
+        throw new SherlokException(getErrorMsg(), "PUT Pipeline");
     }
 
-    void putResource(String path, Part part) throws ValidationException {
-        throw new ValidationException(map(getErrorMsg(), "PUT Resource"));
+    void putResource(String path, Part part) throws SherlokException {
+        throw new SherlokException(getErrorMsg(), "PUT Resource");
     }
 
     // DELETE /////////////////////////////////////////////////////////////
-    void deleteBundleDef(String bundleId) throws ValidationException {
-        throw new ValidationException(map(getErrorMsg(), "DELETE BundleDef"));
+    void deleteBundleDef(String bundleId) throws SherlokException {
+        throw new SherlokException(getErrorMsg(), "DELETE BundleDef");
     }
 
-    void deletePipelineDef(String pipelineId) throws ValidationException {
-        throw new ValidationException(map(getErrorMsg(), "DELETE PipelineDef"));
+    void deletePipelineDef(String pipelineId) throws SherlokException {
+        throw new SherlokException(getErrorMsg(), "DELETE PipelineDef");
     }
 
-    void deleteResource(String path) throws ValidationException {
-        throw new ValidationException(map(getErrorMsg(), "DELETE Resource"));
+    void deleteResource(String path) throws SherlokException {
+        throw new SherlokException(getErrorMsg(), "DELETE Resource");
     }
 }

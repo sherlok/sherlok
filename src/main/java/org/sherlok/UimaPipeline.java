@@ -69,7 +69,7 @@ import org.sherlok.config.NoSuchVariableException;
 import org.sherlok.config.ProcessConfigVariableException;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.utils.ValidationException;
+import org.sherlok.mappings.SherlokException;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
@@ -117,7 +117,7 @@ public class UimaPipeline {
      * @param annotationFilters
      */
     public UimaPipeline(PipelineDef pipelineDef, List<EngineDef> engineDefs)
-            throws IOException, ValidationException, UIMAException {
+            throws IOException, SherlokException, UIMAException {
         this.pipelineDef = pipelineDef;
         this.language = pipelineDef.getLanguage();
 
@@ -230,7 +230,7 @@ public class UimaPipeline {
         CHAR_MAPPING.put("RCURLY", "}");
     }
 
-    private void initEngines() throws UIMAException, ValidationException {
+    private void initEngines() throws UIMAException, SherlokException {
         // redirect stdout to catch Ruta script errors
         ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
         ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
@@ -262,7 +262,8 @@ public class UimaPipeline {
 
             if (maybeErr.length() > 0) {
                 LOG.info("Ruta script error" + maybeErr);
-                throw new ValidationException("Ruta script error", maybeErr);
+                throw new SherlokException("Ruta script error: " + maybeErr)
+                        .setObject(this.pipelineDef.toString());
             }
             for (String line : maybeOut.split("\n")) {
                 if (line.startsWith("Error in line")) {
@@ -271,8 +272,8 @@ public class UimaPipeline {
                         line = line.replaceAll(e.getKey(), "'" + e.getValue()
                                 + "'");
                     }
-                    throw new ValidationException("Ruta script error on line",
-                            line);
+                    throw new SherlokException("Ruta script error on line "
+                            + line).setObject(this.pipelineDef.toString());
                 }
             }
         }
@@ -317,7 +318,7 @@ public class UimaPipeline {
      * @return a payload, defined by 'annotate'
      */
     public Object annotate(Annotate annotate) throws UIMAException,
-            SAXException, ValidationException {
+            SAXException, SherlokException {
 
         CAS cas = null;
         try {
@@ -333,8 +334,7 @@ public class UimaPipeline {
      * @param text
      *            the text to annotate
      */
-    public String annotate(String text) throws UIMAException,
-            ValidationException {
+    public String annotate(String text) throws UIMAException, SherlokException {
 
         CAS cas = null;
         try {
@@ -373,13 +373,14 @@ public class UimaPipeline {
         } catch (AnalysisEngineProcessException aepe) {
             Throwable cause = aepe.getCause();
             if (cause instanceof IllegalArgumentException) {
-                throw new ValidationException("Failed to annotate " + text,
-                        cause.getMessage());
+                throw new SherlokException("Failed to annotate " + text,
+                        this.toString()).setDetails(cause.getMessage());
             } else {
                 throw aepe;
             }
-        } catch (IOException se) {
-            throw new ValidationException(se);
+        } catch (IOException io) {
+            throw new SherlokException("Failed to annotate " + text,
+                    this.toString()).setDetails(io.getMessage());
         } finally {
             casPool.releaseCas(cas);
         }
@@ -402,15 +403,15 @@ public class UimaPipeline {
 
     private void initScript(List<String> scriptLines, List<EngineDef> engineDefs)
             throws ResourceInitializationException, IOException,
-            ValidationException {
+            SherlokException {
 
         // Handle variables in script
         try {
             scriptLines = ConfigVariableManager.processConfigVariables(
                     scriptLines, pipelineDef);
         } catch (NoSuchVariableException | ProcessConfigVariableException e) {
-            throw new ValidationException("could not initialize pipeline '"
-                    + pipelineDef + "'", e);
+            throw new SherlokException(e.getMessage()).setObject(pipelineDef
+                    .toString());
         }
 
         // load engines
@@ -496,7 +497,7 @@ public class UimaPipeline {
 
     /** Extract the engine ID from a "ENGINE $id;" script line */
     private static String extractEngineId(String scriptLine)
-            throws ValidationException {
+            throws SherlokException {
         String pengineId = scriptLine.trim().substring("ENGINE".length())
                 .trim().replaceAll(";", "");
         validateId(pengineId, "ENGINE id in '" + pengineId + "'");

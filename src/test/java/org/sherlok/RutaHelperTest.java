@@ -25,7 +25,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
-import org.sherlok.utils.ValidationException;
+import org.sherlok.mappings.SherlokException;
 
 public class RutaHelperTest {
 
@@ -121,12 +121,12 @@ public class RutaHelperTest {
         assertEquals("Blah", tf2.rangeTypeName);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testFeatures3() throws Exception {
         parseDeclaredTypes("DECLARE Aa (INT);");
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = SherlokException.class)
     public void testFeatures4() throws Exception {
         parseDeclaredTypes("DECLARE Aa (INT asf cc, Blah dd);");
     }

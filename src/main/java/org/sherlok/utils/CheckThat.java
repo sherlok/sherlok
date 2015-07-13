@@ -17,12 +17,10 @@ package org.sherlok.utils;
 
 import static java.util.regex.Pattern.compile;
 import static org.sherlok.mappings.Def.SEPARATOR;
-import static org.sherlok.utils.Create.map;
-import static org.sherlok.utils.ValidationException.MSG;
 
 import java.util.regex.Pattern;
 
-import org.sherlok.mappings.SherlokError;
+import org.sherlok.mappings.SherlokException;
 
 public class CheckThat {
 
@@ -33,19 +31,19 @@ public class CheckThat {
     /**
      * @param test
      *            the string to validate
-     * @param context
-     *            text is prepended to exception
-     * @throws ValidationException
+     * @param variableName
+     *            name is prepended to exception
+     * @throws SherlokException
      *             if <code>test</code> is empty/null, or contains something
      *             else than letters, numbers or dots.
      */
     public static void checkOnlyAlphanumDotUnderscore(String test,
-            String context) throws ValidationException {
+            String variableName) throws SherlokException {
         if (test == null || test.length() == 0) {
-            throw new ValidationException(context + ": cannot be empty or null");
+            throw new SherlokException(variableName + " cannot be empty or null");
         }
         if (ALPHANUM_DOT_UNDERSCORE.matcher(test).find()) {
-            throw new ValidationException(context + ": '" + test
+            throw new SherlokException(variableName + " '" + test
                     + "' contains something else than"
                     + " letters, numbers or dots");
         }
@@ -56,74 +54,72 @@ public class CheckThat {
      *            the domain to validate
      * @param context
      *            text is prepended to exception
-     * @throws ValidationException
+     * @throws SherlokException
      *             if <code>test</code> is null (empty is ok), or contains '..'
      *             or something else than letters, numbers, dots or forward
      *             slashes.
      */
-    public static void validateDomain(String domain, String context)
-            throws ValidationException {
+    public static void validateDomain(String domain) throws SherlokException {
         if (domain == null) {
-            throw new ValidationException(context + ": cannot be null");
+            throw new SherlokException("domain cannot be null");
         }
 
-        validatePath(domain, context);
+        validatePath(domain);
 
         if (ALPHANUM_DOT_UNDERSCORE_SLASH.matcher(domain).find()) {
-            throw new ValidationException(context + ": '" + domain
+            throw new SherlokException("domain '" + domain
                     + "' contains something else than"
                     + " letters, numbers or dots");
         }
     }
 
     /** Forbids to access the whole computer through... */
-    public static void validatePath(String path, String context)
-            throws ValidationException {
+    public static void validatePath(String path) throws SherlokException {
         if (path.indexOf("..") != -1) {
-            throw new ValidationException(context
-                    + " can not contain double dots: '" + path + "'");
+            throw new SherlokException("path '" + path
+                    + "' can not contain double dots.");
         }
     }
 
     /**
      * @param id
      *            the id to validate
-     * @param context
-     *            text is prepended to exception
-     * @throws ValidationException
+     * @param variableName
+     *            name is prepended to exception
+     * @throws SherlokException
      *             if <code>id</code> contains a single column, or if name or
      *             value is not valid.
      */
-    public static void validateId(String id, String context)
-            throws ValidationException {
+    public static void validateId(String id, String variableName)
+            throws SherlokException {
         if (id.indexOf(SEPARATOR) == -1) {
-            throw new ValidationException(context + ": '" + id
+            throw new SherlokException(variableName + " '" + id
                     + "' should have the format"//
                     + " {name}:{version}, but no column was found.");
 
         } else if (id.split(SEPARATOR).length != 2) {
-            throw new ValidationException(context + ": '" + id
+            throw new SherlokException(variableName + " '" + id
                     + "' should have the format"//
                     + " {name}:{version}, but more than one column was found.");
         } else {
             String[] splits = id.split(SEPARATOR);
-            checkOnlyAlphanumDotUnderscore(splits[0], context);
-            checkOnlyAlphanumDotUnderscore(splits[1], context);
+            checkOnlyAlphanumDotUnderscore(splits[0], variableName);
+            checkOnlyAlphanumDotUnderscore(splits[1], variableName);
         }
     }
 
-    public static <T> T validateNotNull(T reference, String errorMessage)
-            throws ValidationException {
+    public static <T> T validateNotNull(T reference, String variableName)
+            throws SherlokException {
         if (reference == null) {
-            throw new ValidationException(map(MSG, errorMessage));
+            throw new SherlokException(variableName + " should not be null");
         }
         return reference;
     }
 
     public static void validateArgument(boolean expression, String errorMessage)
-            throws ValidationException {
+            throws SherlokException {
         if (!expression) {
-            throw new ValidationException(errorMessage);
+            throw new SherlokException(errorMessage);
         }
     }
 
@@ -131,10 +127,10 @@ public class CheckThat {
     private static final Pattern VALID_JAVA_IDENTIFIER = compile(JAVA_IDENTIFIER);
 
     public static void validateJavaIdentifier(String identifier,
-            String errorMessage) throws ValidationException {
+            String errorMessage) throws SherlokException {
 
         if (!VALID_JAVA_IDENTIFIER.matcher(identifier).matches()) {
-            throw new ValidationException(errorMessage);
+            throw new SherlokException(errorMessage);
         }
     }
 
@@ -142,17 +138,18 @@ public class CheckThat {
             + "(\\.\\*)?");
 
     public static void validateTypeIdentifier(String identifier,
-            String errorMessage) throws ValidationException {
+            String errorMessage) throws SherlokException {
 
         if (!VALID_TYPE_IDENTIFIER.matcher(identifier).matches()) {
-            throw new ValidationException(errorMessage);
+            throw new SherlokException(errorMessage);
         }
     }
 
     public static void validateArgument(boolean expression, String message,
-            String object, String remedy) throws SherlokError {
-        if (!expression){
-            throw new SherlokError().setMessage(message).setObject(object).setRemedy(remedy);
+            String object, String remedy) throws SherlokException {
+        if (!expression) {
+            throw new SherlokException().setMessage(message).setObject(object)
+                    .setRemedy(remedy);
         }
     }
 }

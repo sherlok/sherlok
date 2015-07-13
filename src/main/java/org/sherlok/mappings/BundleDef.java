@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.sherlok.Controller;
-import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -54,7 +53,7 @@ public class BundleDef extends Def {
     private Map<String, String> repositories = map();
 
     private List<EngineDef> engines = list();
-    
+
     /** A Maven dependency to some external UIMA code. */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class BundleDependency {
@@ -137,29 +136,26 @@ public class BundleDef extends Def {
         private static final Pattern VALIDATE_ID = compile("[A-Za-z0-9_\\-.]+");
 
         @JsonIgnore
-        public void validate() throws ValidationException {
+        public void validate() throws SherlokException {
 
             validateArgument(isLetterOrDigit(value.charAt(0)),
-                    "'value' should start with a letter or a digit, but was '"
-                            + value + "'");
+                    "Dependency value should start with a letter or a digit, but was '"
+                            + value + "'", "", "");
             validateArgument(value.split(SEPARATOR).length == 3,
-                    "'value' should contain exactly 3 columns (':'), but was '"
-                            + value + "'");
-            validateArgument(
-                    VALIDATE_ID.matcher(getGroupId()).matches(),
-                    "invalid group id '" + getGroupId() + "' for bundle "
-                            + this + ", allowed characters are "
-                            + VALIDATE_ID.toString());
-            validateArgument(
-                    VALIDATE_ID.matcher(getArtifactId()).matches(),
-                    "invalid artifact id '" + getArtifactId() + "' for bundle "
-                            + this + ", allowed characters are "
-                            + VALIDATE_ID.toString());
-            validateArgument(
-                    VALIDATE_ID.matcher(getVersion()).matches(),
-                    "invalid version id '" + getVersion() + "' for bundle "
-                            + this + ", allowed characters are "
-                            + VALIDATE_ID.toString());
+                    "Dependency value should contain exactly 3 columns (':'), but was '"
+                            + value + "'", "", "");
+            validateArgument(VALIDATE_ID.matcher(getGroupId()).matches(),
+                    "Dependency '" + value + "'has an invalid group id '"
+                            + getGroupId() + "', allowed characters are "
+                            + VALIDATE_ID.toString(), "", "");
+            validateArgument(VALIDATE_ID.matcher(getArtifactId()).matches(),
+                    "Dependency '" + value + "'has an invalid artifact id '"
+                            + getArtifactId() + "', allowed characters are "
+                            + VALIDATE_ID.toString(), "", "");
+            validateArgument(VALIDATE_ID.matcher(getVersion()).matches(),
+                    "Dependency '" + value + "' has an invalid version id '"
+                            + getVersion() + "', allowed characters are "
+                            + VALIDATE_ID.toString(), "", "");
         }
     }
 
@@ -181,7 +177,7 @@ public class BundleDef extends Def {
         private String classz;
 
         /** UIMA parameters. To overwrite default parameters */
-        // TODO serialize without [ ], by creating custom 
+        // TODO serialize without [ ], by creating custom
         // serializer, see Def.LineSerializer
         private Map<String, List<String>> parameters = map();
 
@@ -247,8 +243,9 @@ public class BundleDef extends Def {
             return this.parameters.get(key);
         }
 
-        public boolean validate(String msgName) throws ValidationException {
-            checkOnlyAlphanumDotUnderscore(name, msgName);
+        public boolean validate() throws SherlokException {
+            checkOnlyAlphanumDotUnderscore(name,
+                    "EngineDef '" + this.toString() + "'' id");
             return true;
         }
 
@@ -322,22 +319,20 @@ public class BundleDef extends Def {
         return this;
     }
 
-    @Override
-    public void validate(String bundleObject) throws ValidationException {
-        super.validate(bundleObject);
+    public void validate(String context) throws SherlokException {
         try {
+            super.validate();
             for (BundleDependency bd : getDependencies()) {
                 bd.validate();
             }
             for (EngineDef e : getEngines()) {
-                e.validate(bundleObject);
+                e.validate();
             }
 
             // TODO validate usage of variables in engines and make sure no
             // unknown variable are used
-        } catch (Throwable e) {
-            throw new ValidationException("invalid bundle '" + bundleObject
-                    + "'", e.getMessage());
+        } catch (SherlokException e) {
+            throw e.setObject(this.toString()).setWhen(context);
         }
     }
 }

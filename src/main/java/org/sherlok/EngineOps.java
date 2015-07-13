@@ -35,9 +35,8 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.sherlok.config.NoSuchVariableException;
 import org.sherlok.config.ProcessConfigVariableException;
 import org.sherlok.mappings.BundleDef.EngineDef;
-import org.sherlok.mappings.SherlokError;
+import org.sherlok.mappings.SherlokException;
 import org.sherlok.utils.ConfigurationFieldParser;
-import org.sherlok.utils.ValidationException;
 import org.sherlok.utils.ops.MapOps;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
@@ -60,7 +59,7 @@ public class EngineOps {
      * Generate XML descriptor and return engine's descriptor
      */
     static String generateXmlDescriptor(String engineId,
-            List<EngineDef> engineDefs) throws ValidationException,
+            List<EngineDef> engineDefs) throws SherlokException,
             ResourceInitializationException {
 
         EngineDef engineDef = findEngineDefById(engineId, engineDefs);
@@ -97,7 +96,7 @@ public class EngineOps {
      * type.
      */
     private static Map<String, Object> extractParameters(EngineDef engineDef)
-            throws ValidationException {
+            throws SherlokException {
         try {
             // build a [param name -> annotated field] mapping
             Map<String, Field> annotatedFields = extractParametersFields(engineDef);
@@ -113,10 +112,11 @@ public class EngineOps {
 
                 Field field = annotatedFields.get(parameterName);
                 if (field == null) {
-                    throw new ValidationException(
-                            "Expected annotated field in annotator "
+                    throw new SherlokException(
+                            "Expected annotated field in annotator '"
                                     + engineDef.getClassz()
-                                    + " for parameter name", parameterName);
+                                    + "' for parameter name '" + parameterName
+                                    + "'");
                 }
 
                 Object configuredValue = ConfigurationFieldParser
@@ -127,14 +127,15 @@ public class EngineOps {
 
             return convertedParameters;
         } catch (NoSuchVariableException | ProcessConfigVariableException e) {
-            throw new ValidationException(e);
+            throw new SherlokException(e.getMessage()).setObject(engineDef
+                    .toString());
         }
     }
 
     /** Create a map from configuration parameter name to the matching field */
     @SuppressWarnings("unchecked")
     private static Map<String, Field> extractParametersFields(
-            EngineDef engineDef) throws ValidationException {
+            EngineDef engineDef) throws SherlokException {
         Class<? extends AnalysisComponent> klass = extractAnalysisComponentClass(engineDef);
         Map<String, Field> params = map();
 
@@ -172,12 +173,12 @@ public class EngineOps {
 
     @SuppressWarnings("unchecked")
     private static Class<? extends AnalysisComponent> extractAnalysisComponentClass(
-            EngineDef engineDef) throws ValidationException {
+            EngineDef engineDef) throws SherlokException {
         try {
             return (Class<? extends AnalysisComponent>) Class.forName(engineDef
                     .getClassz());
         } catch (ClassNotFoundException e) {
-            throw new SherlokError().setMessage(
+            throw new SherlokException().setMessage(
                     "could not find AnalysisComponent class").setObject(
                     engineDef.getClassz());
         }
@@ -186,18 +187,17 @@ public class EngineOps {
     /**
      * Find an engine definition in a given list based on its id.
      * 
-     * @throws ValidationException
+     * @throws SherlokException
      *             when no such engine exists in the list
      */
     private static EngineDef findEngineDefById(String pengineId,
-            List<EngineDef> engineDefs) throws ValidationException {
+            List<EngineDef> engineDefs) throws SherlokException {
         for (EngineDef engineDef : engineDefs) {
             if (engineDef.getId().equals(pengineId)) {
                 return engineDef;
             }
         }
-
-        throw new ValidationException("pipeline engine not found", pengineId);
+        throw new SherlokException("pipeline engine not found")
+                .setObject(pengineId);
     }
-
 }

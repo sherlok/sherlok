@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.uima.cas.CAS;
-import org.sherlok.utils.ValidationException;
+import org.sherlok.mappings.SherlokException;
 
 /**
  * Helper to parse Ruta script type declarations.
@@ -57,7 +57,7 @@ public class RutaHelper {
      * @return a set of annotation types
      */
     public static Set<TypeDTO> parseDeclaredTypes(String rutaScript)
-            throws ValidationException {
+            throws SherlokException {
         // LHS since insertion order is important & avoids duplicate TypeDTOs
         LinkedHashSet<TypeDTO> types = new LinkedHashSet<TypeDTO>();
 

@@ -24,9 +24,6 @@ import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateId;
 import static org.sherlok.utils.CheckThat.validatePath;
 import static org.sherlok.utils.Create.list;
-import static org.sherlok.utils.Create.map;
-import static org.sherlok.utils.ValidationException.ERR;
-import static org.sherlok.utils.ValidationException.MSG;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,8 +43,7 @@ import org.apache.commons.io.FileUtils;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.Def;
 import org.sherlok.mappings.PipelineDef;
-import org.sherlok.mappings.SherlokError;
-import org.sherlok.utils.ValidationException;
+import org.sherlok.mappings.SherlokException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -112,14 +108,13 @@ public class FileBased {
      *            a {@link BundleDef} as a String
      * @return the {@link BundleDef}, for convenience
      */
-    public static BundleDef putBundle(String bundleStr)
-            throws ValidationException {
+    public static BundleDef putBundle(String bundleStr) throws SherlokException {
         try {
             BundleDef b = MAPPER.readValue(bundleStr, BundleDef.class);
             writeBundle(b);
             return b;
         } catch (Exception e) {
-            throw new ValidationException(e);// TODO validate better
+            throw new SherlokException(e.getMessage());// FIXME validate better
         }
     }
 
@@ -134,14 +129,14 @@ public class FileBased {
      * @return the {@link PipelineDef}, for convenience
      */
     public static PipelineDef putPipeline(String pipelineStr,
-            Set<String> engineIds) throws ValidationException {
+            Set<String> engineIds) throws SherlokException {
         try {
             PipelineDef p = parsePipeline(pipelineStr);
             p.validateEngines(engineIds);
             writePipeline(p);
             return p;
         } catch (Exception e) {
-            throw new ValidationException(e);// TODO validate better
+            throw new SherlokException(e.getMessage());// FIXME validate better
         }
     }
 
@@ -154,7 +149,7 @@ public class FileBased {
      *            holds the resource file itself
      */
     public static void putResource(String path, Part part)
-            throws ValidationException {
+            throws SherlokException {
 
         validateArgument(!path.contains(".."), "path cannot contain '..'");
         validateArgument(part.getSize() < MAX_UPLOAD_SIZE,
@@ -166,7 +161,7 @@ public class FileBased {
         try {
             FileUtils.copyInputStreamToFile(part.getInputStream(), outFile);
         } catch (IOException e) {
-            new ValidationException("could not upload file to", path);
+            new SherlokException("could not upload file to", path);
         }
     }
 
@@ -184,13 +179,14 @@ public class FileBased {
      *            the file to write to
      * @param def
      *            the object to write
-     * @throws ValidationException
      */
-    public static void write(File f, Def def) throws ValidationException {
+    public static void write(File f, Def def) throws SherlokException {
         try {
             MAPPER.writeValue(f, def);
         } catch (Exception e) {
-            throw new ValidationException(e);
+            throw new SherlokException("could not write "
+                    + def.getClass().getSimpleName(), def.toString())
+                    .setDetails(e.getStackTrace());
         }
     }
 
@@ -200,14 +196,14 @@ public class FileBased {
         return MAPPER.writeValueAsString(obj);
     }
 
-    private static void writeBundle(BundleDef b) throws ValidationException {
+    private static void writeBundle(BundleDef b) throws SherlokException {
         b.validate(b.toString());
         File bFile = new File(getBundlePath(b.getName(), b.getVersion()));
         bFile.getParentFile().mkdirs();
         write(bFile, b);
     }
 
-    private static void writePipeline(PipelineDef p) throws ValidationException {
+    private static void writePipeline(PipelineDef p) throws SherlokException {
         p.validate(p.toString());
         File defFile = new File(getPipelinePath(p.getDomain(), p.getName(),
                 p.getVersion()));
@@ -225,21 +221,22 @@ public class FileBased {
      * @param clazz
      *            the class to cast this object into
      * @return the parsed object
-     * @throws ValidationException
+     * @throws SherlokException
      *             if the object cannot be found or parsed
      */
-    public static <T> T read(File f, Class<T> clazz) throws SherlokError {
+    public static <T> T read(File f, Class<T> clazz) throws SherlokException {
         try {
             return MAPPER.readValue(new FileInputStream(f), clazz);
 
         } catch (FileNotFoundException io) {
-            throw new SherlokError()
-                    .setMessage(clazz.getSimpleName().replaceAll("Def$", "") +" does not exist.")
-                    .setObject(f.getName())
-                    .setDetails(io.toString());
+            throw new SherlokException()
+                    .setMessage(
+                            clazz.getSimpleName().replaceAll("Def$", "")
+                                    + " does not exist.")
+                    .setObject(f.getName()).setDetails(io.toString());
 
         } catch (UnrecognizedPropertyException upe) {
-            throw new SherlokError()
+            throw new SherlokException()
                     .setMessage(
                             "Unrecognized field \"" + upe.getPropertyName()
                                     + "\"").setObject(f.getName())
@@ -253,12 +250,12 @@ public class FileBased {
             sb.append(" in '" + f.getName() + "': ");
             sb.append(" " + jme.getOriginalMessage());
 
-            throw new SherlokError().setMessage(sb.toString().replaceAll(
+            throw new SherlokException().setMessage(sb.toString().replaceAll(
                     "org\\.sherlok\\.mappings\\.\\w+Def\\[", "["));
 
         } catch (JsonParseException jpe) {
 
-            throw new SherlokError()
+            throw new SherlokException()
                     .setMessage(
                             "Could not parse JSON object of type "
                                     + clazz.getSimpleName())
@@ -266,14 +263,14 @@ public class FileBased {
                     .setDetails(jpe.getMessage());
 
         } catch (Exception e) {
-            throw new SherlokError().setMessage(e.getMessage())
+            throw new SherlokException().setMessage(e.getMessage())
                     .setObject(f.getName().replaceAll("Def$", ""))
                     .setDetails(e.getStackTrace());
         }
     }
 
     /** @return all {@link BundleDef}s */
-    public static Collection<BundleDef> allBundleDefs() throws SherlokError {
+    public static Collection<BundleDef> allBundleDefs() throws SherlokException {
         List<BundleDef> ret = list();
         File bPath = new File(BUNDLES_PATH);
         validateArgument(bPath.exists(), "bundles directory does not exist",
@@ -287,7 +284,8 @@ public class FileBased {
     }
 
     /** @return all {@link PipelineDef}s */
-    public static Collection<PipelineDef> allPipelineDefs() throws SherlokError {
+    public static Collection<PipelineDef> allPipelineDefs()
+            throws SherlokException {
         List<PipelineDef> ret = list();
         File pPath = new File(PIPELINES_PATH);
         validateArgument(
@@ -304,7 +302,7 @@ public class FileBased {
     }
 
     /** @return a list of the paths of all resources */
-    public static Collection<String> allResources() throws ValidationException {
+    public static Collection<String> allResources() throws SherlokException {
         try {
             List<String> resources = list();
             File dir = new File(RUTA_RESOURCES_PATH);
@@ -325,49 +323,49 @@ public class FileBased {
             }
             return resources;
         } catch (Throwable e) { // you never know...
-            throw new ValidationException("could not list resources", e);
+            throw new SherlokException("could not list resources").setDetails(e
+                    .getStackTrace());
         }
     }
 
-    public static boolean deleteBundle(String bundleId)
-            throws ValidationException {
+    public static boolean deleteBundle(String bundleId) throws SherlokException {
         validateId(bundleId, "BundleId not valid: ");
         File defFile = new File(getBundlePath(getName(bundleId),
                 getVersion(bundleId)));
         if (!defFile.exists())
-            throw new ValidationException(
+            throw new SherlokException(
                     "Cannot delete bundle, since it does not exist", bundleId);
         return defFile.delete();
     }
 
     public static boolean deletePipeline(String pipelineId, String domain)
-            throws ValidationException {
+            throws SherlokException {
         validateId(pipelineId, "PipelineId not valid: ");
         File defFile = new File(getPipelinePath(domain, getName(pipelineId),
                 getVersion(pipelineId)));
         if (!defFile.exists())
-            throw new ValidationException(
+            throw new SherlokException(
                     "Cannot delete pipeline, since it does not exist",
                     pipelineId);
         return defFile.delete();
     }
 
-    public static void deleteResource(String path) throws ValidationException {
-        validatePath(path, path);
+    public static void deleteResource(String path) throws SherlokException {
+        validatePath(path);
         File file = new File(RUTA_RESOURCES_PATH, path);
         validateArgument(file.exists(), "could not find file '" + path + "'");
         validateArgument(file.delete(), "could not delete file '" + path + "'");
     }
 
     /** @return this resource's {@link File} */
-    static InputStream getResource(String path) throws ValidationException {
-        validatePath(path, path);
+    static InputStream getResource(String path) throws SherlokException {
+        validatePath(path);
         File file = new File(RUTA_RESOURCES_PATH, path);
         validateArgument(file.exists(), "could not find file '" + path + "'");
         try {
             return new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            throw new ValidationException(map(MSG, "file not found", ERR, path));
+            throw new SherlokException("file not found", path);
         }
     }
 
@@ -385,7 +383,7 @@ public class FileBased {
 
     /*-
     // Util to read and rewrite all {@link Def}s 
-    public static void main(String[] args) throws ValidationException {
+    public static void main(String[] args) throws SherlokException {
         Controller controller = new Controller().load();
         for (BundleDef b : controller.listBundles())
             writeBundle(b);
