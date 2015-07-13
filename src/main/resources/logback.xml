@@ -4,6 +4,7 @@
 
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="org.sherlok.utils.LogMessagesCache" />
     <encoder>
       <!-- http://logback.qos.ch/manual/layouts.html#ClassicPatternLayout -->
       <Pattern>%-5level %msg [%logger{16} %d{HH:mm:ss}]%n

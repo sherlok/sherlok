@@ -56,6 +56,7 @@ import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
 import org.sherlok.mappings.SherlokError;
+import org.sherlok.utils.LogMessagesCache;
 import org.sherlok.utils.SherlokTests;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
@@ -90,6 +91,7 @@ public class SherlokServer {
     /** Route and path for cleaning runtime resources */
     public static final String CLEAN = "clean";
     public static final String REMOTE_RESOURCES = "remote_resources";
+    public static final String LOGS = "logs";
 
     public static final int STATUS_OK = 200;
     public static final int STATUS_INVALID = 400;
@@ -104,11 +106,13 @@ public class SherlokServer {
 
     // LOGO, see http://www.kammerl.de/ascii/AsciiSignature.php font 'thin'
     private static final String LOGO = "\n,---.|              |         |    \n`---.|---.,---.,---.|    ,---.|__/ \n    ||   ||---'|    |    |   ||  \\ \n`---'`   '`---'`    `---'`---'`   `\n";
+    public static final String GIT_COMMIT_ID = getGitCommitId();
     private static final String VERSION = "Sherlok Server        v. "
-            + getGitCommitId() + "\n";
+            + GIT_COMMIT_ID + "\n";
     static { // print at server startup
         System.out.println(LOGO + VERSION);
     }
+    private static final long START = System.currentTimeMillis();
 
     /** Path to public folder */
     private static final String PUBLIC = "public";
@@ -530,6 +534,17 @@ public class SherlokServer {
                 return map("status", "cleaned");
             }
         });
+
+        // ROUTES: LOGS
+        // ////////////////////////////////////////////////////////////////////
+        get(new JsonRoute("/" + LOGS) { // LOGS
+            @Override
+            public Object handle(Request req, Response resp) {
+                return map("logs", LogMessagesCache.getLogMessages(),//
+                        "sherlok_version", GIT_COMMIT_ID,//
+                        "start_time", START);
+            }
+        });
     }
 
     protected static Object annotateRequest(Request req, Response resp,
@@ -697,7 +712,7 @@ public class SherlokServer {
     }*/
 
     /** Using git-commit-id-plugin maven plugin */
-    public static final String getGitCommitId() {
+    private static final String getGitCommitId() {
         try {
             Properties properties = new Properties();
             properties.load(SherlokServer.class.getClassLoader()

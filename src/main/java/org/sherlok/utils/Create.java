@@ -81,4 +81,19 @@ public class Create {
         map.put(key3, value3);
         return map;
     }
+
+    public static <K, V> Map<K, V> map(K key, V value, K key2, V value2,
+            K key3, V value3, K key4, V value4) {
+        Map<K, V> map = map(key, value, key2, value2, key3, value3);
+        map.put(key4, value4);
+        return map;
+    }
+
+    public static <K, V> Map<K, V> map(K key, V value, K key2, V value2,
+            K key3, V value3, K key4, V value4, K key5, V value5) {
+        Map<K, V> map = map(key, value, key2, value2, key3, value3, key4,
+                value4);
+        map.put(key5, value5);
+        return map;
+    }
 }
