@@ -1,0 +1,22 @@
+{
+  "name" : "stanford.sentiment.en",
+  "version" : "1.8.0",
+  "description" : "sentiment analysis using StanfordNLP models",
+  "domain" : "dkpro",
+  "script" : [
+ "ENGINE opennlp.segmenter.en:1.8.0;"
+, "ENGINE stanford.StanfordSentimentAnalyzer:1.8.0;"
+ ],
+  "output" : {
+    "include_annotations" : [ "de.tudarmstadt.ukp.dkpro.core.sentiment.type.StanfordSentimentAnnotation" ]
+  },
+  "tests" : [ {
+    "input" : "I feel very very bad.",
+    "expected" : {
+      "StanfordSentimentAnnotation" : [ {
+        "begin" : 0,
+        "end" : 11
+      } ]
+    }
+  } ]
+}
