@@ -49,6 +49,10 @@ public class ValidationException extends Exception {
         super(message);
     }
 
+    public ValidationException() {
+        super();
+    }
+
     public ValidationException(Throwable t) {
         super(t);
     }

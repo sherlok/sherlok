@@ -22,6 +22,8 @@ import static org.sherlok.utils.ValidationException.MSG;
 
 import java.util.regex.Pattern;
 
+import org.sherlok.mappings.SherlokError;
+
 public class CheckThat {
 
     /** Letters, numbers, dots and underscore only */
@@ -144,6 +146,13 @@ public class CheckThat {
 
         if (!VALID_TYPE_IDENTIFIER.matcher(identifier).matches()) {
             throw new ValidationException(errorMessage);
+        }
+    }
+
+    public static void validateArgument(boolean expression, String message,
+            String object, String remedy) throws SherlokError {
+        if (!expression){
+            throw new SherlokError().setMessage(message).setObject(object).setRemedy(remedy);
         }
     }
 }

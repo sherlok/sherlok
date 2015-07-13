@@ -35,6 +35,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.sherlok.config.NoSuchVariableException;
 import org.sherlok.config.ProcessConfigVariableException;
 import org.sherlok.mappings.BundleDef.EngineDef;
+import org.sherlok.mappings.SherlokError;
 import org.sherlok.utils.ConfigurationFieldParser;
 import org.sherlok.utils.ValidationException;
 import org.sherlok.utils.ops.MapOps;
@@ -90,7 +91,6 @@ public class EngineOps {
         return engineDescription;
     }
 
-
     /**
      * Extract parameters from the engine definition and use annotation in the
      * corresponding annotator class to convert the parameter value to the right
@@ -131,12 +131,10 @@ public class EngineOps {
         }
     }
 
-
     /** Create a map from configuration parameter name to the matching field */
     @SuppressWarnings("unchecked")
     private static Map<String, Field> extractParametersFields(
-            EngineDef engineDef)
-            throws ValidationException {
+            EngineDef engineDef) throws ValidationException {
         Class<? extends AnalysisComponent> klass = extractAnalysisComponentClass(engineDef);
         Map<String, Field> params = map();
 
@@ -179,8 +177,9 @@ public class EngineOps {
             return (Class<? extends AnalysisComponent>) Class.forName(engineDef
                     .getClassz());
         } catch (ClassNotFoundException e) {
-            throw new ValidationException("could not find class "
-                    + engineDef.getClassz(), e);
+            throw new SherlokError().setMessage(
+                    "could not find AnalysisComponent class").setObject(
+                    engineDef.getClassz());
         }
     }
 

@@ -16,6 +16,7 @@
 package org.sherlok;
 
 import static java.lang.String.format;
+import static org.sherlok.utils.CheckThat.validateArgument;
 import static org.sherlok.utils.CheckThat.validateId;
 import static org.sherlok.utils.Create.map;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -30,6 +31,7 @@ import javax.servlet.http.Part;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.BundleDef.EngineDef;
 import org.sherlok.mappings.PipelineDef;
+import org.sherlok.mappings.SherlokError;
 import org.sherlok.utils.AetherResolver;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
@@ -56,16 +58,14 @@ public class Controller {
         Controller c;
         try {
             c = _load(FileBased.allBundleDefs(), FileBased.allPipelineDefs());
-        } catch (ValidationException ve) {
-            throw new ValidationException(
-                    "could not load pipelines or bundles: " + ve.getMessage());
+        } catch (SherlokError e) {
+            throw e.setWhen("loading pipelines and bundles");
         }
 
         LOG.info(
                 "Done loading from local File store ('{}'): {} bundles, {} engines and {} pipelines",
-                new Object[] { FileBased.CONFIG_DIR_PATH,
-                        bundleDefs.size(), engineDefs.size(),
-                        pipelineDefs.size() });
+                new Object[] { FileBased.CONFIG_DIR_PATH, bundleDefs.size(),
+                        engineDefs.size(), pipelineDefs.size() });
         return c;
     }
 
@@ -109,11 +109,11 @@ public class Controller {
 
                 validateId(pengineId, "engine id '" + pengineId
                         + "' in pipeline '" + pd + "'");
-                if (!engineDefs.containsKey(pengineId)) {
-                    throw new ValidationException(
-                            format("engine '%s' defined in pipeline '%s' was not found in any registered bundle.",
-                                    pengineId, pd), pengineId);
-                }
+
+                validateArgument(engineDefs.containsKey(pengineId),
+                        "engine not found in any registered bundle",
+                        format("'%s' defined in pipeline '%s'", pengineId, pd),
+                        "you might want to check the engine's name spelling");
             }
             // no duplicate pipeline ids
             if (pipelineDefs.containsKey(pd.getId())) {

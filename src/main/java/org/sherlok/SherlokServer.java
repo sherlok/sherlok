@@ -55,6 +55,7 @@ import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.JsonAnnotation;
 import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.PipelineDef.PipelineTest;
+import org.sherlok.mappings.SherlokError;
 import org.sherlok.utils.SherlokTests;
 import org.sherlok.utils.ValidationException;
 import org.slf4j.Logger;
@@ -737,7 +738,11 @@ public class SherlokServer {
                 "Sherlok needs at least Java 1.7, you have " + getJavaVersion());
         CliArguments argParser = new CliArguments();
         new JCommander(argParser, args);
-        init(argParser.port, argParser.address, argParser.masterUrl,
-                argParser.sealed);
+        try {
+            init(argParser.port, argParser.address, argParser.masterUrl,
+                    argParser.sealed);
+        } catch (SherlokError e) {
+            System.err.println("fatal error: " + e.toString());
+        }
     }
 }

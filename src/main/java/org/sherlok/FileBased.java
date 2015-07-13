@@ -46,6 +46,7 @@ import org.apache.commons.io.FileUtils;
 import org.sherlok.mappings.BundleDef;
 import org.sherlok.mappings.Def;
 import org.sherlok.mappings.PipelineDef;
+import org.sherlok.mappings.SherlokError;
 import org.sherlok.utils.ValidationException;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -227,22 +228,28 @@ public class FileBased {
      * @throws ValidationException
      *             if the object cannot be found or parsed
      */
-    public static <T> T read(File f, Class<T> clazz) throws ValidationException {
+    public static <T> T read(File f, Class<T> clazz) throws SherlokError {
         try {
             return MAPPER.readValue(new FileInputStream(f), clazz);
 
         } catch (FileNotFoundException io) {
-            throw new ValidationException(clazz.getSimpleName().replaceAll(
-                    "Def$", "")
-                    + " does not exist", io.getMessage()
-                    .replaceFirst(PIPELINES_PATH, "").replaceFirst(//
-                            "\\(No such file or directory\\)", "").trim());
+            throw new SherlokError()
+                    .setMessage("object does not exists")
+                    .setObject(clazz.getSimpleName().replaceAll("Def$", ""))
+                    .setDetails(
+                            io.getMessage()
+                                    .replaceFirst(PIPELINES_PATH, "")
+                                    .replaceFirst(
+                                            //
+                                            "\\(No such file or directory\\)",
+                                            "").trim());
 
         } catch (UnrecognizedPropertyException upe) {
-            String msg = "Unrecognized field \"" + upe.getPropertyName()
-                    + "\" in file '" + f.getName() + "',  "
-                    + upe.getMessageSuffix();
-            throw new ValidationException(msg);
+            throw new SherlokError()
+                    .setMessage(
+                            "Unrecognized field \"" + upe.getPropertyName()
+                                    + "\"").setObject(f.getName())
+                    .setDetails(upe.getMessageSuffix());
 
         } catch (JsonMappingException jme) {
 
@@ -252,28 +259,32 @@ public class FileBased {
             sb.append(" in '" + f.getName() + "': ");
             sb.append(" " + jme.getOriginalMessage());
 
-            throw new ValidationException(sb.toString().replaceAll(
+            throw new SherlokError().setMessage(sb.toString().replaceAll(
                     "org\\.sherlok\\.mappings\\.\\w+Def\\[", "["));
 
         } catch (JsonParseException jpe) {
-            throw new ValidationException("Could not read JSON"
-                    + clazz.getSimpleName() + " '"
-                    + f.getName().replaceAll("Def$", "") + "'",
-                    jpe.getMessage());
+
+            throw new SherlokError()
+                    .setMessage(
+                            "Could not parse JSON object of type "
+                                    + clazz.getSimpleName())
+                    .setObject(f.getName().replaceAll("Def$", ""))
+                    .setDetails(jpe.getMessage());
 
         } catch (Exception e) {
-            throw new ValidationException(e);
+            throw new SherlokError().setMessage(e.getMessage())
+                    .setObject(f.getName().replaceAll("Def$", ""))
+                    .setDetails(e.getStackTrace());
         }
     }
 
     /** @return all {@link BundleDef}s */
-    public static Collection<BundleDef> allBundleDefs()
-            throws ValidationException {
+    public static Collection<BundleDef> allBundleDefs() throws SherlokError {
         List<BundleDef> ret = list();
         File bPath = new File(BUNDLES_PATH);
-        validateArgument(bPath.exists(), "bundles directory '" + BUNDLES_PATH
-                + "' does not exist (resolves to '" + bPath.getAbsolutePath()
-                + "')");
+        validateArgument(bPath.exists(), "bundles directory does not exist",
+                BUNDLES_PATH, "make sure path exists (currently resolves to '"
+                        + bPath.getAbsolutePath() + "')");
         for (File bf : newArrayList(iterateFiles(bPath,
                 new String[] { "json" }, true))) {
             ret.add(read(bf, BundleDef.class));
@@ -282,14 +293,14 @@ public class FileBased {
     }
 
     /** @return all {@link PipelineDef}s */
-    public static Collection<PipelineDef> allPipelineDefs()
-            throws ValidationException {
+    public static Collection<PipelineDef> allPipelineDefs() throws SherlokError {
         List<PipelineDef> ret = list();
         File pPath = new File(PIPELINES_PATH);
         validateArgument(
                 pPath.exists(),
-                "pipelines directory '" + PIPELINES_PATH
-                        + "' does not exist (resolves to '"
+                "pipelines directory does not exist",
+                PIPELINES_PATH,
+                "make sure directory exists  (currently resolves to '"
                         + pPath.getAbsolutePath() + "')");
         for (File bf : newArrayList(iterateFiles(pPath,
                 new String[] { "json" }, true))) {
