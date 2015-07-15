@@ -16,6 +16,7 @@
 package org.sherlok.config;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sherlok.FileBased.RUNTIME_DIR_PATH;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
@@ -62,7 +63,7 @@ public class HttpConfigVariable implements ConfigVariable {
     static {
         // TODO add environment variable to let the user select another
         // directory if he wants to.
-        PATH_BASE = new File("config/runtime/http/");
+        PATH_BASE = new File(RUNTIME_DIR_PATH + "http/");
 
         // Create the runtime location for git repositories and make sure
         // we can use it.
@@ -92,7 +93,8 @@ public class HttpConfigVariable implements ConfigVariable {
 
     private final String url;
     private final Boolean rutaCompatible;
-    private String filename = null; // computed when fetching the remote resource
+    private String filename = null; // computed when fetching the remote
+                                    // resource
 
     /**
      * Build a new variable.

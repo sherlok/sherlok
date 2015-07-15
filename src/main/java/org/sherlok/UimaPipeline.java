@@ -479,7 +479,7 @@ public class UimaPipeline {
         // write Ruta script to tmp file
         // ruta does not like dots
         String scriptName = pipelineDef.getId().replace(".", "_");
-        File scriptFile = new File(FileBased.RUTA_PIPELINE_CACHE_PATH
+        File scriptFile = new File(FileBased.PIPELINE_CACHE_PATH
                 + scriptName + SCRIPT_FILE_EXTENSION);
         scriptFile.getParentFile().mkdirs();
         saveString2File(script, scriptFile);
@@ -489,7 +489,7 @@ public class UimaPipeline {
         aeds.add(createEngineDescription(RutaEngine.class, //
                 PARAM_SCRIPT_PATHS, scriptFile.getParent(), //
                 PARAM_RESOURCE_PATHS, FileBased.RUTA_RESOURCES_PATH, //
-                PARAM_DESCRIPTOR_PATHS, FileBased.RUTA_ENGINE_CACHE_PATH,//
+                PARAM_DESCRIPTOR_PATHS, FileBased.ENGINE_CACHE_PATH,//
                 PARAM_ADDITIONAL_ENGINES, engineDescriptions,//
                 RutaEngine.PARAM_ADDITIONAL_EXTENSIONS, extensions,//
                 PARAM_MAIN_SCRIPT, scriptName));

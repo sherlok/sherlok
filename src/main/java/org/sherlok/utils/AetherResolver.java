@@ -15,6 +15,7 @@
  */
 package org.sherlok.utils;
 
+import static org.sherlok.FileBased.RUNTIME_DIR_PATH;
 import static org.sherlok.utils.Create.list;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -49,12 +50,8 @@ public class AetherResolver {
     private static final Logger LOG = getLogger(AetherResolver.class);
 
     /** Directory where to store the local artifacts */
-    public static final String LOCAL_REPO_PATH = "local_repo";
-
-    /** Maven repo hosted on Github to cache most common artifacts */
-    //public static final String SHERLOK_REPO_ID = "sherlok_deps";
-    /** Maven repo hosted on Github to cache most common artifacts */
-    //public static final String SHERLOK_REPO_URL = "https://raw.githubusercontent.com/renaud/sherlok_mavenrepo/master/";
+    public static final String LOCAL_REPO_PATH = RUNTIME_DIR_PATH
+            + "local_repo/";
 
     public static RepositorySystem newRepositorySystem() {
         DefaultServiceLocator locator = MavenRepositorySystemUtils
@@ -86,7 +83,7 @@ public class AetherResolver {
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(
                 session, localRepo));
 
-        // session.setTransferListener(new ConsoleTransferListener());
+        session.setTransferListener(new ConsoleTransferListener());
         // session.setRepositoryListener(new ConsoleRepositoryListener());
         // uncomment to generate dirty trees
         // session.setDependencyGraphTransformer( null );

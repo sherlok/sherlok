@@ -65,6 +65,7 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 public class FileBased {
 
     /* package */static final String CONFIG_DIR_PATH = "config/";
+    public static final String RUNTIME_DIR_PATH = "runtime/";
 
     public static final String BUNDLES_PATH = CONFIG_DIR_PATH
             + SherlokServer.BUNDLES + "/";
@@ -72,10 +73,10 @@ public class FileBased {
             + SherlokServer.PIPELINES + "/";
     public static final String RUTA_RESOURCES_PATH = CONFIG_DIR_PATH
             + SherlokServer.RUTA_RESOURCES + "/";
-    public static final String RUTA_PIPELINE_CACHE_PATH = RUTA_RESOURCES_PATH
-            + ".pipelines/";
-    public static final String RUTA_ENGINE_CACHE_PATH = RUTA_RESOURCES_PATH
-            + ".engines/";
+    public static final String PIPELINE_CACHE_PATH = RUNTIME_DIR_PATH
+            + "pipelines/";
+    public static final String ENGINE_CACHE_PATH = RUNTIME_DIR_PATH
+            + "engines/";
 
     /** 100Mb, in bytes */
     static final long MAX_UPLOAD_SIZE = 100 * 1000000l;

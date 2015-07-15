@@ -21,6 +21,9 @@ app.config(function ($routeProvider) {
   }).when('/bundles', {
     templateUrl: 'views/bundles.html',
     controller: 'bundles'
+  }).when('/logs', {
+    templateUrl: 'views/logs.html',
+    controller: 'logs'
   }).otherwise({
     redirectTo: '/pipelines'
   })
@@ -28,10 +31,9 @@ app.config(function ($routeProvider) {
 
 // THEMES
 app.config(function($mdThemingProvider) {
-  $mdThemingProvider.theme('yellow')
-  .primaryPalette('yellow');
-  $mdThemingProvider.theme('teal')
-  .primaryPalette('teal');
+  $mdThemingProvider.theme('yellow').primaryPalette('yellow');
+  $mdThemingProvider.theme('teal')  .primaryPalette('teal');
+  $mdThemingProvider.theme('grey')  .primaryPalette('grey');
 });
 
 app.directive('renderAnnotations', function($compile) {
@@ -441,6 +443,39 @@ app.controller('bundles', function BundleController($scope, $http, $mdToast) {
     })
   };
 });
+
+app.controller('logs', function LogsController($scope, $http, $interval) {
+  var loadLogs = function(){
+    $http.get('/logs').success(function (data) {
+      $scope.logs = data;
+    }).error(function (data, status) {
+      alert(JSON.stringify(data));
+    })
+  }
+  loadLogs();
+  $interval(function(){ // refresh every second
+   // loadLogs();
+  }, 1000);
+
+  $scope.levelIncludes = ['error', 'warn', 'info'];
+
+  $scope.includeLevel = function(level) {
+    var i = $.inArray(level, $scope.levelIncludes);
+    if (i > -1) {
+      $scope.levelIncludes.splice(i, 1);
+    } else {
+      $scope.levelIncludes.push(level);
+    }
+  }
+  $scope.levelFilter = function(log) {
+    if ($scope.levelIncludes.length > 0) {
+      if ($.inArray(log.level, $scope.levelIncludes) < 0)
+        return;
+      }
+      return log;
+    }
+});
+
 
 var toast = function(toaster, msg){
   toaster.show({

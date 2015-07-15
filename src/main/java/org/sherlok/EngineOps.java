@@ -77,7 +77,7 @@ public class EngineOps {
 
         // generate XML descriptor
         try {
-            File tmpEngine = new File(FileBased.RUTA_ENGINE_CACHE_PATH
+            File tmpEngine = new File(FileBased.ENGINE_CACHE_PATH
                     + engineDescription + ".xml");
             tmpEngine.getParentFile().mkdirs();
             FileOutputStream fos = new FileOutputStream(tmpEngine);

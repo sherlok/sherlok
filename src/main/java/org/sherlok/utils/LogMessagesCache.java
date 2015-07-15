@@ -29,16 +29,19 @@ public class LogMessagesCache extends Filter<ILoggingEvent> {
     @Override
     public FilterReply decide(ILoggingEvent event) {
         logCache.add(new LogMessage(event));
+
         return FilterReply.ACCEPT;
     }
 
     public static class LogMessage {
         private String message;
         private String level;
+        private long timestamp;
 
         public LogMessage(ILoggingEvent event) {
             this.message = event.getFormattedMessage();
-            this.level = event.getLevel().toString();
+            this.level = event.getLevel().toString().toLowerCase();
+            this.timestamp = event.getTimeStamp();
         }
 
         public String getMessage() {
@@ -47,6 +50,10 @@ public class LogMessagesCache extends Filter<ILoggingEvent> {
 
         public String getLevel() {
             return level;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
         }
 
         @Override

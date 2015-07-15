@@ -135,6 +135,25 @@ a.no-format{
     padding: 5px;
 }
 
+p.log {
+  margin-top: 0em;
+  margin-bottom: 0em;
+  border-bottom: 1px solid gray;
+}
+
+.log_trace {
+    background-color: lighgray;
+}
+.log_info {
+    background-color: LightYellow;
+}
+.log_warn {
+    background-color: #ffd27f; /*light orange */
+}
+.log_error {
+    background-color: #ff7f7f; /*light red*/
+}
+
 /* toast with different color */
 /*md-toast.md-default-theme {
     background-color: #00FF99;

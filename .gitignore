@@ -1,9 +1,9 @@
 # Sherlok
 local_repo
-config/resources/.pipelines/*
-config/resources/.engines/*
+config/resources/
+config/resources/
 config/resources/test/*
-config/runtime
+runtime
 src/main/resources/git.properties
 
 # Maven          #

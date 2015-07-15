@@ -1,0 +1,33 @@
+<div layout="row" md-theme="grey">
+
+  <div layout-fill>
+    <md-toolbar >
+      <h2 class="md-toolbar-tools">
+        <md-select class="title-select" ng-model="someVal" placeholder="Logs">
+          <md-option value="0" ><a class="no-format" href="#/">Pipelines</a></md-option>
+          <md-option value="1" ><a class="no-format" href="#/resources">Resources</a></md-option>
+          <md-option value="2" ><a class="no-format" href="#/bundles">Bundles</a></md-option>
+          <md-option value="3" ><a class="no-format" href="#/logs">Logs</a></md-option>
+        </md-select>
+        <span flex>
+          <input type="checkbox" ng-click="includeLevel('error')" checked/> Error
+          <input type="checkbox" ng-click="includeLevel('warn')"  checked/> Warn
+          <input type="checkbox" ng-click="includeLevel('info')"  checked/> Info
+          <input type="checkbox" ng-click="includeLevel('trace')"        /> Trace
+        </span>
+      </h2>
+    </md-toolbar>
+    <md-content>
+
+
+
+      <md-list>
+        <md-item ng-repeat="l in logs.logs |  filter:levelFilter | orderBy:'timestamp':reverse">
+              <p class="log log_{{l.level}}">
+                {{l.timestamp | date:'yyyy-MM-dd HH:mm:ss Z'}} [{{l.level}}]  {{l.message}}
+              </p>
+        </md-item>
+      </md-list>
+    </md-content>
+  </div>
+</div>
