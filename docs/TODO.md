@@ -4,10 +4,6 @@
 "DECLARE Annotation Neurotransmitter(String ontologyId);"
 , 
 
-http://localhost:9600/annotate/hbp.methods?text=The%20Golgi%20staining%20protocol,%20but%20B
-{
-  "message" : "could not find Pipeline with Id 'hbp.methods:0000000000000000000000000000000'"
-}
 
 --- a/config/pipelines/bluima/neuroner/neuroner_0.1.json
 +++ b/config/pipelines/bluima/neuroner/neuroner_0.1.json
@@ -25,8 +21,6 @@ http://localhost:9600/annotate/hbp.methods?text=The%20Golgi%20staining%20protoco
 
 * P1 should work offline, too
 
-* P2 [release to github maven repo](http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?lq=1)
-
 * P3 p not highlighted anymore when save
 
 * .NET client, e.g. http://blog.anthonybaker.me/2013/05/how-to-consume-json-rest-api-in-net.html?m=1 or https://msdn.microsoft.com/en-us/magazine/ee309509.aspx
@@ -40,19 +34,11 @@ http://localhost:9600/annotate/hbp.methods?text=The%20Golgi%20staining%20protoco
 * [watson concept insights](http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/doc/concept-insights/)
 * [CLAVIN (Cartographic Location And Vicinity INdexer) open source software package for document geotagging and geoparsing](http://clavin.bericotechnologies.com/)
 
-# DONE
-
-* P3 order of pipelines in right col
-* P2 spinning wheel while running tests
-
 
 ---
 
 # TO IMPLEMENT
 
-Sentiment:
-
-* Stanford DL: http://nlp.stanford.edu/sentiment/code.html
 * Lingpipe: http://alias-i.com/lingpipe/demos/tutorial/sentiment/read-me.html
 * AlchemyAPI: http://grepcode.com/file/repo1.maven.org/maven2/org.apache.uima/AlchemyAPIAnnotator/2.3.1/org/apache/uima/alchemy/digester/sentiment/SentimentAnalysisDigesterProvider.java
 * GATE: https://gate.ac.uk/sentiment/
@@ -83,7 +69,7 @@ License
 
 # Notes
 
-Spark framework
+Spark framework:
 
 * http://www.sparkjava.com/documentation.html
 * http://www.taywils.me/2013/11/05/javasparkframeworktutorial.html

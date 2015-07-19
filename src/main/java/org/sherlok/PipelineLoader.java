@@ -17,6 +17,7 @@ package org.sherlok;
 
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FilenameUtils.getExtension;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.sherlok.mappings.Def.createId;
 import static org.sherlok.mappings.Def.getName;
 import static org.sherlok.mappings.Def.getVersion;
@@ -102,8 +103,9 @@ public class PipelineLoader {
      * @return the {@link UimaPipeline}
      */
     public synchronized UimaPipeline resolvePipeline(String pipelineName,
-            String version) throws SherlokException {
+            final String originalVersion) throws SherlokException {
 
+        String version = originalVersion;
         // 0. resolve version (fallback) if version=null
         if (version == null || version.equals("null")) {
             // init with a lexicographically lowsest value
@@ -132,9 +134,15 @@ public class PipelineLoader {
         } else {
             // 2. else, load it from pipeline def
             PipelineDef pipelineDef = controller.getPipelineDef(pipelineId);
-            validateNotNull(pipelineDef, "could not find Pipeline with Id '"
-                    + pipelineId + "'"); // should not happen here, though...
-
+            if (pipelineDef == null) {
+                throw new SherlokException("no Pipeline with this id",
+                        createId(pipelineName, originalVersion))
+                        .setRemedy("Version resolves to '"
+                                + version
+                                + "'; Available pipelines ids: '"
+                                + join(controller.listPipelineDefNames(),
+                                        "', '") + "'.");
+            }
             UimaPipeline uimaPipeline = load(pipelineDef);
             uimaPipelinesCache.put(pipelineId, uimaPipeline);
             return uimaPipeline;
@@ -174,8 +182,9 @@ public class PipelineLoader {
                     "Failed to resolve solve pipeline dependencies").setObject(
                     pipelineDef.getId()).setDetails(e.getMessage());
         } catch (DependencyCollectionException e) {
-            throw new SherlokException("Failed to collect pipeline dependencies")
-                    .setObject(pipelineDef.getId()).setDetails(e.getMessage());
+            throw new SherlokException(
+                    "Failed to collect pipeline dependencies").setObject(
+                    pipelineDef.getId()).setDetails(e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e); // should not happen
         }

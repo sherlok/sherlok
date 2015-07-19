@@ -8,7 +8,7 @@ Sherlok is a flexible and powerful open source, distributed, real-time text-mini
 
 - [x] highlight persons and locations in text (using [DKPro OpenNLP](https://www.ukp.tu-darmstadt.de/research/current-projects/dkpro/)),
 - [x] identify proteins and brain regions in biomedical texts (using [Bluima](https://github.com/BlueBrain/bluima)),
-- [ ] perform sentiment analysis using deep learning (using [Stanford Sentiment](http://nlp.stanford.edu/sentiment/)),
+- [x] perform sentiment analysis using deep learning (using [Stanford Sentiment](http://nlp.stanford.edu/sentiment/)),
 - [ ] analyse the syntax of tweets (using [TweetNLP](http://www.ark.cs.cmu.edu/TweetNLP/)),
 - [ ] analyze clinical text and perform knowledge extraction (using [Apache cTAKES](http://ctakes.apache.org/index.html))
 
