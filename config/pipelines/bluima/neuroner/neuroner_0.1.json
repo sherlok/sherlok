@@ -57,8 +57,6 @@
 , "Document{ ->TRIE("
 , "\"neuron_triggers.txt\" = NeuronTrigger,"
 , "\"functions.txt\" = Function,"
-, "\"proteins_ns_dan.txt\" = ProteinName,"
-, "\"proteins_obo_pro.txt\" = ProteinName,"
 , "\"regions_adverbs_al.txt\" = BrainRegionProp,"
 , "\"regions_adverbs_ic.txt\" = BrainRegionProp,"
 , "\"regions_lfrench.txt\" = BrainRegionProp,"
