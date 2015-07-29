@@ -455,9 +455,9 @@ public class SherlokServer {
             }
         });
 
-        // ROUTES: CLEANING
+        // ROUTES: CLEANING; curl -XDELETE http://localhost:9600/clean/pipelines
         // ////////////////////////////////////////////////////////////////////
-        delete(new JsonRoute("/" + CLEAN + "/" + PIPELINES) { // PIPELINES
+        delete(new JsonRoute("/" + CLEAN + "/" + PIPELINES) {// RELOAD PIPELINES
             @Override
             public Object handle(Request req, Response resp) {
                 try {

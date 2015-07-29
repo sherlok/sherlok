@@ -308,7 +308,7 @@ public class UimaPipeline {
     }
 
     public interface Annotate {
-        public Object annotate(CAS cas, AnalysisEngine[] aes)
+        public Object annotate(final CAS cas, final AnalysisEngine[] aes)
                 throws AnalysisEngineProcessException;
     }
 
@@ -479,8 +479,8 @@ public class UimaPipeline {
         // write Ruta script to tmp file
         // ruta does not like dots
         String scriptName = pipelineDef.getId().replace(".", "_");
-        File scriptFile = new File(FileBased.PIPELINE_CACHE_PATH
-                + scriptName + SCRIPT_FILE_EXTENSION);
+        File scriptFile = new File(FileBased.PIPELINE_CACHE_PATH + scriptName
+                + SCRIPT_FILE_EXTENSION);
         scriptFile.getParentFile().mkdirs();
         saveString2File(script, scriptFile);
 

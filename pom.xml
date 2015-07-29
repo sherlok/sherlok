@@ -80,12 +80,21 @@
       <groupId>org.apache.uima</groupId>
       <artifactId>ruta-core</artifactId>
       <version>2.3.0</version>
+      <!-- <version>2.3.1-SNAPSHOT</version> -->
     </dependency>
+
     <dependency>
       <groupId>com.github.renaud</groupId>
       <artifactId>ruta-ontologies</artifactId>
-      <version>34ce8a5860</version>
+      <version>2.3.0</version>
     </dependency>
+    <!--
+    <dependency>
+      <groupId>org.apache.uima</groupId>
+      <artifactId>ruta-ontologies</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+    -->
 
     <!-- AETHER TODO: remove some? -->
     <dependency>

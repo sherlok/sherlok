@@ -1,5 +1,26 @@
 # TODOs
 
+### P1
+
+* smooth interaction btw UIMA engines and Ruta scripts, in terms of annotations shared 
+* Windows
+* ES integration: sherlastic 
+
+### P2
+
+* better JS library
+* PHP library
+* more documentation
+* more examples
+
+### P3
+
+* finish distributed mode
+	* remote resources 
+* Java API, allow readers
+
+
+
 03.ruta.ontologies
 "DECLARE Annotation Neurotransmitter(String ontologyId);"
 , 
