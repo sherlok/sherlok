@@ -30,7 +30,7 @@
 , "// SPECIES"
 , "WORDTABLE speciesWt = '$neuroner/resources/bluima/neuroner/ncbi_species_top1000.csv';"
 , "DECLARE NeuronProperty Species;"
-, "Document{-> MARKTABLE(Species, 1, speciesWt, true, 2, \"\", 2, \"ontologyId\" = 2)};"
+, "Document{-> MARKTABLE(Species, 1, speciesWt, true, 2, \"\", 0, \"ontologyId\" = 2)};"
 , ""
 , "// ORIENTATION"
 , "DECLARE NeuronProperty Orientation;"
