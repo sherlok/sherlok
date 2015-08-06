@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.uima.ruta.descriptor.RutaDescriptorFactory;
+import org.apache.uima.ruta.descriptor.RutaDescriptorInformation;
+import org.apache.uima.ruta.descriptor.StringTriple;
 import org.junit.Test;
 import org.sherlok.RutaHelper.TypeDTO;
 import org.sherlok.RutaHelper.TypeFeatureDTO;
@@ -39,6 +42,17 @@ public class RutaHelperTest {
         assertEquals(0, types.size());
         types = parseDeclaredTypes("DECLARE Dog");
         assertEquals("missing ;, but that is ok", 1, types.size());
+    }
+    
+    @Test
+    // TODO use RutaDescriptorFactory
+    public void test() throws Exception {
+        RutaDescriptorFactory factory = new RutaDescriptorFactory();
+        RutaDescriptorInformation descInfo = factory.parseDescriptorInformation("DECLARE Dog;");
+        System.out.println(descInfo);
+        for (StringTriple s:descInfo.getTypeTriples()){
+            System.err.println(s);
+        }
     }
 
     @Test

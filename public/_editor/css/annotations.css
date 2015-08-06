@@ -45,6 +45,11 @@ span.np_Neuron {
     border-bottom: 3px solid #282828;
     -moz-border-bottom-colors: #282828;
 }
+span.np_PreNeuron, span.np_PostNeuron {
+    border-top: 3px dashed #282828;
+    -moz-border-top-colors: #282828;
+}
+
 .np_Morphology { /* blue */
     background-color: #d3e9f4;
     border: 1px solid #98c3cd;
@@ -80,7 +85,7 @@ span.np_Neuron {
     border: 1px solid #9bc08c;
     color: rgb(80, 104, 82);
 }
-.np_Neurotransmitter { /*forest*/
+.np_NeurotransmitterProp, .np_Neurotransmitter { /*forest*/
     background-color: rgb(206, 212, 180);
     border: 1px solid rgb(175, 180, 153);
     color: rgb(67, 70, 56);
@@ -102,7 +107,7 @@ span.np_Neuron {
 }
 
 .np_Missing { /*red*/
-    background-color: #f3c2c2;
+    background-color: red;
     border: 1px solid #c99797;
-    color: #c14240;
+    color: white;
 }
