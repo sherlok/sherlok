@@ -79,22 +79,23 @@
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>ruta-core</artifactId>
+      <!-- 
       <version>2.3.0</version>
-      <!-- <version>2.3.1-SNAPSHOT</version> -->
+      -->
+      <version>2.3.1-SNAPSHOT</version> 
     </dependency>
-
+    <!--
     <dependency>
       <groupId>com.github.renaud</groupId>
       <artifactId>ruta-ontologies</artifactId>
       <version>2.3.0</version>
     </dependency>
-    <!--
+    -->
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>ruta-ontologies</artifactId>
       <version>2.3.0</version>
     </dependency>
-    -->
 
     <!-- AETHER TODO: remove some? -->
     <dependency>
@@ -207,11 +208,17 @@
     <repository>
       <id>dkpro</id>
       <url>http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/</url>
+      <snapshots><enabled>false</enabled></snapshots>
     </repository>
     <!-- JitPack builds GitHub projects on demand and publishes packages -->
     <repository>
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
+    </repository>
+    <repository>
+      <id>Apache Snapshots</id>
+      <url>http://repository.apache.org/snapshots/</url>
+      <snapshots><enabled>true</enabled></snapshots>
     </repository>
   </repositories>
 
