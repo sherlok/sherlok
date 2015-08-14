@@ -12,13 +12,21 @@
 * PHP library
 * more documentation
 * more examples
+    * phone numbers
+    * sentiment
+    * country - continent - geospatial
+    * measures
+    * acronyms
+    * (emails)
+* import remote script (how secure is that?)
 
 ### P3
 
 * finish distributed mode
 	* remote resources 
 * Java API, allow readers
-
+* RutaEnvironment.getWordList l 569: throw exception, rather than LOG.SEVERE
+* list remote resources
 
 
 03.ruta.ontologies

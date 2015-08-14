@@ -45,7 +45,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.uima.UIMAException;
+import org.apache.uima.ruta.extensions.RutaParseRuntimeException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -194,9 +196,18 @@ public class PipelineLoader {
         try {
             uimaPipeline = new UimaPipeline(pipelineDef, engineDefsUsedInP);
         } catch (IOException | UIMAException e) {// other SherlokErrors catched
-            throw new SherlokException("could not initialize UIMA pipeline")
-                    .setObject(pipelineDef.toString()).setDetails(
-                            e.getStackTrace());
+            LOG.warn("could not initialize UIMA pipeline", e);
+
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof RutaParseRuntimeException) {
+                throw new SherlokException(rootCause.getMessage()).setObject(
+                        pipelineDef.toString()).setDetails(
+                        rootCause.getStackTrace());
+            } else {
+                throw new SherlokException("could not initialize UIMA pipeline")
+                        .setObject(pipelineDef.toString()).setDetails(
+                                e.getStackTrace());
+            }
         }
 
         return uimaPipeline;

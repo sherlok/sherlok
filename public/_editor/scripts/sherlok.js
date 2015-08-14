@@ -48,7 +48,7 @@ var Sherlok = {
             // update charTypes
             annotations[type].map( function(an) {
               for (var i = an.begin; i < an.end; i++) {
-                if (charTypes[i].indexOf(typeId) == -1){
+                if (charTypes[i] && charTypes[i].indexOf(typeId) == -1){
                   charTypes[i].push(typeId);
                 }
               }

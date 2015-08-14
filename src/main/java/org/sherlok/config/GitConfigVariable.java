@@ -44,7 +44,7 @@ public class GitConfigVariable implements ConfigVariable {
     static {
         // TODO add environment variable to let the user select another
         // directory if he wants to.
-        PATH_BASE = new File(RUNTIME_DIR_PATH +"git/");
+        PATH_BASE = new File(RUNTIME_DIR_PATH + "git/");
 
         // Create the runtime location for git repositories and make sure
         // we can use it.

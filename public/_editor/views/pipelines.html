@@ -178,10 +178,10 @@ print list(Sherlok().annotate('{{activePipe.name}}', text))</pre></p>
             <div layout="row" class="test_row status_{{test.status}}">
               <span render-annotations></span>
               <span flex></span>
-              <span ng-click="test.visible=!test.visible"> [edit]</span>
+              <span ng-click="test.visible=!test.visible"> [{{test.visible ? "close details" : "edit"}}]</span>
               <span ng-click="activePipe.tests.splice($index, 1)"> [del]</span>
             </div>
-            <div class="test-edit" ng-show="test.visible">
+            <div class="test-edit status_{{test.status}}" ng-show="test.visible">
               <h4>Text:</h4>
               <textarea               ng-model="test.input"    rows="2"></textarea>
               <div layout="row">
@@ -193,6 +193,9 @@ print list(Sherlok().annotate('{{activePipe.name}}', text))</pre></p>
                   <h4>Actual:</h4>
                   <textarea json-text ng-model="test.actual"   rows="18"></textarea>
                 </div>
+              </div>
+              <div layout="row" ng-show="test.errorMsg">
+                <p>Error: {{test.errorMsg}}</p>
               </div>
               <md-button ng-click="runAllTests()" aria-label="run tests">run tests</md-button>
             </div>

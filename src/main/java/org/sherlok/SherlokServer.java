@@ -154,7 +154,7 @@ public class SherlokServer {
             }
         });
 
-        /** For testing only, does not store the pipeline */
+        /** Testing only, does not store the pipeline */
         post(new JsonRoute("/" + TEST) {
             @Override
             public Object handle(Request req, Response resp) {
@@ -180,7 +180,7 @@ public class SherlokServer {
                                             "system", system));
                         } catch (SherlokException e) {
                             isPassed = false;
-                            failed.put(i, e.setWhen(test.toString()));
+                            failed.put(i, e.setWhen(test.getInput()));
                         }
                     }
                     if (isPassed) {

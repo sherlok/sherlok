@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.uima.ruta.tag.obo.OBOOntology;
+import org.apache.uima.ruta.tag.obo.OboFormatException;
 import org.apache.uima.ruta.tag.obo.OntologyTerm;
 import org.apache.uima.ruta.tag.obo.RoboExpander;
 import org.apache.uima.ruta.tag.obo.Synonym;
@@ -37,7 +38,7 @@ public class Obo2Wordtable {
 
     private static final String DIR = "/Users/richarde/git2/neuroNER/resources/bluima/neuroner";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, OboFormatException {
 
         for (String oboFile : new String[] {//
         "GeneNames",//

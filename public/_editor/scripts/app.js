@@ -36,6 +36,7 @@ app.config(function($mdThemingProvider) {
   $mdThemingProvider.theme('grey')  .primaryPalette('grey');
 });
 
+// turns annotation (json) into html with borders and colors.
 app.directive('renderAnnotations', function($compile) {
   return {
     link: function(scope, element, attr) {
@@ -158,7 +159,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     })
   };
 
-  // TESTS
+  // TESTS FIXME refactor and ship a json that can be inserted into the UI as is
   $scope.runAllTests = function(){
     if ($scope.activePipe.tests.length == 0 || !$scope.activePipe.tests[0].input){
       toast($mdToast, 'No tests for this pipeline. Click [edit] to add some!');
@@ -171,9 +172,10 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
       // update ok/fail counts
       $scope.activePipe.testsOk = $scope.activePipe.tests.length;
       $scope.activePipe.testsFailed = 0;
-      // update actual field
+      // update fields
       var p = data.passed;
       for (var id in p) {
+        $scope.activePipe.tests[id].status = 'passed';
         if (p.hasOwnProperty(id)) {
           $scope.activePipe.tests[id].actual = p[id].system;
         }
@@ -188,11 +190,26 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
       for (var id in f) {
         $scope.activePipe.tests[id].status = 'failed';
         try {
-          $scope.activePipe.tests[id].actual = f[id].system;
+          $scope.activePipe.tests[id].actual = f[id].details.actual;
+          $scope.activePipe.tests[id].errorMsg = f[id].message;
         }
-        catch(err) { /*nope*/};
+        catch(err) { /*nope*/
+          console.log('failed to update actual values', f[id]);
+        };
       }
-      $scope.testing = false;
+      // refresh passed
+      var p = testResults.passed;
+      for (var id in p) {
+        $scope.activePipe.tests[id].status = 'passed';
+        try {
+          $scope.activePipe.tests[id].actual = p[id].system;
+          $scope.activePipe.tests[id].errorMsg = 'none';
+        }
+        catch(err) { /*nope*/
+          console.log('failed to update actual values2', p[id]);
+        };
+      }
+      $scope.testing = false; // release button
     })
   };
 
@@ -208,6 +225,7 @@ app.controller('pipelines', function PipelineController($scope, $http, $location
     $scope.activePipe.tests.push({"expected" : {}, "input" : "", "visible": true});
   };
 
+  // annotate a single text
   // copies current pipeline, and set as first test the text to annotate
   $scope.annotateText = function(){
     $scope.annotate.annotating = true;

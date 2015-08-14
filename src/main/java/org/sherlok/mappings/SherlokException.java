@@ -55,7 +55,7 @@ public class SherlokException extends Exception {
     private String _message;
 
     /** More details about what went wrong? */
-    private String details;
+    private Object details;
 
     /** What was the object causing the error? */
     private String object;
@@ -83,7 +83,7 @@ public class SherlokException extends Exception {
         return this;
     }
 
-    public String getDetails() {
+    public Object getDetails() {
         return details;
     }
 
@@ -101,6 +101,15 @@ public class SherlokException extends Exception {
                     + elements[i].getMethodName() + "(); ");
         }
         setDetails(msg.toString().trim());
+        return this;
+    }
+
+    /**
+     * @param detailsObj
+     *            must be JSON seralizable
+     */
+    public SherlokException setDetails(Object detailsObj) {
+        this.details = detailsObj;
         return this;
     }
 

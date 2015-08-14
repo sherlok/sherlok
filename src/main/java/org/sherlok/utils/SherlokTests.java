@@ -15,6 +15,9 @@
  */
 package org.sherlok.utils;
 
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.sherlok.utils.Create.map;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -52,17 +55,24 @@ public class SherlokTests {
             for (Entry<String, List<JsonAnnotation>> entry : expecteds
                     .entrySet()) {
 
-                String expectedKey = entry.getKey();
-                List<JsonAnnotation> expectedValues = entry.getValue();
+                String expectedAnnotationClass = entry.getKey();
+                List<JsonAnnotation> expectedAnnotations = entry.getValue();
 
                 // Get the corresponding annotations and make sure they exists
-                List<JsonAnnotation> actualValues = actuals.get(expectedKey);
+                List<JsonAnnotation> actualValues = actuals
+                        .get(expectedAnnotationClass);
                 if (actualValues == null) {
-                    throw new SherlokException("could not find expected key",
-                            expectedKey);// TODO check
+                    throw new SherlokException(
+                            "could not find expected Annotations of type '"
+                                    + expectedAnnotationClass
+                                    + "', could only find Annotations of type '"
+                                    + join(actuals.keySet(), "', '") + "'",
+                            expectedAnnotationClass)//
+                            .setDetails(map("expected", expecteds, "actual",
+                                    actuals));
                 }
 
-                for (JsonAnnotation expected : expectedValues) {
+                for (JsonAnnotation expected : expectedAnnotations) {
                     // Find an annotation that has the same begin and end in the
                     // actual annotations. Note that two annotations with the
                     // same key and same region are not supported by this test.
@@ -78,8 +88,11 @@ public class SherlokTests {
                     // Make sure that such (begin, end) pair was found
                     if (actual == null) {
                         throw new SherlokException(
-                                "could not find expected annotation",
-                                expected.toString());// TODO
+                                "could not find expected annotation "+
+                                    expectedAnnotationClass    + expected.toString() ,
+                                expected.toString())//
+                                .setDetails(map("expected", expecteds,
+                                        "actual", actuals));
                     }
 
                     // Make sure that each expected properties exist
@@ -96,11 +109,13 @@ public class SherlokTests {
                         // that sub-properties must be included in both
                         // expected and actual properties. Hence the "at least"
                         // test is not perfect.
-                        if (!actualProperty.equals(expectedProperty.getValue())) {
-                            throw new SherlokException("actual property <"
+                        if (!expectedProperty.getValue().equals(actualProperty)) {
+                            throw new SherlokException("actual property '"
                                     + actualProperty
-                                    + "> is not equal to expected property <"
-                                    + expectedProperty + ">");
+                                    + "' is not equal to expected property '"
+                                    + expectedProperty + "'")//
+                                    .setDetails(map("expected", expecteds,
+                                            "actual", actuals));
                         }
                     }
                 }

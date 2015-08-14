@@ -6,31 +6,34 @@
   "script" : [
  "PACKAGE neuroner;"
 , ""
-, "Document{-> RETAINTYPE(BREAK)}; // retains breaking lines, so that two neurons on two different lines do not collide"
+, "RETAINTYPE(BREAK); // so that two neurons on two different lines do not collide"
+, ""
+, "DECLARE Annotation NeuronProperty(STRING name, STRING ontologyId); // base class for properties "
 , ""
 , "DECLARE NeuronTrigger;  // acts as a trigger"
-, "DECLARE Annotation NeuronProperty(STRING name, STRING ontologyId); // base class for properties "
+, "MARKFAST(NeuronTrigger, '$neuroner/resources/bluima/neuroner/neuron_triggers.txt', true, 3);"
+, ""
 , ""
 , "// DEVELOPMENTAL STAGES"
 , "DECLARE NeuronProperty Developmental; "
-, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_developmental_ontology.obo\", Developmental, \"ontologyId\")};"
+, "ONTO(\"$neuroner/resources/bluima/neuroner/hbp_developmental_ontology.obo\", Developmental, \"ontologyId\");"
 , ""
 , "// NEUROTRANSMITTER"
 , "DECLARE NeuronProperty NeurotransmitterProp(STRING name, STRING ontologyId);"
-, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_neurotransmitter_ontology.obo\", NeurotransmitterProp, \"ontologyId\")};"
+, "ONTO(\"$neuroner/resources/bluima/neuroner/hbp_neurotransmitter_ontology.obo\", NeurotransmitterProp, \"ontologyId\");"
 , ""
 , "// LAYER"
 , "DECLARE NeuronProperty Layer;"
-, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_layer_ontology.obo\", Layer, \"ontologyId\")};"
+, "ONTO(\"$neuroner/resources/bluima/neuroner/hbp_layer_ontology.obo\", Layer, \"ontologyId\");"
 , ""
 , "// MORPHOLOGY"
 , "DECLARE NeuronProperty Morphology;"
-, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_morphology_ontology.obo\", Morphology, \"ontologyId\")};"
+, "ONTO(\"$neuroner/resources/bluima/neuroner/hbp_morphology_ontology.obo\", Morphology, \"ontologyId\");"
 , ""
 , "// SPECIES"
 , "WORDTABLE speciesWt = '$neuroner/resources/bluima/neuroner/ncbi_species_top1000.csv';"
 , "DECLARE NeuronProperty Species;"
-, "Document{-> MARKTABLE(Species, 1, speciesWt, true, 2, \"\", 0, \"ontologyId\" = 2)};"
+, "MARKTABLE(Species, 1, speciesWt, true, 2, \"\", 0, \"ontologyId\" = 2);"
 , ""
 , "// ORIENTATION"
 , "DECLARE NeuronProperty Orientation;"
@@ -43,49 +46,42 @@
 , "// ELECTROPHYSIOLOGY"
 , "DECLARE Annotation EphysTrigger(STRING name, STRING ontologyId);"
 , "DECLARE Annotation EphysProp(STRING name, STRING ontologyId);"
-, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_electrophysiology-triggers_ontology.robo\", EphysTrigger, \"ontologyId\")};"
-, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_electrophysiology_ontology.robo\", EphysProp, \"ontologyId\")};"
+, "ONTO(\"$neuroner/resources/bluima/neuroner/hbp_electrophysiology-triggers_ontology.robo\", EphysTrigger, \"ontologyId\");"
+, "ONTO(\"$neuroner/resources/bluima/neuroner/hbp_electrophysiology_ontology.robo\", EphysProp, \"ontologyId\");"
 , "DECLARE NeuronProperty Electrophysiology;"
 , "(EphysTrigger|EphysProp)+ {-> MARK(Electrophysiology)};"
 , ""
-, "// DICTIONARY MATCHING"
+, "// FUNCTIONS"
 , "DECLARE NeuronProperty Function;"
-, "DECLARE NeuronProperty BrainRegionProp; // so as not to be confused w/ other BrainRegion annotations"
-, "DECLARE Annotation ProteinName(STRING name, STRING ontologyId); // is further aggregated below"
-, "// we use a single compiled trie to match word lists (found in resources folder)"
-, "WORDLIST generated = '$neuroner/resources/bluima/neuroner/generated.mtwl';"
-, "Document{ ->TRIE("
-, "\"neuron_triggers.txt\" = NeuronTrigger,"
-, "\"functions.txt\" = Function,"
-, "//\"regions_adverbs_al.txt\" = BrainRegionProp,"
-, "//\"regions_adverbs_ic.txt\" = BrainRegionProp,"
-, "//\"regions_lfrench.txt\" = BrainRegionProp,"
-, "//\"regions.txt\" = BrainRegionProp,"
-, "generated, true, 4, false, 0, \"\")}; // case ignored if word length > 4; edit distance deactivated"
+, "MARKFAST(Function, '$neuroner/resources/bluima/neuroner/functions.txt', true, 4);"
 , ""
 , ""
 , "// BRAIN REGION"
-, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/hbp_brainregions_aba-syn.obo\", BrainRegionProp, \"ontologyId\")};"
+, "DECLARE NeuronProperty BrainRegionProp; // so as not to be confused w/ other BrainRegion annotations"
+, "ONTO(\"$neuroner/resources/bluima/neuroner/hbp_brainregions_aba-syn.obo\", BrainRegionProp, \"ontologyId\");"
 , ""
 , ""
 , "// PROTEIN"
-, "Document{ -> ONTO(\"$neuroner/resources/bluima/neuroner/GeneNames.obo\", ProteinName, \"ontologyId\")};"
-, "// aggregate protein names (as it was matched above) with a ProteinTrigger "
+, "DECLARE NeuronProperty ProteinProp; "
+, "ONTO(\"$neuroner/resources/bluima/neuroner/GeneNames.obo\", ProteinProp, \"ontologyId\");"
 , "DECLARE ProteinTrigger;"
 , "\"(?i)(contain|secret|releas|bind|synthesiz|express|contain)ing|\\\\+|principal|immuno(nega|posi|reac)tive|(reac|posi)tive|immunoreactivity|"
 , "reactive|labeled|stained|[Cc]re\" -> ProteinTrigger;"
-, "DECLARE NeuronProperty ProteinProp;"
-, "(ProteinName \"-\"? ProteinTrigger? ProteinTrigger?){-> CREATE(ProteinProp, \"ontologyId\" = ProteinName.ontologyId)};"
-, "(ProteinTrigger \"-\"? ProteinName ){-> CREATE(ProteinProp, \"ontologyId\" = ProteinName.ontologyId)};"
-, "(ProteinTrigger ProteinName (COMMA ProteinName)?){-> MARK(ProteinProp)};"
+, "// aggregate protein names (as it was matched above) with a ProteinTrigger "
+, "ProteinProp {-> SHIFT(ProteinProp,1,4)} \"-\"? ProteinTrigger? ProteinTrigger?;"
+, "ProteinTrigger \"-\"? ProteinTrigger? \"-\"? ProteinProp {-> SHIFT(ProteinProp,1,5)};"
+, "(ProteinProp (COMMA | \"and\" | (COMMA \"and\") | (COMMA \"or\"))){-> SHIFT(ProteinProp,1,2)} ProteinProp;"
+, ""
 , "// also apply protein rules to neurotransmitters"
 , "(NeurotransmitterProp \"-\"? ProteinTrigger){-> SHIFT(NeurotransmitterProp,1,3)};"
 , ""
+, ""
+, ""
+, "// AGGREGATE ///////////////////////////////////////////////////////////////////////////////////////////////"
 , "// aggregate multiple triggers together"
 , "(NeuronTrigger \"and\"? NeuronTrigger){-> SHIFT(NeuronTrigger)};"
 , ""
 , ""
-, "// AGGREGATE ///////////////////////////////////////////////////////////////////////////////////////////////"
 , "DECLARE Neuron;                // matches the whole span of a neuron definition"
 , "DECLARE PreNeuron, PostNeuron; // context before and after a neuron trigger"
 , ""
@@ -157,12 +153,12 @@
         "begin" : 22,
         "end" : 27
       } ],
-      "BrainRegionProp" : [ {
-        "begin" : 0,
-        "end" : 7
-      }, {
-        "begin" : 12,
-        "end" : 21
+      "Morphology" : [ {
+        "begin" : 28,
+        "end" : 37,
+        "properties" : {
+          "ontologyId" : "HBP_MORPHOLOGY:0000001"
+        }
       } ],
       "Neuron" : [ {
         "begin" : 0,
@@ -191,7 +187,7 @@
         "begin" : 0,
         "end" : 11,
         "properties" : {
-          "ontologyId" : "parvalbumin"
+          "ontologyId" : "NCBI_GENE:19293"
         }
       } ],
       "Morphology" : [ {
@@ -213,7 +209,7 @@
         "begin" : 0,
         "end" : 22,
         "properties" : {
-          "ontologyId" : "Parvalbumin"
+          "ontologyId" : "NCBI_GENE:19293"
         }
       } ],
       "Neuron" : [ {
@@ -225,10 +221,10 @@
     "input" : "neuron expressing parvalbumin",
     "expected" : {
       "ProteinProp" : [ {
-        "begin" : 18,
+        "begin" : 7,
         "end" : 29,
         "properties" : {
-          "ontologyId" : "parvalbumin"
+          "ontologyId" : "NCBI_GENE:19293"
         }
       } ],
       "Neuron" : [ {
@@ -243,7 +239,7 @@
         "begin" : 0,
         "end" : 11,
         "properties" : {
-          "ontologyId" : "parvalbumin"
+          "ontologyId" : "NCBI_GENE:19293"
         }
       } ],
       "Neuron" : [ {
@@ -252,31 +248,8 @@
       } ]
     }
   }, {
-    "input" : "slow non-adapting spiking cell",
+    "input" : "slow nonadapting spiking cell",
     "expected" : {
-      "EphysTrigger" : [ {
-        "begin" : 5,
-        "end" : 17,
-        "properties" : {
-          "ontologyId" : "HBP_EPHYS_TRIGGER:0000009"
-        }
-      }, {
-        "begin" : 9,
-        "end" : 17,
-        "properties" : {
-          "ontologyId" : "HBP_EPHYS_TRIGGER:0000008"
-        }
-      }, {
-        "begin" : 18,
-        "end" : 25,
-        "properties" : {
-          "ontologyId" : "HBP_EPHYS_TRIGGER:0000003"
-        }
-      } ],
-      "Electrophysiology" : [ {
-        "begin" : 0,
-        "end" : 25
-      } ],
       "EphysProp" : [ {
         "begin" : 0,
         "end" : 4,
@@ -284,9 +257,22 @@
           "ontologyId" : "HBP_EPHYS:0000100"
         }
       } ],
+      "EphysTrigger" : [ {
+        "begin" : 5,
+        "end" : 16,
+        "properties" : {
+          "ontologyId" : "HBP_EPHYS_TRIGGER:0000009"
+        }
+      }, {
+        "begin" : 17,
+        "end" : 24,
+        "properties" : {
+          "ontologyId" : "HBP_EPHYS_TRIGGER:0000003"
+        }
+      } ],
       "Neuron" : [ {
         "begin" : 0,
-        "end" : 30
+        "end" : 29
       } ]
     }
   }, {
@@ -324,20 +310,16 @@
   }, {
     "input" : "SAPAP1-Cre expressing cells",
     "expected" : {
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 27
+      } ],
       "ProteinProp" : [ {
         "begin" : 0,
         "end" : 21,
         "properties" : {
-          "ontologyId" : "SAPAP1"
+          "ontologyId" : "NCBI_GENE:224997"
         }
-      } ],
-      "ProteinName" : [ {
-        "begin" : 0,
-        "end" : 6
-      } ],
-      "Neuron" : [ {
-        "begin" : 0,
-        "end" : 27
       } ]
     }
   }, {
@@ -346,13 +328,6 @@
       "ProteinProp" : [ {
         "begin" : 0,
         "end" : 6,
-        "properties" : {
-          "ontologyId" : "PV"
-        }
-      } ],
-      "ProteinName" : [ {
-        "begin" : 0,
-        "end" : 2,
         "properties" : {
           "ontologyId" : "NCBI_GENE:19293"
         }
