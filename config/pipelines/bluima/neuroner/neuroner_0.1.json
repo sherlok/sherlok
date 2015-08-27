@@ -68,6 +68,7 @@
 , ""
 , "DECLARE NeuronProperty Electrophysiology;"
 , "(EphysTrigger|EphysProp|\"-\")+ {-> MARK(Electrophysiology)};"
+, "Electrophysiology{(Electrophysiology.end - Electrophysiology.begin) < 2 -> UNMARK(Electrophysiology)}; // remove single hyphens"
 , ""
 , "DECLARE ProteinTrigger;"
 , "\"(?i)(contain|secret|releas|bind|synthesiz|express|contain)ing|\\\\+|principal|immuno(nega|posi|reac)tive|(reac|posi)tive|immunoreactivity|"
@@ -385,6 +386,23 @@
       "Neuron" : [ {
         "begin" : 0,
         "end" : 24
+      } ]
+    }
+  }, {
+    "comment" : "Example where someone uses [protein], [protein], [protein] [protein trigger] [neuron trigger]. TODO: protein matching still does not work",
+    "input" : "many calretinin-, neuronal nitric oxide synthase-, and reelin-expressing cells",
+    "expected" : {
+      "ProteinTrigger" : [ {
+        "begin" : 62,
+        "end" : 72
+      } ],
+      "Function" : [ {
+        "begin" : 18,
+        "end" : 26
+      } ],
+      "Neuron" : [ {
+        "begin" : 5,
+        "end" : 78
       } ]
     }
   } ]
