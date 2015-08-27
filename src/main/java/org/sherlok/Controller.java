@@ -45,8 +45,11 @@ public class Controller {
     protected static final Logger LOG = getLogger(Controller.class);
 
     // these act as caching:
+    /** key:id, value:bundle */
     protected Map<String, BundleDef> bundleDefs;
+    /** key:id, value:engine */
     protected Map<String, EngineDef> engineDefs;
+    /** key:id, value:pipeline */
     protected Map<String, PipelineDef> pipelineDefs;
 
     /**

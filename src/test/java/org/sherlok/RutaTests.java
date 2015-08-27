@@ -21,6 +21,7 @@ import static org.sherlok.utils.Create.list;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.uima.resource.ResourceInitializationException;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sherlok.mappings.BundleDef.EngineDef;
@@ -43,7 +44,7 @@ public class RutaTests {
         new UimaPipeline(pd, new ArrayList<EngineDef>());
     }
 
-    @Test(expected = SherlokException.class)
+    @Test(expected = ResourceInitializationException.class)
     public void testValidateRutaScriptMissingColumn() throws Exception {
 
         PipelineDef pd = (PipelineDef) new PipelineDef()//
