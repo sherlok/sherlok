@@ -107,7 +107,7 @@ public class PipelineDef extends Def {
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonInclude(NON_DEFAULT)
-    @JsonPropertyOrder(value = { "input", "expected", "comparison" }, alphabetic = true)
+    @JsonPropertyOrder(value = { "comment", "input", "expected", "comparison" }, alphabetic = true)
     public static class PipelineTest {
 
         public enum Comparison {
@@ -117,9 +117,19 @@ public class PipelineDef extends Def {
             exact;
         }
 
+        private String comment;
         private String input;
         private Map<String, List<JsonAnnotation>> expected = map();
         private Comparison comparison = Comparison.atLeast; // default
+
+        public String getComment() {
+            return comment;
+        }
+
+        public PipelineTest setComment(String comment) {
+            this.comment = comment;
+            return this;
+        }
 
         public String getInput() {
             return input;
