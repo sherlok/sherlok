@@ -127,7 +127,7 @@ public class JsonAnnotation {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[" + begin + ":" + end);
+        sb.append("[" + begin + "-" + end);
         for (Entry<String, Object> p : properties.entrySet()) {
             sb.append(", " + p.getKey() + "='" + p.getValue() + "'");
         }

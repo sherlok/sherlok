@@ -76,26 +76,31 @@
       <artifactId>uimaj-json</artifactId>
       <version>2.7.0</version>
     </dependency>
+      <!-- 
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>ruta-core</artifactId>
-      <!-- 
       <version>2.3.0</version>
+      <version>2.3.1-SNAPSHOT</version>       
+    </dependency>
       -->
-      <version>2.3.1-SNAPSHOT</version> 
+    <dependency>
+      <groupId>com.github.renaud</groupId>
+      <artifactId>ruta-core</artifactId>
+      <version>337dbabc66</version><!-- hack to be able to use 2.3.1 -->
+    </dependency>
+    <dependency>
+      <groupId>com.github.renaud</groupId>
+      <artifactId>ruta-ontologies</artifactId>
+      <version>751d6c6ca7</version>
     </dependency>
     <!--
     <dependency>
-      <groupId>com.github.renaud</groupId>
+      <groupId>org.apache.uima</groupId>
       <artifactId>ruta-ontologies</artifactId>
       <version>2.3.0</version>
     </dependency>
     -->
-    <dependency>
-      <groupId>org.apache.uima</groupId>
-      <artifactId>ruta-ontologies</artifactId>
-      <version>2.3.0</version>
-    </dependency>
 
     <!-- AETHER TODO: remove some? -->
     <dependency>
