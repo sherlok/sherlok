@@ -55,7 +55,10 @@
 , ""
 , "// BRAIN REGION"
 , "DECLARE NeuronProperty BrainRegionProp; // so as not to be confused w/ other BrainRegion annotations"
+, "ONTO(\"$neuroner/resources/bluima/neuroner/regions.obo\", BrainRegionProp, \"ontologyId\");"
 , "ONTO(\"$neuroner/resources/bluima/neuroner/hbp_brainregions_aba-syn.obo\", BrainRegionProp, \"ontologyId\");"
+, "// TODO keep in prio the ones with an id"
+, "//(BrainRegionProp{-> UNMARK(BrainRegionProp)}){AND(FEATURE(\"ontologyId\", \"NO_ID\"), PARTOFNEQ(BrainRegionProp))};"
 , ""
 , "// PROTEIN"
 , "DECLARE NeuronProperty ProteinProp; "
@@ -320,7 +323,10 @@
     "expected" : {
       "BrainRegionProp" : [ {
         "begin" : 13,
-        "end" : 46
+        "end" : 46,
+        "properties" : {
+          "ontologyId" : "ABA_REGION:262"
+        }
       } ],
       "Neuron" : [ {
         "begin" : 0,
@@ -459,6 +465,24 @@
         "end" : 22,
         "properties" : {
           "ontologyId" : "NCBI_GENE:14417"
+        }
+      } ]
+    }
+  }, {
+    "comment" : "#31 adding flat lists of region terms back",
+    "input" : "nucleus pulvinaris medialis internus bbbb sixth cranial nerve",
+    "expected" : {
+      "BrainRegionProp" : [ {
+        "begin" : 0,
+        "end" : 36,
+        "properties" : {
+          "ontologyId" : "UNKN_REGION:339"
+        }
+      }, {
+        "begin" : 42,
+        "end" : 61,
+        "properties" : {
+          "ontologyId" : "ABA_REGION:710"
         }
       } ]
     }
