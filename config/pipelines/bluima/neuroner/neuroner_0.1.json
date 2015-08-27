@@ -104,13 +104,15 @@
 , "//PreNeuron{-> DEL};"
 , "//PostNeuron{-> DEL};"
 , ""
-, "// remove single isolated Neuron, unless \"cell\""
-, "NeuronTrigger{NOT(REGEXP(\"[Cc]ells?\")) -> MARK(Neuron, 1, 1)}; "
+, "NeuronTrigger{NOT(REGEXP(\"[Cc]ells?\")) -> MARK(Neuron, 1, 1)}; // remove single isolated Neuron, unless \"cell\""
 , ""
-, "// remove neuron that have line breaks "
-, "Neuron{CONTAINS(BREAK) -> DEL}; // TODO check above with pdf (new lines?)"
-, "// keep only longest Neuron"
-, "Neuron{PARTOF(Neuron) -> DEL}; // TODO remove cells without NeuronProperty"
+, "Neuron{CONTAINS(BREAK) -> DEL}; // remove neuron that have line breaks "
+, "// TODO check above with pdf (new lines?)"
+, ""
+, "(Neuron{-> UNMARK(Neuron)}){PARTOFNEQ(Neuron)}; // only keep longest Neuron"
+, ""
+, "// TODO remove cells without NeuronProperty"
+, ""
 , ""
 , "//"
 , "// MISSING ///////////////////////////////////////////////////////////////////////////////////////////////"
@@ -391,24 +393,20 @@
     }
   }, {
     "comment" : "Example where someone uses [protein], [protein], [protein] [protein trigger] [neuron trigger]. TODO: protein matching still does not work",
-    "input" : "many calretinin-, neuronal nitric oxide synthase-, and reelin-expressing cells",
+    "input" : "many calretinin-, neuronal nitric oxide synthase-, and reelin-expressing cells TODO",
     "expected" : {
       "ProteinTrigger" : [ {
         "begin" : 62,
         "end" : 72
       } ],
-      "Function" : [ {
-        "begin" : 18,
-        "end" : 26
-      } ],
       "Neuron" : [ {
-        "begin" : 5,
+        "begin" : 18,
         "end" : 78
       } ]
     }
   }, {
     "comment" : "",
-    "input" : "Grin2a-expressing neuron",
+    "input" : "Grin2a-expressing neuron space NMDAR2A-expressing neuron space GluN2A-expressing neuron",
     "expected" : {
       "ProteinProp" : [ {
         "begin" : 0,
@@ -416,14 +414,28 @@
         "properties" : {
           "ontologyId" : "NCBI_GENE:14811"
         }
-      } ],
-      "ProteinTrigger" : [ {
-        "begin" : 7,
-        "end" : 17
+      }, {
+        "begin" : 31,
+        "end" : 49,
+        "properties" : {
+          "ontologyId" : "NCBI_GENE:14811"
+        }
+      }, {
+        "begin" : 63,
+        "end" : 80,
+        "properties" : {
+          "ontologyId" : "NCBI_GENE:14811"
+        }
       } ],
       "Neuron" : [ {
         "begin" : 0,
         "end" : 24
+      }, {
+        "begin" : 31,
+        "end" : 56
+      }, {
+        "begin" : 63,
+        "end" : 87
       } ]
     }
   } ]
