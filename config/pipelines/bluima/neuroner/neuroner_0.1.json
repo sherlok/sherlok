@@ -138,7 +138,7 @@
     "include_annotations" : [ "neuroner.*" ]
   },
   "tests" : [ {
-    "input" : "layer V and layer iii large pyramidal neurons",
+    "input" : "layer V and layer iii large pyramidal neurons in Layer 3/4",
     "expected" : {
       "Layer" : [ {
         "begin" : 0,
@@ -151,6 +151,12 @@
         "end" : 21,
         "properties" : {
           "ontologyId" : "HBP_LAYER:0000003"
+        }
+      }, {
+        "begin" : 49,
+        "end" : 58,
+        "properties" : {
+          "ontologyId" : "HBP_LAYER:0000121"
         }
       } ],
       "Size" : [ {
@@ -166,7 +172,7 @@
       } ],
       "Neuron" : [ {
         "begin" : 0,
-        "end" : 45
+        "end" : 58
       } ]
     }
   }, {
