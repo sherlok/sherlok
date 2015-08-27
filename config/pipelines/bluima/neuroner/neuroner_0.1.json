@@ -438,5 +438,29 @@
         "end" : 87
       } ]
     }
+  }, {
+    "comment" : "#5",
+    "input" : "gad aaaa GAD bbbb GAD2",
+    "expected" : {
+      "ProteinProp" : [ {
+        "begin" : 0,
+        "end" : 3,
+        "properties" : {
+          "ontologyId" : "NCBI_GENE:22223"
+        }
+      }, {
+        "begin" : 9,
+        "end" : 12,
+        "properties" : {
+          "ontologyId" : "NCBI_GENE:22223"
+        }
+      }, {
+        "begin" : 18,
+        "end" : 22,
+        "properties" : {
+          "ontologyId" : "NCBI_GENE:14417"
+        }
+      } ]
+    }
   } ]
 }
