@@ -67,7 +67,7 @@
 , "// AGGREGATE PROPERTIES ////////////////////////////////////////////////////////////////////////////////////"
 , ""
 , "DECLARE NeuronProperty Electrophysiology;"
-, "(EphysTrigger|EphysProp)+ {-> MARK(Electrophysiology)};"
+, "(EphysTrigger|EphysProp|\"-\")+ {-> MARK(Electrophysiology)};"
 , ""
 , "DECLARE ProteinTrigger;"
 , "\"(?i)(contain|secret|releas|bind|synthesiz|express|contain)ing|\\\\+|principal|immuno(nega|posi|reac)tive|(reac|posi)tive|immunoreactivity|"
@@ -351,6 +351,40 @@
       "Neuron" : [ {
         "begin" : 0,
         "end" : 11
+      } ]
+    }
+  }, {
+    "comment" : "EphysProps and EphysTriggers should be combined into a neuroNER if they are conjoined by a hyphen",
+    "input" : "fast-spiking basket cell",
+    "expected" : {
+      "Morphology" : [ {
+        "begin" : 13,
+        "end" : 19,
+        "properties" : {
+          "ontologyId" : "HBP_MORPHOLOGY:0000019"
+        }
+      } ],
+      "EphysTrigger" : [ {
+        "begin" : 5,
+        "end" : 12,
+        "properties" : {
+          "ontologyId" : "HBP_EPHYS_TRIGGER:0000003"
+        }
+      } ],
+      "Electrophysiology" : [ {
+        "begin" : 0,
+        "end" : 12
+      } ],
+      "EphysProp" : [ {
+        "begin" : 0,
+        "end" : 4,
+        "properties" : {
+          "ontologyId" : "HBP_EPHYS:0000080"
+        }
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 24
       } ]
     }
   } ]
