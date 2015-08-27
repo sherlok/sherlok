@@ -78,8 +78,9 @@
 , "ProteinTrigger \"-\"? ProteinTrigger? \"-\"? ProteinProp {-> SHIFT(ProteinProp,1,5)};"
 , "(ProteinProp (COMMA | \"and\" | (COMMA \"and\") | (COMMA \"or\"))){-> SHIFT(ProteinProp,1,2)} ProteinProp;"
 , ""
-, "// also apply protein rules to neurotransmitters"
-, "(NeurotransmitterProp \"-\"? ProteinTrigger){-> SHIFT(NeurotransmitterProp,1,3)};"
+, "(NeurotransmitterProp \"-\"? ProteinTrigger){-> SHIFT(NeurotransmitterProp,1,3)}; // also apply protein rules to neurotransmitters"
+, ""
+, "(NeuronProperty{-> UNMARK(NeuronProperty)}){PARTOFNEQ(NeuronProperty)}; // only keep longest property"
 , ""
 , "//"
 , "// AGGREGATE NEURONS ////////////////////////////////////////////////////////////////////////////////////"
@@ -403,6 +404,26 @@
       "Neuron" : [ {
         "begin" : 5,
         "end" : 78
+      } ]
+    }
+  }, {
+    "comment" : "",
+    "input" : "Grin2a-expressing neuron",
+    "expected" : {
+      "ProteinProp" : [ {
+        "begin" : 0,
+        "end" : 17,
+        "properties" : {
+          "ontologyId" : "NCBI_GENE:14811"
+        }
+      } ],
+      "ProteinTrigger" : [ {
+        "begin" : 7,
+        "end" : 17
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 24
       } ]
     }
   } ]
