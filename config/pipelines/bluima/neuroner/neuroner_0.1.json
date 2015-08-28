@@ -486,5 +486,39 @@
         }
       } ]
     }
+  }, {
+    "comment" : "don't require that the protein trigger be activated before identifying the protein.",
+    "input" : "Parvalbumin-expressing neurons aaaa parvalbumin neuron bbbb neuron expressing parvalbumin",
+    "expected" : {
+      "ProteinProp" : [ {
+        "begin" : 0,
+        "end" : 22,
+        "properties" : {
+          "ontologyId" : "NCBI_GENE:19293"
+        }
+      }, {
+        "begin" : 36,
+        "end" : 47,
+        "properties" : {
+          "ontologyId" : "NCBI_GENE:19293"
+        }
+      }, {
+        "begin" : 67,
+        "end" : 89,
+        "properties" : {
+          "ontologyId" : "NCBI_GENE:19293"
+        }
+      } ],
+      "Neuron" : [ {
+        "begin" : 0,
+        "end" : 30
+      }, {
+        "begin" : 36,
+        "end" : 54
+      }, {
+        "begin" : 60,
+        "end" : 89
+      } ]
+    }
   } ]
 }
