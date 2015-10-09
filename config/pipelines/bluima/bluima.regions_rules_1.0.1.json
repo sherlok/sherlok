@@ -1,0 +1,44 @@
+{
+  "name" : "bluima.regions_rules",
+  "version" : "1.0.1",
+  "description" : "annotate brain regions",
+  "domain" : "bluima",
+  "script" : [
+ "ENGINE SentenceAnnotator:1.0.1;"
+, "ENGINE TokenAnnotator:1.0.1;"
+, "ENGINE PosTagAnnotator:1.0.1;"
+, "ENGINE BlueBioLemmatizer:1.0.1;"
+, "ENGINE MeasureRegexAnnotator:1.0.1;"
+, "ENGINE PruneMeasuresAnnotator:1.0.1;"
+, "ENGINE LinnaeusAnnotator:1.0.1;"
+, "ENGINE BrainRegionAnnotator:1.0.1;"
+, "ENGINE KeepLargestBrainRegionAnnotator:1.0.1;"
+, "ENGINE ExtractSameBrainRegionCoocurrences:1.0.1;"
+, "ENGINE BrainregionRules:1.0.1;"
+, "ENGINE KeepLargestCooccurrenceAnnotator:1.0.1;"
+ ],
+  "output" : { },
+  "tests" : [ {
+    "input" : "Sex differences in the gross size of the rat neocortex.",
+    "expected" : {
+      "BrainRegion" : [ {
+        "begin" : 45,
+        "end" : 54
+      } ]
+    }
+  }, {
+    "input" : "neocortex projects to the nucleus accumbens",
+    "expected" : {
+      "Cooccurrence" : [ {
+        "begin" : 0,
+        "end" : 33,
+        "properties" : {
+          "firstIds" : [ "neocortex" ],
+          "secondEntity" : 332,
+          "firstEntity" : 319,
+          "secondIds" : [ "nucleus" ]
+        }
+      } ]
+    }
+  } ]
+}
