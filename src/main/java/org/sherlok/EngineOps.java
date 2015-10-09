@@ -153,8 +153,8 @@ public class EngineOps {
             // find super class (if still implementing AnalysisComponent)
             Class<?> superklass = klass.getSuperclass();
             if (AnalysisComponent.class.isAssignableFrom(superklass)) {
-                LOG.trace("klass " + klass.getName() + " has superklass: "
-                        + superklass.getName());
+                // LOG.trace("klass " + klass.getName() + " has superklass: "
+                // + superklass.getName());
                 klass = (Class<? extends AnalysisComponent>) superklass;
             } else {
                 LOG.trace("klass " + klass.getName()

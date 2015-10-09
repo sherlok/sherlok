@@ -253,6 +253,9 @@ public class UimaPipeline {
 
             if (maybeErr.startsWith("Adding annotator")) {
                 maybeErr = "";// fix for StanfordNLP output FIXME
+            } else if (maybeErr
+                    .contains("Couldn't open cc.mallet.util.MalletLogger")) {
+                maybeErr = "";// fix for Mallet FIXME
             }
 
             if (maybeOut.length() > 0)

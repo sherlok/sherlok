@@ -240,7 +240,10 @@ public class FileBased {
             throw new SherlokException()
                     .setMessage(
                             "Unrecognized field \"" + upe.getPropertyName()
-                                    + "\"").setObject(f.getName())
+                                    + "\"")
+                    .setObject(
+                            clazz.getSimpleName().replaceAll("Def$", "") + " "
+                                    + f.getName())
                     .setDetails(upe.getMessageSuffix());
 
         } catch (JsonMappingException jme) {

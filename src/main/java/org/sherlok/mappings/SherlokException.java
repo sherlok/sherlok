@@ -145,4 +145,13 @@ public class SherlokException extends Exception {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return (getMessage() != null ? getMessage() : "") //
+                + (getObject() != null ? " ON OBJECT " + getObject() : "")//
+                + (getWhen() != null ? " WHEN " + getWhen() : "")//
+                + (getRoute() != null ? " and ROUTE " + getRoute() : "")//
+                + (getDetails() != null ? "; DETAILS: " + getDetails() : "")//
+                + (getRemedy() != null ? "; REMEDY: " + getRemedy() : "");
+    }
 }
