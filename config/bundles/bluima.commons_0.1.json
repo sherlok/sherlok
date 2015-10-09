@@ -23,7 +23,7 @@
       "name": "LinnaeusAnnotator",
       "class": "ch.epfl.bbp.uima.ae.LinnaeusAnnotator",
       "parameters": {
-        "configFile": [
+        "CONFIG_FILE": [
           "$bluima/linnaeus/properties.conf"
         ]
       }
