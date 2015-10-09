@@ -188,6 +188,15 @@ public class RutaHelper {
                 return "uima.cas.Float";
             case "DOUBLE":
                 return "uima.cas.Double";
+
+            case "INTLIST":
+                return "uima.cas.IntegerList";
+            case "FLOATLIST":
+                return "uima.cas.FloatList";
+            case "DOUBLELIST":
+                return "uima.cas.DoubleList";
+            case "BOOLEANLIST":
+                return "uima.cas.BooleanList";
                 // TODO do more
             default:
                 return rangeTypeName;
