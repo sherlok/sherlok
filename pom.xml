@@ -76,31 +76,16 @@
       <artifactId>uimaj-json</artifactId>
       <version>2.7.0</version>
     </dependency>
-      <!-- 
     <dependency>
       <groupId>org.apache.uima</groupId>
       <artifactId>ruta-core</artifactId>
-      <version>2.3.0</version>
-      <version>2.3.1-SNAPSHOT</version>       
+      <version>2.3.1</version>
     </dependency>
-      -->
-    <dependency>
-      <groupId>com.github.renaud</groupId>
-      <artifactId>ruta-core</artifactId>
-      <version>337dbabc66</version><!-- hack to be able to use 2.3.1 -->
-    </dependency>
-    <dependency>
-      <groupId>com.github.renaud</groupId>
-      <artifactId>ruta-ontologies</artifactId>
-      <version>751d6c6ca7</version>
-    </dependency>
-    <!--
     <dependency>
       <groupId>org.apache.uima</groupId>
+      <version>2.3.1</version>
       <artifactId>ruta-ontologies</artifactId>
-      <version>2.3.0</version>
     </dependency>
-    -->
 
     <!-- AETHER TODO: remove some? -->
     <dependency>
@@ -209,21 +194,29 @@
   </dependencies>
 
   <repositories>
-    <!-- models for dkpro -->
     <repository>
-      <id>dkpro</id>
-      <url>http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/</url>
-      <snapshots><enabled>false</enabled></snapshots>
+      <id>sherlok_releases</id>
+      <url>https://github.com/sherlok/sherlok_mavenrepo/raw/master/releases</url>
     </repository>
     <!-- JitPack builds GitHub projects on demand and publishes packages -->
     <repository>
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
     </repository>
+    <!-- models for dkpro -->
+    <repository>
+      <id>dkpro</id>
+      <url>http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-model-releases-local/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
     <repository>
       <id>Apache Snapshots</id>
       <url>http://repository.apache.org/snapshots/</url>
-      <snapshots><enabled>true</enabled></snapshots>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
@@ -328,11 +321,11 @@
         <artifactId>appassembler-maven-plugin</artifactId>
         <version>1.8.1</version>
         <configuration>
-          <!-- Add Java property for log to prevent ValidationException from
-            org.sherlok.UimaPipeline.initEngines(UimaPipeline.java:243) (line numbering
-            from 156718b0d11d5402e73de45406666a854fa09c5a) because MalletLogger might
-            write on syserr if this property is not set and resources/logging.properties
-            is not found. Note that log.properties doesn't have to exist to make this
+          <!-- Add Java property for log to prevent ValidationException from 
+            org.sherlok.UimaPipeline.initEngines(UimaPipeline.java:243) (line numbering 
+            from 156718b0d11d5402e73de45406666a854fa09c5a) because MalletLogger might 
+            write on syserr if this property is not set and resources/logging.properties 
+            is not found. Note that log.properties doesn't have to exist to make this 
             work. -->
           <extraJvmArguments>-Djava.util.logging.config.file=log.properties
             -Dfile.encoding=UTF8</extraJvmArguments>
@@ -352,7 +345,7 @@
   </build>
 
   <profiles>
-    <!-- TEST COVERAGE REPORTS, run it like: mvn clean test jacoco:report
+    <!-- TEST COVERAGE REPORTS, run it like: mvn clean test jacoco:report 
       -P test_coverage then open target/site/jacoco/index.html -->
     <profile>
       <id>test_coverage</id>
