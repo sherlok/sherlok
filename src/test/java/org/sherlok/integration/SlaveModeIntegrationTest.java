@@ -67,7 +67,7 @@ public class SlaveModeIntegrationTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         Thread.sleep(250);
-        SherlokServer.init(SLAVE_PORT, DEFAULT_IP, MASTER_API_URL, false);
+        SherlokServer.init(SLAVE_PORT, DEFAULT_IP, MASTER_API_URL, null);
         Thread.sleep(250);
     }
 

@@ -47,6 +47,7 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.uima.UIMAException;
+import org.apache.uima.ruta.engine.RutaEngine;
 import org.apache.uima.ruta.extensions.RutaParseRuntimeException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -139,11 +140,11 @@ public class PipelineLoader {
             if (pipelineDef == null) {
                 throw new SherlokException("no Pipeline with this id",
                         createId(pipelineName, originalVersion))
-                        .setRemedy("Version resolves to '"
-                                + version
-                                + "'; Available pipelines ids: '"
-                                + join(controller.listPipelineDefNames(),
-                                        "', '") + "'.");
+                                .setRemedy("Version resolves to '" + version
+                                        + "'; Available pipelines ids: '"
+                                        + join(controller
+                                                .listPipelineDefNames(), "', '")
+                                        + "'.");
             }
             UimaPipeline uimaPipeline = load(pipelineDef);
             uimaPipelinesCache.put(pipelineId, uimaPipeline);
@@ -181,12 +182,14 @@ public class PipelineLoader {
                     bundleDefsToResolve, engineDefsUsedInP.size());
         } catch (ArtifactResolutionException e) {
             throw new SherlokException(
-                    "Failed to resolve solve pipeline dependencies").setObject(
-                    pipelineDef.getId()).setDetails(e.getMessage());
+                    "Failed to resolve solve pipeline dependencies")
+                            .setObject(pipelineDef.getId())
+                            .setDetails(e.getMessage());
         } catch (DependencyCollectionException e) {
             throw new SherlokException(
-                    "Failed to collect pipeline dependencies").setObject(
-                    pipelineDef.getId()).setDetails(e.getMessage());
+                    "Failed to collect pipeline dependencies")
+                            .setObject(pipelineDef.getId())
+                            .setDetails(e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e); // should not happen
         }
@@ -200,13 +203,13 @@ public class PipelineLoader {
 
             Throwable rootCause = ExceptionUtils.getRootCause(e);
             if (rootCause instanceof RutaParseRuntimeException) {
-                throw new SherlokException(rootCause.getMessage()).setObject(
-                        pipelineDef.toString()).setDetails(
-                        rootCause.getStackTrace());
+                throw new SherlokException(rootCause.getMessage())
+                        .setObject(pipelineDef.toString())
+                        .setDetails(rootCause.getStackTrace());
             } else {
                 throw new SherlokException("could not initialize UIMA pipeline")
-                        .setObject(pipelineDef.toString()).setDetails(
-                                e.getStackTrace());
+                        .setObject(pipelineDef.toString())
+                        .setDetails(e.getStackTrace());
             }
         }
 
@@ -222,9 +225,10 @@ public class PipelineLoader {
      * (jars) to the classpath
      */
     static void solveDependencies(String pipelineName, String version,
-            Set<BundleDef> bundleDefs, int nrEngines) throws IOException,
-            TemplateException, ArtifactResolutionException,
-            DependencyCollectionException, IOException, SherlokException {
+            Set<BundleDef> bundleDefs, int nrEngines)
+                    throws IOException, TemplateException,
+                    ArtifactResolutionException, DependencyCollectionException,
+                    IOException, SherlokException {
 
         // create fake POM that contains all bundle deps
         String fakePom = MavenPom.writePom(bundleDefs, pipelineName, version);
@@ -237,7 +241,8 @@ public class PipelineLoader {
                 .newRepositorySystemSession(system, LOCAL_REPO_PATH);
         Map<String, String> repositoriesDefs = map();
         for (BundleDef b : bundleDefs) {
-            for (Entry<String, String> id_url : b.getRepositories().entrySet()) {
+            for (Entry<String, String> id_url : b.getRepositories()
+                    .entrySet()) {
                 repositoriesDefs.put(id_url.getKey(), id_url.getValue());
             }
         }
@@ -245,13 +250,12 @@ public class PipelineLoader {
                 session, repositoriesDefs);
 
         // solve dependencies
-        CollectResult collectResult = system.collectDependencies(
-                session,
+        CollectResult collectResult = system.collectDependencies(session,
                 new CollectRequest(new Dependency(rootArtifact, ""),
                         AetherResolver.newRepositories(system, session,
                                 new HashMap<String, String>())));
-        collectResult.getRoot().accept(
-                new AetherResolver.ConsoleDependencyGraphDumper());
+        collectResult.getRoot()
+                .accept(new AetherResolver.ConsoleDependencyGraphDumper());
         PreorderNodeListGenerator p = new PreorderNodeListGenerator();
         collectResult.getRoot().accept(p);
         List<Dependency> dependencies = p.getDependencies(true);
@@ -275,8 +279,9 @@ public class PipelineLoader {
                     && AetherResolver.localRepo.canWrite()) {
                 File sherlokRepo = new File(AetherResolver.LOCAL_REPO_PATH);
                 String canonicalPath = jar.getCanonicalPath();
-                String relative = canonicalPath.substring(sherlokRepo
-                        .getAbsolutePath().length(), canonicalPath.length());
+                String relative = canonicalPath.substring(
+                        sherlokRepo.getAbsolutePath().length(),
+                        canonicalPath.length());
                 File localRepoFile = new File(AetherResolver.localRepo,
                         relative);
                 if (!localRepoFile.exists()) {
@@ -345,8 +350,8 @@ public class PipelineLoader {
                         className.append(".");
                     className.append(part);
                     if (part.endsWith(".class"))
-                        className.setLength(className.length()
-                                - ".class".length());
+                        className.setLength(
+                                className.length() - ".class".length());
                 }
                 classNames.add(className.toString());
             }
@@ -370,8 +375,8 @@ public class PipelineLoader {
             Class sysclass = URLClassLoader.class;
 
             try {
-                Method method = sysclass
-                        .getDeclaredMethod("addURL", parameters);
+                Method method = sysclass.getDeclaredMethod("addURL",
+                        parameters);
                 method.setAccessible(true);
                 method.invoke(sysloader, new Object[] { u });
             } catch (Throwable t) {

@@ -15,12 +15,20 @@
  */
 package org.sherlok;
 
+import static org.sherlok.utils.Create.list;
+import static org.sherlok.utils.Create.set;
+
+import java.util.Collection;
+import java.util.Set;
+
 import javax.servlet.http.Part;
 
+import org.sherlok.mappings.PipelineDef;
 import org.sherlok.mappings.SherlokException;
 
 /**
- * Blocks PUT and DELETE methods from {@link Controller}.
+ * Restricts LIST and GET to {@link #pipelineId}; Blocks PUT and DELETE methods
+ * from {@link Controller}.
  * 
  * @author renaud@apache.org
  */
@@ -29,8 +37,48 @@ public class SealedController extends Controller {
     // /////////////////////////////////////////////////////////////////////
     // access API, LIST/GET are ok (inherit), PUT/DELETE are not allowed
 
+    private String pipelineId = null;
+
+    public SealedController() {// should not get called...
+    }
+
+    public SealedController(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
+
     protected String getErrorMsg() {
         return "not allowed in sealed mode";
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // access API, package visibility
+
+    // LIST all /////////////////////////////////////////////////////////////
+
+    Collection<PipelineDef> listPipelines() throws SherlokException {
+        for (PipelineDef p : pipelineDefs.values()) {
+            if (p.getId().equals(pipelineId)) {
+                return list(p);
+            }
+        }
+        throw new SherlokException(getErrorMsg(), "LIST pipelines");
+    }
+
+    // LIST all names /////////////////////////////////////////////////////////
+
+    Set<String> listPipelineDefNames() {
+        return set(pipelineId);
+    }
+
+    // GET by name /////////////////////////////////////////////////////////
+
+    PipelineDef getPipelineDef(String pipelineId) throws SherlokException {
+        if (pipelineId.equals(pipelineId)) {
+            return pipelineDefs.get(pipelineId);
+        } else {
+            throw new SherlokException(getErrorMsg(),
+                    "GET pipeline with id " + pipelineId);
+        }
     }
 
     // PUT /////////////////////////////////////////////////////////////

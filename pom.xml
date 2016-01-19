@@ -83,8 +83,8 @@
     </dependency>
     <dependency>
       <groupId>org.apache.uima</groupId>
-      <version>2.3.1</version>
       <artifactId>ruta-ontologies</artifactId>
+      <version>2.3.1</version>
     </dependency>
 
     <!-- AETHER TODO: remove some? -->
@@ -240,10 +240,7 @@
         <configuration>
           <filesets>
             <fileset>
-              <directory>config/resources/.pipelines</directory>
-            </fileset>
-            <fileset>
-              <directory>config/resources/.engines</directory>
+              <directory>runtime</directory>
             </fileset>
           </filesets>
         </configuration>
@@ -319,24 +316,24 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>appassembler-maven-plugin</artifactId>
-        <version>1.8.1</version>
+        <version>1.10</version>
         <configuration>
-          <!-- Add Java property for log to prevent ValidationException from 
-            org.sherlok.UimaPipeline.initEngines(UimaPipeline.java:243) (line numbering 
-            from 156718b0d11d5402e73de45406666a854fa09c5a) because MalletLogger might 
-            write on syserr if this property is not set and resources/logging.properties 
-            is not found. Note that log.properties doesn't have to exist to make this 
+          <!-- Add Java property for log to prevent ValidationException from
+            org.sherlok.UimaPipeline.initEngines(UimaPipeline.java:243) (line numbering
+            from 156718b0d11d5402e73de45406666a854fa09c5a) because MalletLogger might
+            write on syserr if this property is not set and resources/logging.properties
+            is not found. Note that log.properties doesn't have to exist to make this
             work. -->
           <extraJvmArguments>-Djava.util.logging.config.file=log.properties
             -Dfile.encoding=UTF8</extraJvmArguments>
           <programs>
             <program>
               <mainClass>org.sherlok.SherlokServer</mainClass>
-              <name>sherlok</name>
+              <id>sherlok</id>
             </program>
             <program>
               <mainClass>org.sherlok.utils.BundleCreatorUtil</mainClass>
-              <name>create_bundle</name>
+              <id>create_bundle</id>
             </program>
           </programs>
         </configuration>
@@ -345,7 +342,7 @@
   </build>
 
   <profiles>
-    <!-- TEST COVERAGE REPORTS, run it like: mvn clean test jacoco:report 
+    <!-- TEST COVERAGE REPORTS, run it like: mvn clean test jacoco:report
       -P test_coverage then open target/site/jacoco/index.html -->
     <profile>
       <id>test_coverage</id>

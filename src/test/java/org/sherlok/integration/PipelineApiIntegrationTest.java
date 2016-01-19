@@ -61,7 +61,7 @@ public class PipelineApiIntegrationTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         Thread.sleep(250);
-        SherlokServer.init(TEST_PORT, DEFAULT_IP, null, false);
+        SherlokServer.init(TEST_PORT, DEFAULT_IP, null, null);
         Thread.sleep(250);
     }
 

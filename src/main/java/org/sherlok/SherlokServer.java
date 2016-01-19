@@ -104,9 +104,11 @@ public class SherlokServer {
     public static final String GIT_COMMIT_ID = getGitCommitId();
     private static final String VERSION = "Sherlok Server        v. "
             + GIT_COMMIT_ID + "\n";
+
     static { // print at server startup
         System.out.println(LOGO + VERSION);
     }
+
     private static final long START = System.currentTimeMillis();
 
     /** Path to public folder */
@@ -117,17 +119,17 @@ public class SherlokServer {
 
     /** Called at server startup (main). Registers all {@link Route}s */
     public static void init(int port, String ip, String masterUrl,
-            boolean sealed) throws SherlokException {
+            String sealed) throws SherlokException {
 
         // CONFIG
         // ////////////////////////////////////////////////////////////////////////////
         final Controller controller;
         if (masterUrl != null) { // slave
-            System.out.println("Starting in SLAVE mode (master url:'"
-                    + masterUrl + "'");
+            System.out.println(
+                    "Starting in SLAVE mode (master url:'" + masterUrl + "'");
             controller = new SlaveController(masterUrl).load();
-        } else if (sealed) { // sealed
-            controller = new SealedController().load();
+        } else if (sealed != null) { // sealed
+            controller = new SealedController(sealed).load();
         } else { // master
             controller = new Controller().load();
         }
@@ -169,15 +171,13 @@ public class SherlokServer {
                     for (int i = 0; i < pipeline.getTests().size(); i++) {
                         PipelineTest test = pipeline.getTests().get(i);
                         try {
-                            String systemStr = uimaPipeline.annotate(test
-                                    .getInput());
+                            String systemStr = uimaPipeline
+                                    .annotate(test.getInput());
                             Map<String, List<JsonAnnotation>> system = SherlokTests
-                                    .assertEquals(test.getExpected(),
-                                            systemStr, test.getComparison());
-                            passed.put(
-                                    i,
-                                    map("expected", test.getExpected(),
-                                            "system", system));
+                                    .assertEquals(test.getExpected(), systemStr,
+                                            test.getComparison());
+                            passed.put(i, map("expected", test.getExpected(),
+                                    "system", system));
                         } catch (SherlokException e) {
                             isPassed = false;
                             failed.put(i, e.setWhen(test.getInput()));
@@ -191,11 +191,13 @@ public class SherlokServer {
                     }
 
                 } catch (SherlokException se) {
-                    return invalid("GET /" + TEST + " pipeline '" + req.body()
-                            + "'", se, resp);
+                    return invalid(
+                            "GET /" + TEST + " pipeline '" + req.body() + "'",
+                            se, resp);
                 } catch (Exception e) {
-                    return error("GET /" + TEST + " pipeline '" + req.body()
-                            + "'", e, resp);
+                    return error(
+                            "GET /" + TEST + " pipeline '" + req.body() + "'",
+                            e, resp);
                 }
             }
         });
@@ -213,8 +215,8 @@ public class SherlokServer {
                     checkOnlyAlphanumDotUnderscore(pipelineName,
                             "'pipeline' req parameter");
 
-                    UimaPipeline pipeline = pipelineLoader.resolvePipeline(
-                            pipelineName, version);
+                    UimaPipeline pipeline = pipelineLoader
+                            .resolvePipeline(pipelineName, version);
 
                     for (PipelineTest test : pipeline.getPipelineDef()
                             .getTests()) {
@@ -349,7 +351,8 @@ public class SherlokServer {
                     resp.type(JSON);
                     return map(STATUS, "created", "bundle_id", newId);
                 } catch (SherlokException ve) {
-                    return invalid("POST bundle '" + req.body() + "'", ve, resp);
+                    return invalid("POST bundle '" + req.body() + "'", ve,
+                            resp);
                 } catch (Exception e) {
                     return error("POST '" + req.body(), e, resp);
                 }
@@ -499,13 +502,15 @@ public class SherlokServer {
                 if (cleaner == null) {
                     return invalid(CLEAN + "/" + REMOTE_RESOURCES + "/" + type,
                             new SherlokException("unknown type")
-                                    .setObject(type), resp);
+                                    .setObject(type),
+                            resp);
                 }
 
                 if (!cleaner.clean()) {
                     return invalid(CLEAN + "/" + REMOTE_RESOURCES + "/" + type,
                             new SherlokException("failed to clean type")
-                                    .setObject(type), resp);
+                                    .setObject(type),
+                            resp);
                 }
                 pipelineLoader.clearCache();
                 resp.status(STATUS_OK);
@@ -537,8 +542,8 @@ public class SherlokServer {
         get(new JsonRoute("/" + LOGS) { // LOGS
             @Override
             public Object handle(Request req, Response resp) {
-                return map("logs", LogMessagesCache.getLogMessages(),//
-                        "sherlok_version", GIT_COMMIT_ID,//
+                return map("logs", LogMessagesCache.getLogMessages(), //
+                        "sherlok_version", GIT_COMMIT_ID, //
                         "start_time", START);
             }
         });
@@ -570,19 +575,18 @@ public class SherlokServer {
             resp.header("Access-Control-Allow-Origin", "*");
 
             long start = currentTimeMillis(); // stats
-            UimaPipeline pipeline = pipelineLoader.resolvePipeline(
-                    pipelineName, version);
+            UimaPipeline pipeline = pipelineLoader.resolvePipeline(pipelineName,
+                    version);
             long resolved = currentTimeMillis(), //
-            resolve = resolved - start;
+                    resolve = resolved - start;
             String json = pipeline.annotate(text);
             long annotate = currentTimeMillis() - resolved;
 
             // remove last '}' of json, append some stats
-            StringBuilder sb = new StringBuilder(json.substring(0,
-                    json.length() - 1));
+            StringBuilder sb = new StringBuilder(
+                    json.substring(0, json.length() - 1));
             sb.append(",\n  \"_stats\" : {\n" //
-                    + "    \"_pipeline_resolution\": " + resolve
-                    + ",\n"
+                    + "    \"_pipeline_resolution\": " + resolve + ",\n"
                     + "    \"_annotation\": " + annotate + "\n  }\n}");
 
             return sb.toString();
@@ -624,7 +628,9 @@ public class SherlokServer {
         return value;
     }
 
-    /** Ensures that no file or directory in pluginFolder can collide with API */
+    /**
+     * Ensures that no file or directory in pluginFolder can collide with API
+     */
     private static void validatePluginsNames(String pluginFolder)
             throws SherlokException {
 
@@ -634,20 +640,15 @@ public class SherlokServer {
                         + external.getAbsolutePath() + "') does not exist");
         for (File plugin : external.listFiles()) {
             if (plugin.isDirectory()) {
-                validateArgument(
-                        plugin.getName().startsWith("_"),
-                        "Plugin '"
-                                + plugin.getName()
-                                + "' must start with an underscore (to avoid collision with the REST API)");
+                validateArgument(plugin.getName().startsWith("_"), "Plugin '"
+                        + plugin.getName()
+                        + "' must start with an underscore (to avoid collision with the REST API)");
             } else {
                 if (!PUBLIC_WHITELIST.contains(plugin.getName())) {
-                    validateArgument(
-                            plugin.getName().startsWith("_"),
-                            "File  '"
-                                    + plugin.getName()
-                                    + "' in plugin directory '"
-                                    + pluginFolder
-                                    + "' must start with an underscore (to avoid collision with the REST API)");
+                    validateArgument(plugin.getName().startsWith("_"), "File  '"
+                            + plugin.getName() + "' in plugin directory '"
+                            + pluginFolder
+                            + "' must start with an underscore (to avoid collision with the REST API)");
                 }
             }
         }
@@ -742,13 +743,14 @@ public class SherlokServer {
         String address = DEFAULT_IP;
         @Parameter(names = "-master-url", description = "Turns slave mode on. Specifies master URL")
         String masterUrl = null;
-        @Parameter(names = "--sealed", description = "Turns sealed mode on.")
-        boolean sealed = false;
+        @Parameter(names = "-sealed", description = "Turns sealed mode on. Specifies allowed pipeline")
+        String sealed = null;
     }
 
     public static void main(String[] args) throws Exception {
         checkArgument(getJavaVersion() >= 1.7d,
-                "Sherlok needs at least Java 1.7, you have " + getJavaVersion());
+                "Sherlok needs at least Java 1.7, you have "
+                        + getJavaVersion());
         CliArguments argParser = new CliArguments();
         new JCommander(argParser, args);
         try {

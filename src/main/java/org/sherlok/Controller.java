@@ -136,7 +136,7 @@ public class Controller {
         return bundleDefs.values();
     }
 
-    Collection<PipelineDef> listPipelines() {
+    Collection<PipelineDef> listPipelines() throws SherlokException {
         return pipelineDefs.values();
     }
 
@@ -162,7 +162,7 @@ public class Controller {
         return engineDefs.get(engineId);
     }
 
-    PipelineDef getPipelineDef(String pipelineId) {
+    PipelineDef getPipelineDef(String pipelineId) throws SherlokException {
         return pipelineDefs.get(pipelineId);
     }
 
